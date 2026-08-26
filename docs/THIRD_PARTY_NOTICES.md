@@ -4,6 +4,7 @@
 
 | 位置 | 来源/用途 | 当前处理 |
 | --- | --- | --- |
+| `software/firmware/main-controller/` 的早期工程基础 | [XCELINE / MotorCycle](https://gitee.com/xceline566/motorcycle)，GPL-3.0 | 本项目为大幅修改后的独立仓库，保留上游归因并遵守适用的 GPL-3.0 条款 |
 | `software/firmware/main-controller/Libraries/` | Infineon AURIX TC26B iLLD、寄存器定义与平台组件 | 保留原始版权头；根据各文件原始许可证发布 |
 | `software/firmware/main-controller/user/` 与工程模板 | Infineon/ADS 工程模板 | 保留原始版权头；不纳入未来自有代码许可证 |
 | `software/firmware/drive-esc-ai8051u/` | 行进电机：逐飞科技 AI8051U 库与无刷电调工程 | 文件头说明含非商业限制，不能被仓库未来的 MIT/GPL 许可证覆盖 |

@@ -58,4 +58,10 @@ software/tools/path-tools/tools/node_coordinate_viewer.html
 
 已识别到的第三方组件和发布边界见 [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。
 
+## 致谢与上游
+
+主控工程的早期基础参考了 [XCELINE / MotorCycle](https://gitee.com/xceline566/motorcycle) 的第二十一届智能车单车定向开源项目。感谢 XCELINE 公开基础工程与文档。
+
+本仓库不是该项目的官方分支：路径复现、车辆控制、速度与姿态策略、串口协议、路径工具及上位机均已进行了大量改动和扩展。上游来源、版本与许可证边界见 [docs/UPSTREAM.md](docs/UPSTREAM.md)。
+
 `archive/` 存放本次整理前的原始导入压缩包，仅供本地追溯，已由 `.gitignore` 排除。
