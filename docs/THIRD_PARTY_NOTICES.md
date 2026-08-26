@@ -6,8 +6,8 @@
 | --- | --- | --- |
 | `software/firmware/main-controller/Libraries/` | Infineon AURIX TC26B iLLD、寄存器定义与平台组件 | 保留原始版权头；根据各文件原始许可证发布 |
 | `software/firmware/main-controller/user/` 与工程模板 | Infineon/ADS 工程模板 | 保留原始版权头；不纳入未来自有代码许可证 |
-| `software/firmware/esc-ai8051u/libraries/` | 逐飞科技 AI8051U 库 | 保留原始版权头；发布前核实再分发许可 |
-| `software/firmware/esc-ai8051u/bldc/` | 基于逐飞科技的无刷电调工程 | 文件头说明含非商业限制，不能被仓库未来的 MIT/GPL 许可证覆盖 |
+| `software/firmware/drive-esc-ai8051u/` | 行进电机：逐飞科技 AI8051U 库与无刷电调工程 | 文件头说明含非商业限制，不能被仓库未来的 MIT/GPL 许可证覆盖 |
+| `software/firmware/suction-esc-ai8051u/` | 负压电机：逐飞科技 AI8051U 库与无刷电调工程 | 文件头说明含非商业限制，不能被仓库未来的 MIT/GPL 许可证覆盖 |
 | `software/tools/PathCapture/` | 本项目上位机与网页工具 | 作者需确认所有文件均为自有或兼容许可后再授权 |
 | `software/tools/path-tools/` | 本项目节点规划与路径查看工具 | 作者需确认所有文件均为自有或兼容许可后再授权 |
 

@@ -11,7 +11,8 @@
 ├── software/
 │   ├── firmware/
 │   │   ├── main-controller/ # TC2xx 主控：惯导、路径、速度和姿态控制
-│   │   └── esc-ai8051u/     # AI8051U 无刷电调控制
+│   │   ├── drive-esc-ai8051u/   # 行进电机 AI8051U 电调
+│   │   └── suction-esc-ai8051u/ # 负压电机 AI8051U 电调
 │   └── tools/
 │       ├── PathCapture/     # 串口上位机、路径上传与复现数据可视化
 │       └── path-tools/      # 节点坐标规划器、路径日志查看器

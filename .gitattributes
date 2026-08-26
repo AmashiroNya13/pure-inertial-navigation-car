@@ -9,3 +9,7 @@
 *.h whitespace=-trailing-space,-blank-at-eof
 *.asm whitespace=-trailing-space,-blank-at-eof
 *.A51 whitespace=-trailing-space,-blank-at-eof
+*.txt whitespace=-trailing-space,-blank-at-eof
+
+# Do not reformat imported vendor firmware as part of repository maintenance.
+software/firmware/** whitespace=-trailing-space,-space-before-tab,-blank-at-eof
