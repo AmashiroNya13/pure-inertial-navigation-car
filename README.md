@@ -4,7 +4,10 @@
 
 > 安全提示：本项目涉及高速电机、无刷电调、负压和移动平台。首次使用必须架空车辆，使用保守的速度与加速度参数，并确认急停可用。
 
-> **重要文档**：[纯惯导软件设计说明](docs/INERTIAL_NAVIGATION_SOFTWARE.md) 介绍本项目的 IMU、编码器、双自由度角度环、速度前馈、路径与修正思路。
+> **重要文档**：
+> - [纯惯导软件设计说明](docs/INERTIAL_NAVIGATION_SOFTWARE.md)：IMU、编码器、双自由度角度环、速度前馈、路径与修正思路。
+> - [纯惯导机械设计说明](docs/INERTIAL_NAVIGATION_MECHANICAL.md)：电机、负压、结构、减振、底盘和装配经验。
+> - [纯惯导硬件设计说明](docs/INERTIAL_NAVIGATION_HARDWARE.md)：电调、双 IMU、屏蔽、编码器连接和后续硬件方向。
 
 ## 目录
 
