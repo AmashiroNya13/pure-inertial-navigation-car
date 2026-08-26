@@ -1,0 +1,79 @@
+#ifndef MAD_CIRCUITS_DRIVER_DMA_H
+#define MAD_CIRCUITS_DRIVER_DMA_H
+
+#include "IfxDma_Dma.h"
+
+#define DMA_CHANNEL_MAGNETIC_ENCODER1_GTM_ATOM_TIMER_TO_QSPI IfxDma_ChannelId_5
+#define DMA_CHANNEL_MAGNETIC_ENCODER2_GTM_ATOM_TIMER_TO_QSPI IfxDma_ChannelId_6
+#define DMA_CHANNEL_MAGNETIC_ENCODER1_QSPI_TO_INTERRUPT IfxDma_ChannelId_7
+#define DMA_CHANNEL_MAGNETIC_ENCODER2_QSPI_TO_INTERRUPT IfxDma_ChannelId_8
+
+#define DMA_CHANNEL_PHOTOTUBE_GROUP0_EVADC_TO_INTERRUPT IfxDma_ChannelId_9
+#define DMA_CHANNEL_PHOTOTUBE_GROUP1_EVADC_TO_INTERRUPT IfxDma_ChannelId_17
+#define DMA_CHANNEL_PHOTOTUBE_GROUP2_EVADC_TO_INTERRUPT IfxDma_ChannelId_23
+
+#define DMA_CHANNEL_TASK1_INTERRUPT IfxDma_ChannelId_25
+#define DMA_CHANNEL_TASK2_INTERRUPT IfxDma_ChannelId_26
+#define DMA_CHANNEL_TASK3_INTERRUPT IfxDma_ChannelId_27
+#define DMA_CHANNEL_TASK4_INTERRUPT IfxDma_ChannelId_28
+#define DMA_CHANNEL_TASK5_INTERRUPT IfxDma_ChannelId_29
+#define DMA_CHANNEL_TASK6_INTERRUPT IfxDma_ChannelId_30
+#define DMA_CHANNEL_TASK7_INTERRUPT IfxDma_ChannelId_31
+#define DMA_CHANNEL_TASK8_INTERRUPT IfxDma_ChannelId_32
+
+#define DMA_CHANNEL_CARRIER1 IfxDma_ChannelId_33
+#define DMA_CHANNEL_CARRIER2 IfxDma_ChannelId_34
+#define DMA_CHANNEL_CARRIER3 IfxDma_ChannelId_35
+#define DMA_CHANNEL_CARRIER4 IfxDma_ChannelId_36
+#define DMA_CHANNEL_CARRIER5 IfxDma_ChannelId_37
+#define DMA_CHANNEL_CARRIER6 IfxDma_ChannelId_38
+#define DMA_CHANNEL_CARRIER7 IfxDma_ChannelId_39
+#define DMA_CHANNEL_CARRIER8 IfxDma_ChannelId_40
+
+
+
+#define DMA_PRIORITY_MAGNETIC_ENCODER1_GTM_ATOM_TIMER_TO_QSPI IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_MAGNETIC_ENCODER2_GTM_ATOM_TIMER_TO_QSPI IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_MAGNETIC_ENCODER1_QSPI_TO_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_MAGNETIC_ENCODER2_QSPI_TO_INTERRUPT IfxDma_ChannelBusPriority_medium
+
+#define DMA_PRIORITY_PHOTOTUBE_GROUP0_EVADC_TO_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_PHOTOTUBE_GROUP1_EVADC_TO_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_PHOTOTUBE_GROUP2_EVADC_TO_INTERRUPT IfxDma_ChannelBusPriority_medium
+
+#define DMA_PRIORITY_TASK1_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK2_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK3_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK4_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK5_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK6_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK7_INTERRUPT IfxDma_ChannelBusPriority_medium
+#define DMA_PRIORITY_TASK8_INTERRUPT IfxDma_ChannelBusPriority_medium
+
+#define DMA_PRIORITY_CARRIER1 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER2 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER3 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER4 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER5 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER6 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER7 IfxDma_ChannelBusPriority_low
+#define DMA_PRIORITY_CARRIER8 IfxDma_ChannelBusPriority_low
+
+typedef struct
+{
+    Ifx_DMA* dma_module;
+    IfxDma_Dma_Config dma_modulecfg;
+    IfxDma_Dma_ChannelConfig dma_channelcfg;
+} driver_dma_cfg_t;
+
+typedef struct
+{
+    IfxDma_Dma dma_modulehn;
+    IfxDma_Dma_Channel dma_channelhn;
+} driver_dma_runtime_t;
+
+void driver_dma_init(driver_dma_cfg_t* dma_cfg, driver_dma_runtime_t* dma_runtime);
+void driver_dma_setSourceDestinationAddress(driver_dma_runtime_t* dma_runtime, uint32 source_address, uint32 destination_address);
+void driver_dma_start(driver_dma_runtime_t* dma_runtime);
+
+#endif

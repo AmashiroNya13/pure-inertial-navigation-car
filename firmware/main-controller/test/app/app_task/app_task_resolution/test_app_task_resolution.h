@@ -1,0 +1,40 @@
+#ifndef TEST_APP_TASK_RESOLUTION_H
+#define TEST_APP_TASK_RESOLUTION_H
+
+void app_test_app_task_resolution_imu_1_callback(void);
+void app_test_app_task_resolution_imu_2_callback(void);
+
+void app_test_app_task_resolution_magnetic_encoder_1_callback(void);
+void app_test_app_task_resolution_magnetic_encoder_2_callback(void);
+
+void app_test_app_task_resolution_esc_1_callback(void);
+void app_test_app_task_resolution_esc_2_callback(void);
+void app_test_app_task_resolution_esc_3_callback(void);
+
+void app_test_app_task_resolution_phototube_1_callback(void);
+void app_test_app_task_resolution_phototube_2_callback(void);
+void app_test_app_task_resolution_phototube_3_callback(void);
+void app_test_app_task_resolution_phototube_4_callback(void);
+void app_test_app_task_resolution_phototube_5_callback(void);
+void app_test_app_task_resolution_phototube_6_callback(void);
+void app_test_app_task_resolution_phototube_7_callback(void);
+void app_test_app_task_resolution_phototube_8_callback(void);
+void app_test_app_task_resolution_phototube_9_callback(void);
+void app_test_app_task_resolution_phototube_10_callback(void);
+void app_test_app_task_resolution_phototube_11_callback(void);
+void app_test_app_task_resolution_phototube_12_callback(void);
+void app_test_app_task_resolution_phototube_13_callback(void);
+void app_test_app_task_resolution_phototube_14_callback(void);
+void app_test_app_task_resolution_phototube_15_callback(void);
+void app_test_app_task_resolution_phototube_16_callback(void);
+
+void app_test_app_task_resolution_carrier_1_callback(void);
+void app_test_app_task_resolution_carrier_2_callback(void);
+void app_test_app_task_resolution_carrier_3_callback(void);
+void app_test_app_task_resolution_carrier_4_callback(void);
+void app_test_app_task_resolution_carrier_5_callback(void);
+void app_test_app_task_resolution_carrier_6_callback(void);
+void app_test_app_task_resolution_carrier_7_callback(void);
+void app_test_app_task_resolution_carrier_8_callback(void);
+
+#endif

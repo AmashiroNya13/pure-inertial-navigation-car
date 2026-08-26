@@ -1,0 +1,6 @@
+#ifndef TEST_APP_TASK_ASYNCHRONOUS_PHOTOTUBE_H
+#define TEST_APP_TASK_ASYNCHRONOUS_PHOTOTUBE_H
+
+void app_test_app_task_asynchronous_phototube_print_all(void);
+
+#endif

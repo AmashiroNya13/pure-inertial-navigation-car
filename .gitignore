@@ -1,0 +1,34 @@
+# Local archives and generated data
+archive/
+*.log
+*.dat
+*.pyc
+__pycache__/
+.pytest_cache/
+venv/
+.venv/
+
+# Python and JavaScript tooling
+.coverage
+htmlcov/
+node_modules/
+
+# IDE and build output
+.vscode/
+.idea/
+build/
+Debug/
+Release/
+*.elf
+*.hex
+*.map
+
+# Local capture data
+software/PathCapture/data/
+
+# Vendor reference PDFs remain in the local source project.
+firmware/main-controller/docs/datasheets/
+
+# OS files
+.DS_Store
+Thumbs.db

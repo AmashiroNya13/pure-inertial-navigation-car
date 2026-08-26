@@ -1,0 +1,26 @@
+{
+  "unit": "mm",
+  "start_node_id": 1,
+  "nodes": [
+    {"id": 1, "name": "起点", "x_mm": 1000, "y_mm": 500, "type": "start"},
+    {"id": 2, "name": "第一弯", "x_mm": 1000, "y_mm": 1500, "type": "turn"},
+    {"id": 3, "name": "第二弯", "x_mm": 1550, "y_mm": 1500, "type": "turn"},
+    {"id": 4, "name": "终点", "x_mm": 1550, "y_mm": 500, "type": "end"}
+  ],
+  "original_links": [
+    {"from": 1, "to": 2}, {"from": 2, "to": 3}, {"from": 3, "to": 4}, {"from": 4, "to": 1}
+  ],
+  "computed_shortest_route": {
+    "distance_mm": 2550,
+    "full_path_node_ids": [1, 2, 3, 4],
+    "full_path_node_names": ["起点", "第一弯", "第二弯", "终点"],
+    "speed_segments": [
+      {"turn_node_id": 2, "speed_mps": 1.5, "radius_m": 0.2, "points_mm": [
+        {"x": 1000, "y": 500}, {"x": 1000, "y": 1200}, {"x": 1050, "y": 1400}, {"x": 1200, "y": 1500}
+      ]},
+      {"turn_node_id": 3, "speed_mps": 1.2, "radius_m": 0.2, "points_mm": [
+        {"x": 1200, "y": 1500}, {"x": 1400, "y": 1500}, {"x": 1550, "y": 1400}, {"x": 1550, "y": 500}
+      ]}
+    ]
+  }
+}

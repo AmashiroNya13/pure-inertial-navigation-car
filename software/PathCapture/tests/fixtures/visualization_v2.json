@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "saved_at": "2026-08-08T00:00:00",
+  "predefined": [
+    {"x": 0, "y": 0, "index": 0, "speed_mm_s": 500},
+    {"x": 100, "y": 0, "index": 1, "speed_mm_s": 2500},
+    {"x": 200, "y": 50, "index": 2, "speed_mm_s": 1800}
+  ],
+  "realtime": [
+    {"id": 1, "x": 0, "y": 5, "theta_deg": 0, "target_x_mm": 100, "target_y_mm": 0, "target_index": 1, "cross_track_error_mm": 5, "raw_plan_speed_mm_s": 500, "target_speed_mm_s": 500, "target_left_speed_mm_s": 500, "target_right_speed_mm_s": 500, "actual_left_speed_mm_s": 480, "actual_right_speed_mm_s": 490, "target_left_pwm": 2100, "target_right_pwm": 2100, "actual_left_pwm": 2120, "actual_right_pwm": 2110, "launch_phase": 1},
+    {"id": 2, "x": 100, "y": 8, "theta_deg": 8, "target_x_mm": 200, "target_y_mm": 50, "target_index": 2, "cross_track_error_mm": 8, "raw_plan_speed_mm_s": 2500, "target_speed_mm_s": 2400, "target_left_speed_mm_s": 2200, "target_right_speed_mm_s": 2600, "actual_left_speed_mm_s": 2160, "actual_right_speed_mm_s": 2540, "target_left_pwm": 6200, "target_right_pwm": 7100, "actual_left_pwm": 6250, "actual_right_pwm": 7050, "launch_phase": 0, "sample_dt_ms": 20, "target_theta_deg": 12, "angle_error_deg": 4, "target_yaw_rate_deg_s": 85, "yaw_rate_deg_s": 78, "effective_yaw_correction_mm_s": 200, "lookahead_distance_mm": 180, "base_x_mm": 95, "base_y_mm": 0, "tangent_x_mm": 220, "tangent_y_mm": 60}
+  ],
+  "lookahead": [
+    {"id": 1, "x": 100, "y": 0, "role": "target"},
+    {"id": 2, "x": 200, "y": 50, "role": "target"}
+  ]
+}

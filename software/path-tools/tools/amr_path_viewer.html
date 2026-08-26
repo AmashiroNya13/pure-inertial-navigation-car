@@ -1,0 +1,1345 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AMR Path Viewer</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f3f1ec;
+    --panel: #fffdf9;
+    --line: #ddd6ca;
+    --text: #202124;
+    --muted: #666b72;
+    --blue: #1f6fb2;
+    --green: #159447;
+    --red: #cf3030;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 22px;
+  }
+
+  h1 {
+    margin: 0 0 14px;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .dropzone {
+    display: grid;
+    place-items: center;
+    min-height: 150px;
+    border: 2px dashed #a9a196;
+    border-radius: 8px;
+    background: #faf7f1;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .dropzone.dragover {
+    border-color: var(--blue);
+    background: #edf5fc;
+    color: var(--blue);
+  }
+
+  .dropzone strong {
+    display: block;
+    color: var(--text);
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 14px;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .quick-command-title {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  button, select, input[type="number"] {
+    height: 34px;
+    border: 1px solid #bfb6a8;
+    border-radius: 6px;
+    background: white;
+    color: var(--text);
+    padding: 0 10px;
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button.active {
+    border-color: var(--blue);
+    background: #e7f1fb;
+    color: #155b95;
+  }
+
+  .layer-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 9px;
+    border: 1px solid #d5cec3;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 13px;
+  }
+
+  .layer-toggle input { margin: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) 1fr;
+    gap: 14px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th, td {
+    border-bottom: 1px solid #eee8df;
+    padding: 7px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    width: 145px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .path-wrap {
+    overflow: hidden;
+    position: relative;
+  }
+
+  svg.path {
+    width: 100%;
+    height: 68vh;
+    min-height: 460px;
+    display: block;
+    border: 1px solid #e2dbd0;
+    background: #fbfbf8;
+  }
+
+  .readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    min-height: 34px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border: 1px solid #e2dbd0;
+    border-radius: 6px;
+    background: #fbfbf8;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .readout span {
+    color: var(--muted);
+  }
+
+  .readout b {
+    font-weight: 650;
+    color: #0d4d7d;
+  }
+
+  .correction-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    margin-top: 10px;
+    padding: 9px 10px;
+    border: 1px solid #d6d0c6;
+    border-left: 7px solid #8a8f98;
+    border-radius: 6px;
+    background: #f7f7f5;
+    color: #34373b;
+    font-size: 13px;
+  }
+
+  .correction-status[data-state="waiting"] { border-left-color: #d28a00; background: #fff8e7; }
+  .correction-status[data-state="observing"] { border-left-color: #2675b8; background: #eef6fd; }
+  .correction-status[data-state="applied"] { border-left-color: #159447; background: #eefaf1; }
+  .correction-status[data-state="fault"] { border-left-color: #c53030; background: #fff0f0; }
+  .correction-status strong { font-weight: 700; }
+  .correction-status span { color: #666b72; }
+
+  svg.speed {
+    width: 100%;
+    height: 220px;
+    display: block;
+    border: 1px solid #e2dbd0;
+    background: #fbfbf8;
+  }
+
+  .message {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .warn {
+    color: #9b4f00;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (max-width: 880px) {
+    main { padding: 14px; }
+    .grid { grid-template-columns: 1fr; }
+    svg.path { height: 58vh; min-height: 360px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>AMR Path Viewer</h1>
+
+  <label id="dropzone" class="dropzone">
+    <input id="fileInput" type="file" accept=".dat,.txt,.log,.csv" hidden />
+    <span>
+      <strong>把串口日志文件拖到这里</strong>
+      支持 {path} 录制路径、{pathdump} raw/planned 导出路径和速度规划
+    </span>
+  </label>
+
+  <section class="panel">
+    <div class="quick-command-title">串口快捷命令</div>
+    <div class="controls">
+      <label class="layer-toggle" title="主控仅允许停车时修改"><span>轮周长</span><input id="wheelCircumferenceInput" type="number" min="50" max="150" step="0.1" value="93.9" />mm</label>
+      <button id="copyWheelCircumferenceBtn" type="button" title="复制 vwcirc 轮周长；主控仅允许停车时修改">复制轮周长命令</button>
+      <button id="copyWheelCircumferenceStatusBtn" type="button" title="复制当前轮周长查询命令">查询轮周长</button>
+    </div>
+  </section>
+
+  <section id="controlsPanel" class="panel hidden">
+    <div class="controls">
+      <button id="modeAuto" type="button" class="active">自动</button>
+      <button id="modePath" type="button">最后录制 {path}</button>
+      <button id="modePlanned" type="button">规划 {pathdump planned}</button>
+      <button id="modeRawDump" type="button">导出 {pathdump raw}</button>
+      <select id="segmentSelect" title="选择识别到的数据段"></select>
+      <label class="layer-toggle"><input id="showTurnSlip" type="checkbox" checked />弯道滑移</label>
+      <label class="layer-toggle"><input id="showAccelSlip" type="checkbox" checked />加速滑移</label>
+      <label class="layer-toggle"><input id="showPhotoCorrection" type="checkbox" checked />光电修正</label>
+    </div>
+    <div id="correctionStatus" class="correction-status" data-state="off">
+      <strong>Phototube correction: no data</strong>
+    </div>
+  </section>
+
+  <section id="summaryPanel" class="panel hidden">
+    <div class="grid">
+      <div>
+        <table id="summaryTable"></table>
+      </div>
+      <div id="notes" class="message"></div>
+    </div>
+  </section>
+
+  <section id="pathPanel" class="panel hidden path-wrap">
+    <div id="pathReadout" class="readout">
+      <span>鼠标</span>移动到图上查看厘米坐标
+      <span>最近点</span>-
+    </div>
+    <div id="pathSvg"></div>
+  </section>
+
+  <section id="speedPanel" class="panel hidden">
+    <div id="speedSvg"></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const state = {
+  fileName: "",
+  dataSets: [],
+  mode: "auto",
+  selectedKey: "",
+  renderedPoints: [],
+  phototube: null,
+  events: { turnSlip: [], accelSlip: [], phototube: [] },
+  layers: { turnSlip: true, accelSlip: true, phototube: true },
+};
+
+const rawFields = [
+  "x_mm",
+  "y_mm",
+  "theta_deg",
+  "index",
+  "record_distance_mm",
+  "left_total_distance_mm",
+  "right_total_distance_mm",
+  "left_total_count",
+  "right_total_count",
+  "lr_diff_mm",
+  "encoder_theta_deg",
+  "left_sample_count",
+  "right_sample_count",
+  "pose_update_count",
+  "encoder_update_count",
+];
+
+  const $ = (id) => document.getElementById(id);
+
+  async function copySerialCommand(command, button) {
+    try {
+      await navigator.clipboard.writeText(command);
+      const originalText = button.textContent;
+      button.textContent = `已复制: ${command}`;
+      window.setTimeout(() => { button.textContent = originalText; }, 1400);
+    } catch (_) {
+      window.prompt("复制以下串口命令", command);
+    }
+  }
+
+function parseRecords(text) {
+  const records = [];
+  const re = /\{([^}]+)\}/g;
+  const matches = [];
+  let match;
+  while ((match = re.exec(text)) !== null) {
+    matches.push({ prefix: match[1], start: match.index, end: re.lastIndex });
+  }
+  for (let i = 0; i < matches.length; i++) {
+    const bodyStart = matches[i].end;
+    const bodyEnd = i + 1 < matches.length ? matches[i + 1].start : text.length;
+    const body = text.slice(bodyStart, bodyEnd).replace(/\s+/g, "");
+    records.push({ prefix: matches[i].prefix, body });
+  }
+  return records;
+}
+
+function parseNumberList(body) {
+  if (!body || body.includes("{") || body.includes("}")) {
+    return null;
+  }
+  const parts = body.split(",");
+  const values = [];
+  for (const part of parts) {
+    if (part === "") return null;
+    const value = Number(part);
+    if (!Number.isFinite(value)) return null;
+    values.push(value);
+  }
+  return values;
+}
+
+function parsePhototube(records) {
+  const result = {
+    lastStatus: null,
+    lastData: null,
+    dataCount: 0,
+    appliedCount: 0,
+    segmentCount: 0,
+    events: [],
+  };
+
+  for (const record of records) {
+    if (record.prefix === "ptcorrseg") {
+      const values = parseNumberList(record.body);
+      if (values && values.length >= 11) {
+        const segmentId = result.segmentCount++;
+        const common = {
+          type: "phototube", confidence: values[10],
+          correctionX: values[6], correctionY: values[7],
+          sampleCount: values[9], peakStep: values[8], segment: true,
+          segmentId, startIndex: values[0], endIndex: values[1],
+          startX: values[2], startY: values[3], endX: values[4], endY: values[5],
+        };
+        result.events.push({ ...common, pathIndex: values[0], x_mm: values[2], y_mm: values[3], segmentEdge: "start" });
+        result.events.push({ ...common, pathIndex: values[1], x_mm: values[4], y_mm: values[5], segmentEdge: "end" });
+        result.appliedCount += values[9];
+      }
+      continue;
+    }
+    if (record.prefix === "ptcorrevt") {
+      const values = parseNumberList(record.body);
+      if (values && values.length >= 6) {
+        result.events.push({
+          type: "phototube", pathIndex: values[0], x_mm: values[1], y_mm: values[2],
+          confidence: values[3], correctionX: values[4], correctionY: values[5],
+        });
+        result.appliedCount += 1;
+      }
+      continue;
+    }
+    if (record.prefix !== "ptcorr") continue;
+    const parts = record.body.split(",");
+    if (parts[0] === "enable") {
+      const status = {};
+      for (let i = 0; i + 1 < parts.length; i += 2) {
+        if (parts[i] && parts[i + 1] !== "") status[parts[i]] = parts[i + 1];
+      }
+      result.lastStatus = status;
+      continue;
+    }
+    if (parts.length < 4 || !/^[01]$/.test(parts[0]) || !/^[01]$/.test(parts[1])) continue;
+    const data = {
+      enable: Number(parts[0]),
+      applied: Number(parts[1]),
+      lineValid: Number(parts[2]),
+      projectionValid: Number(parts[3]),
+      correctionX: Number(parts[15]),
+      correctionY: Number(parts[16]),
+      pathIndex: Number(parts[9]),
+      projectionX: Number(parts[10]),
+      projectionY: Number(parts[11]),
+      confidence: Number(parts[5]),
+    };
+    result.lastData = data;
+    result.dataCount += 1;
+    if (data.applied === 1 && !records.some((item) => item.prefix === "ptcorrevt" || item.prefix === "ptcorrseg")) {
+      result.appliedCount += 1;
+      result.events.push({
+        type: "phototube",
+        pathIndex: data.pathIndex,
+        x_mm: data.projectionX,
+        y_mm: data.projectionY,
+        confidence: data.confidence,
+        correctionX: data.correctionX,
+        correctionY: data.correctionY,
+      });
+    }
+  }
+  return result;
+}
+
+function parseSlipEvents(records) {
+  const result = { turnSlip: [], accelSlip: [] };
+  for (const record of records) {
+    const values = parseNumberList(record.body);
+    if (!values) continue;
+    if (record.prefix === "vslipevt" && values.length >= 9) {
+      result.turnSlip.push({
+        type: "turnSlip", eventId: values[0], pathIndex: values[1],
+        x_mm: values[2], y_mm: values[3], ratio: values[4],
+        encoderTurnDeg: values[5], imuTurnDeg: values[6],
+        pendingMm: values[7], totalMm: values[8],
+      });
+    } else if (record.prefix === "vslipacc" && values.length >= 8 && (values[1] === 1 || values[1] === 2)) {
+      result.accelSlip.push({
+        type: "accelSlip", eventId: values[0], state: values[1], pathIndex: values[2],
+        x_mm: values[3], y_mm: values[4], encoderAccel: values[5],
+        imuAccel: values[6], ratio: values[7],
+      });
+    }
+  }
+  return result;
+}
+
+function renderPhototubeStatus() {
+  const element = $("correctionStatus");
+  const photo = state.phototube;
+  if (!element || !photo || (!photo.lastStatus && !photo.lastData)) {
+    if (element) {
+      element.dataset.state = "off";
+      element.innerHTML = "<strong>Phototube correction: no data</strong>";
+    }
+    return;
+  }
+
+  const status = photo.lastStatus || {};
+  const data = photo.lastData || {};
+  const enabled = Number(status.enable ?? data.enable ?? 0) === 1;
+  const actual = Number(status.actual ?? 0) === 1;
+  const allow = Number(status.allow ?? 0) === 1;
+  const applied = data.applied === 1;
+  let stateName = "off";
+  let label = "OFF";
+  if (enabled && !actual) {
+    stateName = "fault";
+    label = "ON / HARDWARE OFF";
+  } else if (enabled && applied) {
+    stateName = "applied";
+    label = "APPLIED";
+  } else if (enabled && actual && allow) {
+    stateName = "observing";
+    label = "READY, NO CORRECTION IN LAST SAMPLE";
+  } else if (enabled && actual) {
+    stateName = "waiting";
+    label = "POWERED, WAITING FOR ALLOW";
+  }
+
+  const xy = Number.isFinite(data.correctionX) && Number.isFinite(data.correctionY)
+    ? `dx=${data.correctionX.toFixed(3)} mm, dy=${data.correctionY.toFixed(3)} mm`
+    : "dx=?, dy=?";
+  element.dataset.state = stateName;
+  element.innerHTML = `<strong>Phototube correction: ${label}</strong>`
+    + `<span>enable=${enabled ? 1 : 0}</span>`
+    + `<span>actual=${actual ? 1 : 0}</span>`
+    + `<span>allow=${allow ? 1 : 0}</span>`
+    + `<span>last=${applied ? 1 : 0}</span>`
+    + `<span>${xy}</span>`
+    + `<span>applied samples=${photo.appliedCount}/${photo.dataCount}</span>`
+    + `<span>correction segments=${photo.segmentCount || 0}</span>`;
+}
+
+function parsePathSegments(records) {
+  const segments = [];
+  let current = [];
+  let lastIndex = null;
+
+  for (const record of records) {
+    if (record.prefix !== "path") continue;
+    const values = parseNumberList(record.body);
+    if (!values || values.length < rawFields.length) continue;
+
+    const point = {};
+    rawFields.forEach((name, index) => {
+      point[name] = values[index];
+    });
+    point.index = Math.round(point.index);
+    point.theta_rad = point.theta_deg * Math.PI / 180;
+
+    if (current.length && lastIndex !== null && point.index <= lastIndex) {
+      segments.push(current);
+      current = [];
+    }
+    current.push(point);
+    lastIndex = point.index;
+  }
+
+  if (current.length) segments.push(current);
+  return segments;
+}
+
+function parseDumpBlocks(records) {
+  const blocks = [];
+  let slot = "unknown";
+  let current = null;
+
+  for (const record of records) {
+    if (record.prefix !== "pathdump") continue;
+
+    if (record.body.startsWith("slot,")) {
+      slot = record.body.slice(5);
+      continue;
+    }
+
+    if (record.body.startsWith("begin,")) {
+      if (current && current.points.length) blocks.push(current);
+      current = {
+        kind: "dump",
+        slot,
+        declaredCount: Number(record.body.slice(6)),
+        points: [],
+      };
+      continue;
+    }
+
+    if (record.body.startsWith("length,") && current) {
+      current.declaredLengthMm = Number(record.body.slice(7));
+      continue;
+    }
+
+    if (record.body.startsWith("end,")) {
+      if (current) blocks.push(current);
+      current = null;
+      continue;
+    }
+
+    if (!current) continue;
+    const values = parseNumberList(record.body);
+    if (!values || values.length < 5) continue;
+
+    current.points.push({
+      index: Math.round(values[0]),
+      x_mm: values[1],
+      y_mm: values[2],
+      theta_rad: values[3],
+      theta_deg: values[3] * 180 / Math.PI,
+      speed_mm_s: values[4],
+    });
+  }
+
+  if (current && current.points.length) blocks.push(current);
+  return blocks;
+}
+
+function parsePathPlan(records) {
+  const plans = [];
+  for (const record of records) {
+    if (record.prefix !== "pathplan" || !record.body.startsWith("done,")) continue;
+    const values = parseNumberList(record.body.slice(5));
+    if (!values || values.length < 3) continue;
+    plans.push({
+      pointCount: values[0],
+      minSpeed: values[1],
+      maxSpeed: values[2],
+    });
+  }
+  return plans;
+}
+
+function distance(a, b) {
+  return Math.hypot(a.x_mm - b.x_mm, a.y_mm - b.y_mm);
+}
+
+function pathLength(points) {
+  let length = 0;
+  for (let i = 1; i < points.length; i++) {
+    length += distance(points[i - 1], points[i]);
+  }
+  return length;
+}
+
+function flattenSegments(segments) {
+  return segments.flatMap((segment) => segment);
+}
+
+function segmentedLength(segments) {
+  return segments.reduce((sum, segment) => sum + pathLength(segment), 0);
+}
+
+function median(values) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) * 0.5;
+}
+
+function pointLooksUsable(point, kind) {
+  if (!Number.isFinite(point.x_mm) || !Number.isFinite(point.y_mm)) return false;
+  if (!Number.isFinite(point.theta_rad) || Math.abs(point.theta_rad) > 10) return false;
+  if (kind === "dump") {
+    if (!Number.isFinite(point.speed_mm_s)) return false;
+    if (point.speed_mm_s < 0 || point.speed_mm_s > 6000) return false;
+  }
+  return true;
+}
+
+function prepareDrawableData(dataSet) {
+  const warnings = [];
+  const usable = [];
+  let badSpeed = 0;
+  let badTheta = 0;
+  let badNumber = 0;
+
+  for (const point of dataSet.points) {
+    if (!Number.isFinite(point.x_mm) || !Number.isFinite(point.y_mm)) {
+      badNumber++;
+      continue;
+    }
+    if (!Number.isFinite(point.theta_rad) || Math.abs(point.theta_rad) > 10) {
+      badTheta++;
+      continue;
+    }
+    if (dataSet.kind === "dump"
+        && (!Number.isFinite(point.speed_mm_s) || point.speed_mm_s < 0 || point.speed_mm_s > 6000)) {
+      badSpeed++;
+      continue;
+    }
+    usable.push(point);
+  }
+
+  const normalSteps = [];
+  for (let i = 1; i < usable.length; i++) {
+    const prev = usable[i - 1];
+    const cur = usable[i];
+    const indexGap = Math.abs((cur.index ?? i) - (prev.index ?? (i - 1)));
+    const step = distance(prev, cur);
+    if (indexGap <= 2 && step > 0.01 && step < 80) {
+      normalSteps.push(step);
+    }
+  }
+
+  const typicalStep = median(normalSteps) || 5;
+  const jumpLimit = dataSet.kind === "dump"
+    ? Math.max(45, typicalStep * 8)
+    : Math.max(80, typicalStep * 12);
+  const indexGapLimit = dataSet.kind === "dump" ? 8 : 20;
+  const segments = [];
+  let current = [];
+  let jumpBreaks = 0;
+  let droppedShort = 0;
+
+  for (const point of usable) {
+    if (current.length) {
+      const prev = current[current.length - 1];
+      const step = distance(prev, point);
+      const indexGap = Math.abs((point.index ?? 0) - (prev.index ?? 0));
+      if (step > jumpLimit || indexGap > indexGapLimit) {
+        if (current.length >= 2) {
+          segments.push(current);
+        } else {
+          droppedShort += current.length;
+        }
+        current = [];
+        jumpBreaks++;
+      }
+    }
+    current.push(point);
+  }
+
+  if (current.length >= 2) {
+    segments.push(current);
+  } else {
+    droppedShort += current.length;
+  }
+
+  const points = flattenSegments(segments);
+  const declaredCount = Number(dataSet.meta?.declaredCount);
+
+  if (Number.isFinite(declaredCount) && declaredCount > 0 && dataSet.points.length < declaredCount * 0.9) {
+    warnings.push(`导出不完整：声明 ${declaredCount} 点，但只解析到 ${dataSet.points.length} 点`);
+  }
+  if (badSpeed) warnings.push(`已丢弃速度异常点 ${badSpeed} 个`);
+  if (badTheta) warnings.push(`已丢弃角度异常点 ${badTheta} 个`);
+  if (badNumber) warnings.push(`已丢弃数字异常点 ${badNumber} 个`);
+  if (jumpBreaks) warnings.push(`检测到断包/跳点 ${jumpBreaks} 处，点图已按连续片段过滤`);
+  if (droppedShort) warnings.push(`已丢弃孤立碎片点 ${droppedShort} 个`);
+  if (points.length < 2) warnings.push("可用点不足，无法可靠绘图");
+
+  return {
+    segments,
+    points,
+    warnings,
+    rawCount: dataSet.points.length,
+    visibleCount: points.length,
+    typicalStep,
+    jumpLimit,
+  };
+}
+
+function dataQuality(points, kind) {
+  const warnings = [];
+  let badSpeed = 0;
+  let bigJump = 0;
+  let badTheta = 0;
+  let previous = null;
+
+  for (const point of points) {
+    if ("speed_mm_s" in point && (point.speed_mm_s < -1 || point.speed_mm_s > 6000)) {
+      badSpeed++;
+    }
+    if (Math.abs(point.theta_rad ?? 0) > 10) {
+      badTheta++;
+    }
+    if (previous && distance(previous, point) > 60) {
+      bigJump++;
+    }
+    previous = point;
+  }
+
+  if (badSpeed) warnings.push(`速度异常点 ${badSpeed} 个，可能串口丢包/粘包`);
+  if (bigJump && kind === "dump") warnings.push(`相邻点跳变 ${bigJump} 次，导出可能不完整`);
+  if (badTheta) warnings.push(`角度异常点 ${badTheta} 个`);
+  return warnings;
+}
+
+function buildDataSets(text, fileName) {
+  const records = parseRecords(text);
+  const dataSets = [];
+  const rawSegments = parsePathSegments(records);
+  const dumpBlocks = parseDumpBlocks(records);
+  const plans = parsePathPlan(records);
+
+  rawSegments.forEach((points, index) => {
+    dataSets.push({
+      key: `path-${index}`,
+      mode: "path",
+      label: `{path} 录制段 ${index + 1}/${rawSegments.length}`,
+      kind: "path",
+      slot: "",
+      points,
+      meta: {},
+    });
+  });
+
+  dumpBlocks.forEach((block, index) => {
+    dataSets.push({
+      key: `dump-${index}`,
+      mode: block.slot === "planned" ? "planned" : "rawDump",
+      label: `{pathdump} ${block.slot} ${index + 1}/${dumpBlocks.length}`,
+      kind: "dump",
+      slot: block.slot,
+      points: block.points,
+      meta: block,
+    });
+  });
+
+  const phototube = parsePhototube(records);
+  const slips = parseSlipEvents(records);
+  return {
+    fileName, records, dataSets, plans, phototube,
+    events: { turnSlip: slips.turnSlip, accelSlip: slips.accelSlip, phototube: phototube.events },
+  };
+}
+
+function chooseDefaultDataSet() {
+  const mode = state.mode;
+  const sets = state.dataSets;
+  if (!sets.length) return null;
+
+  if (state.selectedKey) {
+    const selected = sets.find((item) => item.key === state.selectedKey);
+    if (selected && (mode === "auto" || selected.mode === mode)) return selected;
+  }
+
+  if (mode === "auto") {
+    return sets.findLast((item) => item.mode === "planned")
+      || sets.findLast((item) => item.mode === "path")
+      || sets[sets.length - 1];
+  }
+
+  return sets.findLast((item) => item.mode === mode) || null;
+}
+
+function fmt(value, digits = 1) {
+  if (!Number.isFinite(value)) return "-";
+  return value.toFixed(digits);
+}
+
+function bounds(points) {
+  const xs = points.map((p) => p.x_mm);
+  const ys = points.map((p) => p.y_mm);
+  return {
+    minX: Math.min(...xs),
+    maxX: Math.max(...xs),
+    minY: Math.min(...ys),
+    maxY: Math.max(...ys),
+  };
+}
+
+function speedColor(speed, minSpeed, maxSpeed) {
+  const ratio = maxSpeed > minSpeed ? Math.max(0, Math.min(1, (speed - minSpeed) / (maxSpeed - minSpeed))) : 0;
+  const hue = 220 - 210 * ratio;
+  return `hsl(${hue.toFixed(1)} 82% 45%)`;
+}
+
+function niceGridStep(spanMm) {
+  if (!Number.isFinite(spanMm) || spanMm <= 0) return 10;
+  const target = spanMm / 9;
+  const pow = 10 ** Math.floor(Math.log10(target));
+  for (const factor of [1, 2, 5, 10]) {
+    const step = factor * pow;
+    if (step >= target) return step;
+  }
+  return 10 * pow;
+}
+
+function fmtCm(mm, digits = 1) {
+  return fmt(mm / 10, digits);
+}
+
+function renderCoordinateGrid(viewX, viewY, viewW, viewH) {
+  const viewMax = Math.max(viewW, viewH);
+  const step = niceGridStep(viewMax);
+  const fontSize = Math.max(4, Math.min(12, viewMax / 80));
+  const labelPad = fontSize * 1.25;
+  const minX = viewX;
+  const maxX = viewX + viewW;
+  const minY = viewY;
+  const maxY = viewY + viewH;
+  const labelY = maxY - labelPad * 0.35;
+  const labelX = minX + labelPad * 0.55;
+  const xStart = Math.ceil(minX / step) * step;
+  const yStart = Math.ceil(minY / step) * step;
+  let content = `<g class="coord-grid" font-family="Segoe UI, sans-serif" font-size="${fontSize}" fill="#666b72">`;
+
+  for (let x = xStart; x <= maxX + step * 0.01; x += step) {
+    const axis = Math.abs(x) < step * 0.001;
+    content += `<line x1="${x}" y1="${minY}" x2="${x}" y2="${maxY}" stroke="${axis ? "#7c7367" : "#e6dfd4"}" stroke-width="${axis ? 1.4 : 0.8}" vector-effect="non-scaling-stroke"></line>`;
+    if (x > minX + labelPad * 2 && x < maxX - labelPad * 2) {
+      content += `<text x="${x}" y="${labelY}" text-anchor="middle">${fmtCm(x, 0)}</text>`;
+    }
+  }
+
+  for (let y = yStart; y <= maxY + step * 0.01; y += step) {
+    const axis = Math.abs(y) < step * 0.001;
+    content += `<line x1="${minX}" y1="${y}" x2="${maxX}" y2="${y}" stroke="${axis ? "#7c7367" : "#e6dfd4"}" stroke-width="${axis ? 1.4 : 0.8}" vector-effect="non-scaling-stroke"></line>`;
+    if (y > minY + labelPad && y < maxY - labelPad) {
+      content += `<text x="${labelX}" y="${y - fontSize * 0.25}">${fmtCm(-y, 0)}</text>`;
+    }
+  }
+
+  content += `<text x="${maxX - labelPad}" y="${labelY}" text-anchor="end">X cm</text>`;
+  content += `<text x="${labelX}" y="${minY + labelPad}" text-anchor="start">Y cm</text>`;
+  content += "</g>";
+  return content;
+}
+
+function eventPosition(event, points) {
+  const index = Math.round(event.pathIndex);
+  const point = points.find((candidate, arrayIndex) =>
+    (Number.isFinite(candidate.index) ? Math.round(candidate.index) : arrayIndex) === index);
+  if (point) return { x_mm: point.x_mm, y_mm: point.y_mm };
+  if (Number.isFinite(event.x_mm) && Number.isFinite(event.y_mm)) return event;
+  return null;
+}
+
+function renderEventLayers(points, radius) {
+  const groups = [
+    { enabled: state.layers.turnSlip, events: state.events.turnSlip, color: "#df7a00", label: "弯道滑移" },
+    { enabled: state.layers.accelSlip, events: state.events.accelSlip.filter((event) => event.state === 1), color: "#c53030", label: "加速滑移" },
+    { enabled: state.layers.phototube, events: state.events.phototube, color: "#159447", label: "光电修正" },
+  ];
+  let content = '<g id="eventLayers">';
+  if (state.layers.phototube) {
+    content += '<g id="phototubeCorrectionSegments">';
+    for (const event of state.events.phototube) {
+      if (!event.segment || event.segmentEdge !== "start") continue;
+      const magnitude = Math.hypot(event.correctionX, event.correctionY);
+      const midpointX = (event.startX + event.endX) * 0.5;
+      const midpointY = -(event.startY + event.endY) * 0.5;
+      const detail = `路径 #${Math.round(event.startIndex)}→#${Math.round(event.endIndex)}, 累计 dx=${fmt(event.correctionX, 2)}mm, dy=${fmt(event.correctionY, 2)}mm, |d|=${fmt(magnitude, 2)}mm, ${event.sampleCount} 次, 峰值=${fmt(event.peakStep, 2)}mm`;
+      content += `<line x1="${event.startX}" y1="${-event.startY}" x2="${event.endX}" y2="${-event.endY}" stroke="#159447" stroke-width="5" stroke-opacity="0.72" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>光电修正路段: ${detail}</title></line>`;
+      content += `<text x="${midpointX}" y="${midpointY - radius * 3}" text-anchor="middle" fill="#08713a" font-size="${Math.max(11, radius * 3.2)}" font-weight="700" stroke="#ffffff" stroke-width="3" paint-order="stroke" vector-effect="non-scaling-stroke">#${Math.round(event.startIndex)}→#${Math.round(event.endIndex)} · ${event.sampleCount}次<title>光电修正路段: ${detail}</title></text>`;
+    }
+    content += '</g>';
+  }
+  for (const group of groups) {
+    if (!group.enabled) continue;
+    for (const event of group.events) {
+      const position = eventPosition(event, points);
+      if (!position) continue;
+      let detail = `path #${Math.round(event.pathIndex)}`;
+      if (event.type === "turnSlip") {
+        detail += `, ratio=${fmt(event.ratio * 100, 1)}%, enc=${fmt(event.encoderTurnDeg, 1)}deg, imu=${fmt(event.imuTurnDeg, 1)}deg, pending=${fmt(event.pendingMm, 2)}mm`;
+      } else if (event.type === "accelSlip") {
+        detail += `, ratio=${fmt(event.ratio * 100, 1)}%, enc=${fmt(event.encoderAccel / 1000, 2)}m/s2, imu=${fmt(event.imuAccel / 1000, 2)}m/s2`;
+      } else {
+        detail += event.segment
+          ? `, ${event.segmentEdge}, range=#${Math.round(event.startIndex)}→#${Math.round(event.endIndex)}, samples=${event.sampleCount}, dx=${fmt(event.correctionX, 2)}mm, dy=${fmt(event.correctionY, 2)}mm`
+          : `, confidence=${fmt(event.confidence, 2)}, dx=${fmt(event.correctionX, 2)}mm, dy=${fmt(event.correctionY, 2)}mm`;
+      }
+      content += `<circle cx="${position.x_mm}" cy="${-position.y_mm}" r="${radius * 2.5}" fill="${group.color}" fill-opacity="0.88" stroke="#ffffff" stroke-width="1.5" vector-effect="non-scaling-stroke"><title>${group.label}: ${detail}</title></circle>`;
+    }
+  }
+  content += "</g>";
+  return content;
+}
+
+function renderPathSvg(segments) {
+  const points = flattenSegments(segments);
+  if (!points.length) return "";
+  const box = bounds(points);
+  const w = Math.max(1, box.maxX - box.minX);
+  const h = Math.max(1, box.maxY - box.minY);
+  const pad = Math.max(w, h) * 0.08 + 30;
+  const viewX = box.minX - pad;
+  const viewY = -box.maxY - pad;
+  const viewW = w + pad * 2;
+  const viewH = h + pad * 2;
+  const viewMax = Math.max(viewW, viewH);
+  const radius = Math.max(1.7, Math.min(5.5, viewMax / 260));
+  const speeds = points.filter((p) => "speed_mm_s" in p).map((p) => p.speed_mm_s).filter(Number.isFinite);
+  const minSpeed = speeds.length ? Math.min(...speeds) : 0;
+  const maxSpeed = speeds.length ? Math.max(...speeds) : 0;
+  const safeMaxSpeed = Math.min(maxSpeed, 6000);
+  let content = `<svg id="pathPlot" class="path" viewBox="${viewX} ${viewY} ${viewW} ${viewH}" data-view-x="${viewX}" data-view-y="${viewY}" data-view-w="${viewW}" data-view-h="${viewH}" preserveAspectRatio="xMidYMid meet">`;
+  content += `<rect x="${viewX}" y="${viewY}" width="${viewW}" height="${viewH}" fill="#fbfbf8"></rect>`;
+  content += renderCoordinateGrid(viewX, viewY, viewW, viewH);
+
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    const pointIndex = Number.isFinite(p.index) ? p.index : i;
+    const isStart = i === 0;
+    const isEnd = i === points.length - 1;
+    const speed = Number.isFinite(p.speed_mm_s) ? Math.min(p.speed_mm_s, safeMaxSpeed) : NaN;
+    const color = isStart ? "#159447"
+      : isEnd ? "#cf3030"
+      : speeds.length && Number.isFinite(speed) ? speedColor(speed, minSpeed, safeMaxSpeed)
+      : "#1f6fb2";
+    const pointRadius = isStart || isEnd ? radius * 1.7 : radius;
+    const thetaDeg = Number.isFinite(p.theta_deg) ? p.theta_deg : (p.theta_rad * 180 / Math.PI);
+    const speedText = Number.isFinite(p.speed_mm_s) ? `, v=${fmt(p.speed_mm_s / 1000, 2)}m/s` : "";
+    content += `<circle class="path-point" cx="${p.x_mm}" cy="${-p.y_mm}" r="${pointRadius}" fill="${color}" fill-opacity="${isStart || isEnd ? 1 : 0.82}" stroke="#ffffff" stroke-width="1" vector-effect="non-scaling-stroke" data-point="${i}"><title>#${pointIndex}: x=${fmtCm(p.x_mm, 2)}cm, y=${fmtCm(p.y_mm, 2)}cm, theta=${fmt(thetaDeg, 1)}deg${speedText}</title></circle>`;
+  }
+
+  content += renderEventLayers(points, radius);
+
+  content += `<g id="pathCursorLayer" visibility="hidden" pointer-events="none">
+    <line id="pathCursorX" x1="${viewX}" y1="0" x2="${viewX + viewW}" y2="0" stroke="#8a4f00" stroke-width="1" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"></line>
+    <line id="pathCursorY" x1="0" y1="${viewY}" x2="0" y2="${viewY + viewH}" stroke="#8a4f00" stroke-width="1" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"></line>
+    <circle id="nearestMarker" cx="0" cy="0" r="${radius * 2.7}" fill="none" stroke="#111111" stroke-width="2" vector-effect="non-scaling-stroke"></circle>
+  </g>`;
+  content += "</svg>";
+  return content;
+}
+
+function localSvgPoint(svg, event) {
+  const matrix = svg.getScreenCTM();
+  if (!matrix) return null;
+  return new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+}
+
+function findNearestRenderedPoint(svgPoint) {
+  let nearest = null;
+  let nearestDistance2 = Infinity;
+  for (let i = 0; i < state.renderedPoints.length; i++) {
+    const point = state.renderedPoints[i];
+    const dx = point.x_mm - svgPoint.x;
+    const dy = -point.y_mm - svgPoint.y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < nearestDistance2) {
+      nearestDistance2 = d2;
+      nearest = { point, arrayIndex: i, distanceMm: Math.sqrt(d2) };
+    }
+  }
+  return nearest;
+}
+
+function pointLabel(point, fallbackIndex) {
+  return Number.isFinite(point.index) ? point.index : fallbackIndex;
+}
+
+function updatePathReadout(svgPoint, nearest) {
+  const readout = $("pathReadout");
+  if (!readout) return;
+  const cursorXcm = fmtCm(svgPoint.x, 2);
+  const cursorYcm = fmtCm(-svgPoint.y, 2);
+
+  if (!nearest) {
+    readout.innerHTML = `<span>鼠标</span><b>X ${cursorXcm} cm</b><b>Y ${cursorYcm} cm</b><span>最近点</span>-`;
+    return;
+  }
+
+  const point = nearest.point;
+  const thetaDeg = Number.isFinite(point.theta_deg) ? point.theta_deg : (point.theta_rad * 180 / Math.PI);
+  const speedText = Number.isFinite(point.speed_mm_s)
+    ? `<b>v ${fmt(point.speed_mm_s / 1000, 3)} m/s</b>`
+    : "";
+  readout.innerHTML = `
+    <span>鼠标</span><b>X ${cursorXcm} cm</b><b>Y ${cursorYcm} cm</b>
+    <span>最近点</span><b>#${pointLabel(point, nearest.arrayIndex)}</b>
+    <b>X ${fmtCm(point.x_mm, 2)} cm</b><b>Y ${fmtCm(point.y_mm, 2)} cm</b>
+    <b>theta ${fmt(thetaDeg, 1)} deg</b>${speedText}
+    <b>距离 ${fmtCm(nearest.distanceMm, 2)} cm</b>`;
+}
+
+function updatePathCursor(svg, svgPoint, nearest) {
+  const layer = svg.querySelector("#pathCursorLayer");
+  const xLine = svg.querySelector("#pathCursorX");
+  const yLine = svg.querySelector("#pathCursorY");
+  const marker = svg.querySelector("#nearestMarker");
+  if (!layer || !xLine || !yLine || !marker) return;
+
+  const viewX = Number(svg.dataset.viewX);
+  const viewY = Number(svg.dataset.viewY);
+  const viewW = Number(svg.dataset.viewW);
+  const viewH = Number(svg.dataset.viewH);
+  layer.setAttribute("visibility", "visible");
+  xLine.setAttribute("y1", svgPoint.y);
+  xLine.setAttribute("y2", svgPoint.y);
+  xLine.setAttribute("x1", viewX);
+  xLine.setAttribute("x2", viewX + viewW);
+  yLine.setAttribute("x1", svgPoint.x);
+  yLine.setAttribute("x2", svgPoint.x);
+  yLine.setAttribute("y1", viewY);
+  yLine.setAttribute("y2", viewY + viewH);
+
+  if (nearest) {
+    marker.setAttribute("cx", nearest.point.x_mm);
+    marker.setAttribute("cy", -nearest.point.y_mm);
+    marker.setAttribute("visibility", "visible");
+  } else {
+    marker.setAttribute("visibility", "hidden");
+  }
+}
+
+function setupPathInteraction() {
+  const svg = $("pathPlot");
+  const readout = $("pathReadout");
+  if (!svg || !readout) return;
+
+  svg.style.cursor = "crosshair";
+  const handlePointer = (event) => {
+    const svgPoint = localSvgPoint(svg, event);
+    if (!svgPoint) return;
+    const nearest = findNearestRenderedPoint(svgPoint);
+    updatePathCursor(svg, svgPoint, nearest);
+    updatePathReadout(svgPoint, nearest);
+  };
+
+  svg.addEventListener("pointermove", handlePointer);
+  svg.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    if (svg.setPointerCapture) svg.setPointerCapture(event.pointerId);
+    handlePointer(event);
+  });
+
+  const first = state.renderedPoints[0];
+  if (first) {
+    updatePathReadout({ x: first.x_mm, y: -first.y_mm }, {
+      point: first,
+      arrayIndex: 0,
+      distanceMm: 0,
+    });
+  }
+}
+
+function renderSpeedSvg(points) {
+  const values = points.map((p) => p.speed_mm_s).filter(Number.isFinite);
+  if (!values.length) return "";
+  const cleanValues = values.map((v) => Math.max(0, Math.min(6000, v)));
+  const minSpeed = Math.min(...cleanValues);
+  const maxSpeed = Math.max(...cleanValues);
+  const span = Math.max(1, maxSpeed - minSpeed);
+  const w = 1000;
+  const h = 220;
+  const pad = 35;
+  const step = (w - pad * 2) / Math.max(1, cleanValues.length - 1);
+  const d = cleanValues.map((speed, i) => {
+    const x = pad + i * step;
+    const y = pad + (h - pad * 2) * (1 - (speed - minSpeed) / span);
+    return `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(" ");
+  return `<svg class="speed" viewBox="0 0 1000 220" preserveAspectRatio="none">
+    <rect x="0" y="0" width="1000" height="220" fill="#fbfbf8"></rect>
+    <path d="${d}" fill="none" stroke="#b14b25" stroke-width="3"></path>
+    <text x="35" y="24" font-size="14">speed ${fmt(minSpeed, 0)} - ${fmt(maxSpeed, 0)} mm/s</text>
+  </svg>`;
+}
+
+function renderSummary(dataSet, prepared) {
+  const points = prepared.points;
+  const length = segmentedLength(prepared.segments);
+  if (points.length < 2) {
+    $("summaryTable").innerHTML = `
+      <tr><th>文件</th><td>${escapeHtml(state.fileName)}</td></tr>
+      <tr><th>当前数据</th><td>${escapeHtml(dataSet.label)}</td></tr>
+      <tr><th>原始解析点数</th><td>${dataSet.points.length}</td></tr>
+      <tr><th>可显示点数</th><td>${points.length}</td></tr>`;
+    $("notes").innerHTML = `<strong class="warn">注意：</strong><br>${prepared.warnings.map(escapeHtml).join("<br>")}`;
+    return;
+  }
+  const box = bounds(points);
+  const rows = [
+    ["文件", state.fileName],
+    ["当前数据", dataSet.label],
+    ["原始解析点数", String(dataSet.points.length)],
+    ["可显示点数", String(points.length)],
+    ["可显示段数", String(prepared.segments.length)],
+    ["XY长度", `${fmt(length)} mm`],
+    ["X范围", `${fmt(box.minX)} .. ${fmt(box.maxX)} mm`],
+    ["Y范围", `${fmt(box.minY)} .. ${fmt(box.maxY)} mm`],
+    ["起点", `${fmt(points[0].x_mm)}, ${fmt(points[0].y_mm)}, ${fmt(points[0].theta_deg, 2)} deg`],
+    ["终点", `${fmt(points[points.length - 1].x_mm)}, ${fmt(points[points.length - 1].y_mm)}, ${fmt(points[points.length - 1].theta_deg, 2)} deg`],
+  ];
+
+  if ("record_distance_mm" in points[points.length - 1]) {
+    const end = points[points.length - 1];
+    rows.push(["记录距离", `${fmt(end.record_distance_mm)} mm`]);
+    rows.push(["左轮距离", `${fmt(end.left_total_distance_mm)} mm`]);
+    rows.push(["右轮距离", `${fmt(end.right_total_distance_mm)} mm`]);
+    rows.push(["左右差", `${fmt(end.lr_diff_mm)} mm`]);
+  }
+
+  if ("speed_mm_s" in points[0]) {
+    const speeds = points.map((p) => p.speed_mm_s).filter(Number.isFinite);
+    rows.push(["速度范围", `${fmt(Math.min(...speeds))} .. ${fmt(Math.max(...speeds))} mm/s`]);
+    rows.push(["平均速度", `${fmt(speeds.reduce((a, b) => a + b, 0) / speeds.length)} mm/s`]);
+  }
+
+  if (dataSet.meta && dataSet.meta.declaredCount) {
+    rows.push(["声明点数", String(dataSet.meta.declaredCount)]);
+  }
+
+  $("summaryTable").innerHTML = rows.map(([key, value]) => `<tr><th>${escapeHtml(key)}</th><td>${escapeHtml(value)}</td></tr>`).join("");
+  $("notes").innerHTML = prepared.warnings.length
+    ? `<strong class="warn">注意：</strong><br>${prepared.warnings.map(escapeHtml).join("<br>")}`
+    : "路径图只显示离散点：绿色点是起点，红色点是终点；规划路径会按速度给点上色。鼠标移动或拖动时会显示当前厘米坐标和最近路径点。";
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function updateSegmentSelect() {
+  const mode = state.mode;
+  const select = $("segmentSelect");
+  const options = state.dataSets.filter((item) => mode === "auto" || item.mode === mode);
+  select.innerHTML = "";
+  for (const item of options) {
+    const option = document.createElement("option");
+    option.value = item.key;
+    option.textContent = `${item.label} (${item.points.length}点)`;
+    select.appendChild(option);
+  }
+  const selected = chooseDefaultDataSet();
+  if (selected) {
+    select.value = selected.key;
+    state.selectedKey = selected.key;
+  }
+}
+
+function render() {
+  const dataSet = chooseDefaultDataSet();
+  updateModeButtons();
+  updateSegmentSelect();
+  renderPhototubeStatus();
+
+  if (!dataSet) {
+    state.renderedPoints = [];
+    $("summaryPanel").classList.remove("hidden");
+    $("summaryTable").innerHTML = "";
+    $("notes").textContent = "没有找到当前模式对应的数据段。";
+    $("pathPanel").classList.add("hidden");
+    $("speedPanel").classList.add("hidden");
+    return;
+  }
+
+  state.selectedKey = dataSet.key;
+  $("segmentSelect").value = dataSet.key;
+
+  const prepared = prepareDrawableData(dataSet);
+  state.renderedPoints = prepared.points;
+  renderSummary(dataSet, prepared);
+  $("pathSvg").innerHTML = renderPathSvg(prepared.segments);
+  setupPathInteraction();
+  const speedSvg = renderSpeedSvg(prepared.points);
+  $("speedSvg").innerHTML = speedSvg;
+
+  $("controlsPanel").classList.remove("hidden");
+  $("summaryPanel").classList.remove("hidden");
+  $("pathPanel").classList.remove("hidden");
+  $("speedPanel").classList.toggle("hidden", !speedSvg);
+}
+
+function updateModeButtons() {
+  const map = {
+    modeAuto: "auto",
+    modePath: "path",
+    modePlanned: "planned",
+    modeRawDump: "rawDump",
+  };
+  for (const [id, mode] of Object.entries(map)) {
+    $(id).classList.toggle("active", state.mode === mode);
+  }
+}
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const result = buildDataSets(String(reader.result ?? ""), file.name);
+    state.fileName = result.fileName;
+    state.dataSets = result.dataSets;
+    state.phototube = result.phototube;
+    state.events = result.events;
+    state.mode = "auto";
+    state.selectedKey = "";
+    if (!state.dataSets.length) {
+      $("summaryPanel").classList.remove("hidden");
+      $("summaryTable").innerHTML = "";
+      $("notes").textContent = "没有识别到 {path} 或 {pathdump} 数据。";
+      return;
+    }
+    render();
+  };
+  reader.readAsText(file);
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  state.selectedKey = "";
+  render();
+}
+
+function setupEvents() {
+  const dropzone = $("dropzone");
+  const input = $("fileInput");
+
+  dropzone.addEventListener("click", () => input.click());
+  input.addEventListener("change", () => {
+    if (input.files && input.files[0]) loadFile(input.files[0]);
+  });
+
+  for (const eventName of ["dragenter", "dragover"]) {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+  }
+
+  for (const eventName of ["dragleave", "drop"]) {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove("dragover");
+    });
+  }
+
+  dropzone.addEventListener("drop", (event) => {
+    const file = event.dataTransfer && event.dataTransfer.files[0];
+    if (file) loadFile(file);
+  });
+
+  $("modeAuto").addEventListener("click", () => setMode("auto"));
+  $("modePath").addEventListener("click", () => setMode("path"));
+  $("modePlanned").addEventListener("click", () => setMode("planned"));
+  $("modeRawDump").addEventListener("click", () => setMode("rawDump"));
+  $("segmentSelect").addEventListener("change", () => {
+    state.selectedKey = $("segmentSelect").value;
+    render();
+  });
+  $("copyWheelCircumferenceBtn").addEventListener("click", () => {
+    const value = Number($("wheelCircumferenceInput").value);
+    if (!Number.isFinite(value) || value < 50 || value > 150) {
+      $("wheelCircumferenceInput").focus();
+      return;
+    }
+    copySerialCommand(`vwcirc ${value.toFixed(3)}`, $("copyWheelCircumferenceBtn"));
+  });
+  $("copyWheelCircumferenceStatusBtn").addEventListener("click", () => {
+    copySerialCommand("vwcirc", $("copyWheelCircumferenceStatusBtn"));
+  });
+  for (const [id, layer] of [["showTurnSlip", "turnSlip"], ["showAccelSlip", "accelSlip"], ["showPhotoCorrection", "phototube"]]) {
+    $(id).addEventListener("change", () => {
+      state.layers[layer] = $(id).checked;
+      render();
+    });
+  }
+}
+
+setupEvents();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Treat documents as binary so Git never performs text or whitespace checks on them.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+
+# Imported embedded source retains its original formatting.
+*.c whitespace=-trailing-space,-blank-at-eof
+*.h whitespace=-trailing-space,-blank-at-eof
+*.asm whitespace=-trailing-space,-blank-at-eof
+*.A51 whitespace=-trailing-space,-blank-at-eof

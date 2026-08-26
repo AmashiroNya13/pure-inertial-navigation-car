@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="com.rt.hightec.agent.launcher.launchConfigurationType">
+    <stringAttribute key="ACC_HW" value="DAS JDS TriBoard TC3XX V2.0 TBAMHA6U"/>
+    <booleanAttribute key="ENABLE_AGENTLOG" value="false"/>
+    <booleanAttribute key="ENABLE_FLASHING" value="true"/>
+    <booleanAttribute key="ENABLE_STOPPING" value="true"/>
+    <stringAttribute key="EXECUTABLE_PATH" value="${project_loc}/TriCore Debug (TASKING)/Mad_Circuits.elf"/>
+    <stringAttribute key="STOP_FUNCTION" value="core0_main"/>
+    <stringAttribute key="SVD" value="D:/Infineon/AURIX-Studio-1.10.28/build_system/bundled-artefacts-repo/svd/tc26xbpd/1.1-2/device.svd"/>
+    <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="Mad_Circuits"/>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+        <listEntry value="/Mad_Circuits"/>
+    </listAttribute>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+        <listEntry value="4"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.debug.ui.ATTR_LOCATION" value="/Mad_Circuits/Mad_Circuits TriCore Debug (TASKING)_1.launch"/>
+    <stringAttribute key="org.eclipse.debug.ui.ATTR_PROJECT_NAME" value="Mad_Circuits"/>
+    <booleanAttribute key="org.eclipse.debug.ui.ATTR_SHARED" value="true"/>
+    <stringAttribute key="org.eclipse.tcf.debug.MemoryMap" value="[{&quot;FileName&quot;:&quot;D:/Code/Mad_Circuits_TC2xx/Mad_Circuits/TriCore Debug (TASKING)/Mad_Circuits.elf&quot;,&quot;ID&quot;:&quot;/DAS JDS TriBoard TC3XX V2.0 TBAMHA6U/Core 0: CPU0 TriCore 1.6E&quot;,&quot;Flags&quot;:0,&quot;UUID&quot;:&quot;c42badb4-aaee-40d6-b29e-35ee4b096875&quot;},{&quot;FileName&quot;:&quot;D:/Code/Mad_Circuits_TC2xx/Mad_Circuits/TriCore Debug (TASKING)/Mad_Circuits.elf&quot;,&quot;ID&quot;:&quot;/DAS JDS TriBoard TC3XX V2.0 TBAMHA6U/Core 0: CPU0 TriCore 1.6E&quot;,&quot;Flags&quot;:0,&quot;UUID&quot;:&quot;37629fc1-bf50-4fa9-a113-a5448f40f31f&quot;},{&quot;FileName&quot;:&quot;D:/Code/Mad_Circuits_TC2xx/Mad_Circuits/TriCore Debug (TASKING)/Mad_Circuits.elf&quot;,&quot;ID&quot;:&quot;/DAS JDS TriBoard TC3XX V2.0 TBAMHA6U/Core 0: CPU0 TriCore 1.6E&quot;,&quot;Flags&quot;:0,&quot;UUID&quot;:&quot;79d3ac10-a561-4f33-b9b1-8b8d65ce32a9&quot;},{&quot;FileName&quot;:&quot;D:/Code/Mad_Circuits_TC2xx/Mad_Circuits/TriCore Debug (TASKING)/Mad_Circuits.elf&quot;,&quot;ID&quot;:&quot;/DAS JDS TriBoard TC3XX V2.0 TBAMHA6U/Core 1: CPU1 TriCore 1.6P&quot;,&quot;Flags&quot;:0,&quot;UUID&quot;:&quot;355436ba-b0e8-44c4-89a5-1f5af85bde47&quot;},{&quot;FileName&quot;:&quot;D:/Code/Mad_Circuits_TC2xx/Mad_Circuits/TriCore Debug (TASKING)/Mad_Circuits.elf&quot;,&quot;ID&quot;:&quot;/DAS JDS TriBoard TC3XX V2.0 TBAMHA6U/Core 0: CPU0 TriCore 1.6E&quot;,&quot;Flags&quot;:0,&quot;UUID&quot;:&quot;effb6b85-a053-407c-bbda-95237d8d8a19&quot;},{&quot;FileName&quot;:&quot;D:/Code/Mad_Circuits_TC2xx/Mad_Circuits/TriCore Debug (TASKING)/Mad_Circuits.elf&quot;,&quot;ID&quot;:&quot;/DAS JDS TriBoard TC3XX V2.0 TBAMHA6U/Core 1: CPU1 TriCore 1.6P&quot;,&quot;Flags&quot;:0,&quot;UUID&quot;:&quot;c0a8d434-5865-491b-bd12-00d3018808e3&quot;}]"/>
+    <stringAttribute key="org.eclipse.tcf.debug.PeerID" value="TCP:127.0.0.1:55067"/>
+    <stringAttribute key="org.eclipse.tcf.debug.ProjectName" value="Mad_Circuits"/>
+    <booleanAttribute key="org.eclipse.tcf.debug.RunLocalAgent" value="false"/>
+    <booleanAttribute key="org.eclipse.tcf.debug.RunLocalServer" value="false"/>
+    <booleanAttribute key="org.eclipse.tcf.debug.UseLocalAgent" value="false"/>
+    <stringAttribute key="org.eclipse.tcf.debug.executable_name" value="${project_loc}/TriCore Debug (TASKING)/Mad_Circuits.elf"/>
+    <stringAttribute key="sessionID" value="0c658b08-587f-4c05-a7e3-49a4744f4071"/>
+</launchConfiguration>

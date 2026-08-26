@@ -1,0 +1,408 @@
+#include "./device_magnetic_encoder_cfg.h"
+#include "../../../isr/isr_config.h"
+
+device_magnetic_encoder_cfg_t device_magnetic_encoder_cfg_table[DEVICE_MAGNETIC_ENCODER_COUNT] =
+{
+    {
+        .magnetic_encoder_id = DEVICE_MAGNETIC_ENCODER_1,
+        .gtm_atom_timer_cfg =
+        {
+            .gtm_module = &MODULE_GTM,
+
+            .atom_timer_modulecfg.gtm = &MODULE_GTM,
+            .atom_timer_modulecfg.atom = IfxGtm_Atom_3,
+            .atom_timer_modulecfg.timerChannel = IfxGtm_Atom_Ch_1,
+            .atom_timer_modulecfg.triggerOut = NULL_PTR,
+            .atom_timer_modulecfg.clock = IfxGtm_Cmu_Clk_0,
+            .atom_timer_modulecfg.base.frequency = 1920,
+            .atom_timer_modulecfg.base.isrPriority = DMA_CHANNEL_MAGNETIC_ENCODER1_GTM_ATOM_TIMER_TO_QSPI,
+            .atom_timer_modulecfg.base.isrProvider = IfxSrc_Tos_dma,
+            .atom_timer_modulecfg.base.minResolution = 0,
+            .atom_timer_modulecfg.base.trigger.outputMode = IfxPort_OutputMode_pushPull,
+            .atom_timer_modulecfg.base.trigger.outputDriver = IfxPort_PadDriver_cmosAutomotiveSpeed1,
+            .atom_timer_modulecfg.base.trigger.risingEdgeAtPeriod = FALSE,
+            .atom_timer_modulecfg.base.trigger.outputEnabled = FALSE,
+            .atom_timer_modulecfg.base.trigger.enabled = FALSE,
+            .atom_timer_modulecfg.base.trigger.triggerPoint = 0,
+            .atom_timer_modulecfg.base.trigger.isrPriority = 0,
+            .atom_timer_modulecfg.base.trigger.isrProvider = IfxSrc_Tos_cpu0,
+            .atom_timer_modulecfg.base.countDir = IfxStdIf_Timer_CountDir_up,
+            .atom_timer_modulecfg.base.startOffset = 0.0,
+            .atom_timer_modulecfg.irqModeTimer = IfxGtm_IrqMode_pulse,
+            .atom_timer_modulecfg.irqModeTrigger = IfxGtm_IrqMode_pulse,
+            .atom_timer_modulecfg.initPins = FALSE,
+        },
+        .tx_dma_cfg =
+        {
+            .dma_module = &MODULE_DMA,
+            .dma_modulecfg.dma = &MODULE_DMA,
+
+            .dma_channelcfg.module = NULL_PTR,
+
+            .dma_channelcfg.channelId = DMA_CHANNEL_MAGNETIC_ENCODER1_GTM_ATOM_TIMER_TO_QSPI,
+            .dma_channelcfg.sourceAddress = 0,
+            .dma_channelcfg.destinationAddress = 0,
+            .dma_channelcfg.shadowAddress = 0,
+            .dma_channelcfg.readDataCrc = 0,
+            .dma_channelcfg.sourceDestinationAddressCrc = 0,
+            .dma_channelcfg.transferCount = 1,
+            .dma_channelcfg.blockMode = IfxDma_ChannelMove_1,
+            .dma_channelcfg.requestMode = IfxDma_ChannelRequestMode_completeTransactionPerRequest,
+            .dma_channelcfg.operationMode = IfxDma_ChannelOperationMode_continuous,
+            .dma_channelcfg.moveSize = IfxDma_ChannelMoveSize_16bit,
+            .dma_channelcfg.pattern = IfxDma_ChannelPattern_0_disable,
+            .dma_channelcfg.requestSource = IfxDma_ChannelRequestSource_peripheral,
+            .dma_channelcfg.busPriority = DMA_PRIORITY_MAGNETIC_ENCODER1_GTM_ATOM_TIMER_TO_QSPI,
+            .dma_channelcfg.hardwareRequestEnabled = TRUE,
+            .dma_channelcfg.sourceAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.sourceAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.sourceAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.destinationAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.destinationAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.destinationAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.shadowControl = IfxDma_ChannelShadow_none,
+            .dma_channelcfg.sourceCircularBufferEnabled = TRUE,
+            .dma_channelcfg.destinationCircularBufferEnabled = TRUE,
+            .dma_channelcfg.timestampEnabled = FALSE,
+            .dma_channelcfg.wrapSourceInterruptEnabled = FALSE,
+            .dma_channelcfg.wrapDestinationInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptControl = IfxDma_ChannelInterruptControl_thresholdLimitMatch,
+            .dma_channelcfg.interruptRaiseThreshold = 0,
+            .dma_channelcfg.transactionRequestLostInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptPriority = 0,
+            .dma_channelcfg.channelInterruptTypeOfService = IfxSrc_Tos_cpu0,
+        },
+        .qspi_cfg =
+        {
+            .qspi_index = IfxQspi_Index_2,
+
+            .qspi_module = NULL_PTR,
+
+            .qspi_modulecfg.mode = IfxQspi_Mode_master,
+
+            .qspi_modulecfg.rxPriority = DMA_CHANNEL_MAGNETIC_ENCODER1_QSPI_TO_INTERRUPT,
+            .qspi_modulecfg.txPriority = 0,
+            .qspi_modulecfg.erPriority = 0,
+            .qspi_modulecfg.isrProvider = IfxSrc_Tos_dma,
+
+            .qspi_modulecfg.bufferSize = 0,
+            .qspi_modulecfg.buffer = NULL_PTR,
+
+            .qspi_modulecfg.qspi = NULL_PTR,
+
+            .qspi_modulecfg.allowSleepMode = FALSE,
+
+            .qspi_modulecfg.pauseOnBaudrateSpikeErrors = FALSE,
+
+            .qspi_modulecfg.pauseRunTransition = IfxQspi_PauseRunTransition_run,
+
+            .qspi_modulecfg.txFifoThreshold = IfxQspi_TxFifoInt_1,
+            .qspi_modulecfg.rxFifoThreshold = IfxQspi_RxFifoInt_1,
+            .qspi_modulecfg.txFifoMode = IfxQspi_FifoMode_singleMove,
+            .qspi_modulecfg.rxFifoMode = IfxQspi_FifoMode_singleMove,
+
+            .qspi_modulecfg.pins = NULL_PTR,
+
+            .qspi_modulecfg.dma.rxDmaChannelId = IfxDma_ChannelId_none,
+            .qspi_modulecfg.dma.txDmaChannelId = IfxDma_ChannelId_none,
+            .qspi_modulecfg.dma.useDma = FALSE,
+
+            .qspi_modulecfg.maximumBaudrate = 50000000,
+
+            .qspi_pins.sclk = &IfxQspi2_SCLK_P15_3_OUT,
+            .qspi_pins.sclkMode = IfxPort_OutputMode_pushPull,
+            .qspi_pins.mtsr = &IfxQspi2_MTSR_P15_5_OUT,
+            .qspi_pins.mtsrMode = IfxPort_OutputMode_pushPull,
+            .qspi_pins.mrst = &IfxQspi2_MRSTA_P15_4_IN,
+            .qspi_pins.mrstMode = IfxPort_InputMode_pullDown,
+            .qspi_pins.pinDriver = IfxPort_PadDriver_cmosAutomotiveSpeed1,
+
+            .qspi_channelcfg.ch.baudrate = 10000000,
+            .qspi_channelcfg.ch.mode.enabled = TRUE,
+            .qspi_channelcfg.ch.mode.autoCS = TRUE,
+            .qspi_channelcfg.ch.mode.loopback = FALSE,
+            .qspi_channelcfg.ch.mode.clockPolarity = IfxQspi_ClockPolarity_idleLow,
+            .qspi_channelcfg.ch.mode.shiftClock = IfxQspi_ShiftClock_shiftTransmitDataOnLeadingEdge,
+            .qspi_channelcfg.ch.mode.dataHeading = IfxQspi_DataHeading_msbFirst,
+            .qspi_channelcfg.ch.mode.dataWidth = 16,
+            .qspi_channelcfg.ch.mode.csActiveLevel = Ifx_ActiveState_low,
+            .qspi_channelcfg.ch.mode.csLeadDelay = IfxQspi_SlsoTiming_3,
+            .qspi_channelcfg.ch.mode.csTrailDelay = IfxQspi_SlsoTiming_3,
+            .qspi_channelcfg.ch.mode.csInactiveDelay = IfxQspi_SlsoTiming_3,
+            .qspi_channelcfg.ch.mode.parityCheck = FALSE,
+            .qspi_channelcfg.ch.mode.parityMode = IfxQspi_ParityMode_even,
+            .qspi_channelcfg.ch.errorChecks.baudrate = FALSE,
+            .qspi_channelcfg.ch.errorChecks.phase = FALSE,
+            .qspi_channelcfg.ch.errorChecks.receive = FALSE,
+            .qspi_channelcfg.ch.errorChecks.transmit = FALSE,
+            .qspi_channelcfg.ch.channelId = IfxQspi_ChannelId_0,
+            .qspi_channelcfg.channelBasedCs = IfxQspi_SpiMaster_ChannelBasedCs_disabled,
+            .qspi_channelcfg.mode = IfxQspi_SpiMaster_Mode_short,
+            .qspi_channelcfg.dummyTxValue = 0xFFFFFFFFu,
+            .qspi_channelcfg.dummyRxValue = 0u,
+            .qspi_channelcfg.spiMaster = NULL_PTR,
+            .qspi_channelcfg.qspi = NULL_PTR,
+            .qspi_channelcfg.dma = NULL_PTR,
+
+            .qspi_sls.output.pin = &IfxQspi2_SLSO0_P15_2_OUT,
+            .qspi_sls.output.mode = IfxPort_OutputMode_pushPull,
+            .qspi_sls.output.driver = IfxPort_PadDriver_cmosAutomotiveSpeed1,
+        },
+        .rx_dma_cfg =
+        {
+            .dma_module = &MODULE_DMA,
+            .dma_modulecfg.dma = &MODULE_DMA,
+
+            .dma_channelcfg.module = NULL_PTR,
+
+            .dma_channelcfg.channelId = DMA_CHANNEL_MAGNETIC_ENCODER1_QSPI_TO_INTERRUPT,
+            .dma_channelcfg.sourceAddress = 0,
+            .dma_channelcfg.destinationAddress = 0,
+            .dma_channelcfg.shadowAddress = 0,
+            .dma_channelcfg.readDataCrc = 0,
+            .dma_channelcfg.sourceDestinationAddressCrc = 0,
+            .dma_channelcfg.transferCount = 1,
+            .dma_channelcfg.blockMode = IfxDma_ChannelMove_1,
+            .dma_channelcfg.requestMode = IfxDma_ChannelRequestMode_oneTransferPerRequest,
+            .dma_channelcfg.operationMode = IfxDma_ChannelOperationMode_continuous,
+            .dma_channelcfg.moveSize = IfxDma_ChannelMoveSize_16bit,
+            .dma_channelcfg.pattern = IfxDma_ChannelPattern_0_disable,
+            .dma_channelcfg.requestSource = IfxDma_ChannelRequestSource_peripheral,
+            .dma_channelcfg.busPriority = DMA_PRIORITY_MAGNETIC_ENCODER1_QSPI_TO_INTERRUPT,
+            .dma_channelcfg.hardwareRequestEnabled = TRUE,
+            .dma_channelcfg.sourceAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.sourceAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.sourceAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.destinationAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.destinationAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.destinationAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.shadowControl = IfxDma_ChannelShadow_none,
+            .dma_channelcfg.sourceCircularBufferEnabled = TRUE,
+            .dma_channelcfg.destinationCircularBufferEnabled = TRUE,
+            .dma_channelcfg.timestampEnabled = FALSE,
+            .dma_channelcfg.wrapSourceInterruptEnabled = FALSE,
+            .dma_channelcfg.wrapDestinationInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptEnabled = TRUE,
+            .dma_channelcfg.channelInterruptControl = IfxDma_ChannelInterruptControl_thresholdLimitMatch,
+            .dma_channelcfg.interruptRaiseThreshold = 0,
+            .dma_channelcfg.transactionRequestLostInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptPriority = ISR_CONFIG_PRIORITY_MAGNETIC_ENCODER1_BUSINESS_INTERRUPT,
+            .dma_channelcfg.channelInterruptTypeOfService = ISR_CONFIG_TOS_MAGNETIC_ENCODER1_BUSINESS_INTERRUPT,
+        },
+    },
+    {
+        .magnetic_encoder_id = DEVICE_MAGNETIC_ENCODER_2,
+        .gtm_atom_timer_cfg =
+        {
+            .gtm_module = &MODULE_GTM,
+
+            .atom_timer_modulecfg.gtm = &MODULE_GTM,
+            .atom_timer_modulecfg.atom = IfxGtm_Atom_3,
+            .atom_timer_modulecfg.timerChannel = IfxGtm_Atom_Ch_2,
+            .atom_timer_modulecfg.triggerOut = NULL_PTR,
+            .atom_timer_modulecfg.clock = IfxGtm_Cmu_Clk_0,
+            .atom_timer_modulecfg.base.frequency = 1920,
+            .atom_timer_modulecfg.base.isrPriority = DMA_CHANNEL_MAGNETIC_ENCODER2_GTM_ATOM_TIMER_TO_QSPI,
+            .atom_timer_modulecfg.base.isrProvider = IfxSrc_Tos_dma,
+            .atom_timer_modulecfg.base.minResolution = 0,
+            .atom_timer_modulecfg.base.trigger.outputMode = IfxPort_OutputMode_pushPull,
+            .atom_timer_modulecfg.base.trigger.outputDriver = IfxPort_PadDriver_cmosAutomotiveSpeed1,
+            .atom_timer_modulecfg.base.trigger.risingEdgeAtPeriod = FALSE,
+            .atom_timer_modulecfg.base.trigger.outputEnabled = FALSE,
+            .atom_timer_modulecfg.base.trigger.enabled = FALSE,
+            .atom_timer_modulecfg.base.trigger.triggerPoint = 0,
+            .atom_timer_modulecfg.base.trigger.isrPriority = 0,
+            .atom_timer_modulecfg.base.trigger.isrProvider = IfxSrc_Tos_cpu0,
+            .atom_timer_modulecfg.base.countDir = IfxStdIf_Timer_CountDir_up,
+            .atom_timer_modulecfg.base.startOffset = 0.0,
+            .atom_timer_modulecfg.irqModeTimer = IfxGtm_IrqMode_pulse,
+            .atom_timer_modulecfg.irqModeTrigger = IfxGtm_IrqMode_pulse,
+            .atom_timer_modulecfg.initPins = FALSE,
+        },
+        .tx_dma_cfg =
+        {
+            .dma_module = &MODULE_DMA,
+            .dma_modulecfg.dma = &MODULE_DMA,
+
+            .dma_channelcfg.module = NULL_PTR,
+
+            .dma_channelcfg.channelId = DMA_CHANNEL_MAGNETIC_ENCODER2_GTM_ATOM_TIMER_TO_QSPI,
+            .dma_channelcfg.sourceAddress = 0,
+            .dma_channelcfg.destinationAddress = 0,
+            .dma_channelcfg.shadowAddress = 0,
+            .dma_channelcfg.readDataCrc = 0,
+            .dma_channelcfg.sourceDestinationAddressCrc = 0,
+            .dma_channelcfg.transferCount = 1,
+            .dma_channelcfg.blockMode = IfxDma_ChannelMove_1,
+            .dma_channelcfg.requestMode = IfxDma_ChannelRequestMode_completeTransactionPerRequest,
+            .dma_channelcfg.operationMode = IfxDma_ChannelOperationMode_continuous,
+            .dma_channelcfg.moveSize = IfxDma_ChannelMoveSize_16bit,
+            .dma_channelcfg.pattern = IfxDma_ChannelPattern_0_disable,
+            .dma_channelcfg.requestSource = IfxDma_ChannelRequestSource_peripheral,
+            .dma_channelcfg.busPriority = DMA_PRIORITY_MAGNETIC_ENCODER2_GTM_ATOM_TIMER_TO_QSPI,
+            .dma_channelcfg.hardwareRequestEnabled = TRUE,
+            .dma_channelcfg.sourceAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.sourceAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.sourceAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.destinationAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.destinationAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.destinationAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.shadowControl = IfxDma_ChannelShadow_none,
+            .dma_channelcfg.sourceCircularBufferEnabled = TRUE,
+            .dma_channelcfg.destinationCircularBufferEnabled = TRUE,
+            .dma_channelcfg.timestampEnabled = FALSE,
+            .dma_channelcfg.wrapSourceInterruptEnabled = FALSE,
+            .dma_channelcfg.wrapDestinationInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptControl = IfxDma_ChannelInterruptControl_thresholdLimitMatch,
+            .dma_channelcfg.interruptRaiseThreshold = 0,
+            .dma_channelcfg.transactionRequestLostInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptPriority = 0,
+            .dma_channelcfg.channelInterruptTypeOfService = IfxSrc_Tos_cpu0,
+        },
+        .qspi_cfg =
+        {
+            .qspi_index = IfxQspi_Index_3,
+
+            .qspi_module = NULL_PTR,
+
+            .qspi_modulecfg.mode = IfxQspi_Mode_master,
+
+            .qspi_modulecfg.rxPriority = DMA_CHANNEL_MAGNETIC_ENCODER2_QSPI_TO_INTERRUPT,
+            .qspi_modulecfg.txPriority = 0,
+            .qspi_modulecfg.erPriority = 0,
+            .qspi_modulecfg.isrProvider = IfxSrc_Tos_dma,
+
+            .qspi_modulecfg.bufferSize = 0,
+            .qspi_modulecfg.buffer = NULL_PTR,
+
+            .qspi_modulecfg.qspi = NULL_PTR,
+
+            .qspi_modulecfg.allowSleepMode = FALSE,
+
+            .qspi_modulecfg.pauseOnBaudrateSpikeErrors = FALSE,
+
+            .qspi_modulecfg.pauseRunTransition = IfxQspi_PauseRunTransition_run,
+
+            .qspi_modulecfg.txFifoThreshold = IfxQspi_TxFifoInt_1,
+            .qspi_modulecfg.rxFifoThreshold = IfxQspi_RxFifoInt_1,
+            .qspi_modulecfg.txFifoMode = IfxQspi_FifoMode_singleMove,
+            .qspi_modulecfg.rxFifoMode = IfxQspi_FifoMode_singleMove,
+
+            .qspi_modulecfg.pins = NULL_PTR,
+
+            .qspi_modulecfg.dma.rxDmaChannelId = IfxDma_ChannelId_none,
+            .qspi_modulecfg.dma.txDmaChannelId = IfxDma_ChannelId_none,
+            .qspi_modulecfg.dma.useDma = FALSE,
+
+            .qspi_modulecfg.maximumBaudrate = 50000000,
+
+            .qspi_pins.sclk = &IfxQspi3_SCLK_P02_7_OUT,
+            .qspi_pins.sclkMode = IfxPort_OutputMode_pushPull,
+            .qspi_pins.mtsr = &IfxQspi3_MTSR_P02_6_OUT,
+            .qspi_pins.mtsrMode = IfxPort_OutputMode_pushPull,
+            .qspi_pins.mrst = &IfxQspi3_MRSTA_P02_5_IN,
+            .qspi_pins.mrstMode = IfxPort_InputMode_pullDown,
+            .qspi_pins.pinDriver = IfxPort_PadDriver_cmosAutomotiveSpeed1,
+
+            .qspi_channelcfg.ch.baudrate = 10000000,
+            .qspi_channelcfg.ch.mode.enabled = TRUE,
+            .qspi_channelcfg.ch.mode.autoCS = TRUE,
+            .qspi_channelcfg.ch.mode.loopback = FALSE,
+            .qspi_channelcfg.ch.mode.clockPolarity = IfxQspi_ClockPolarity_idleLow,
+            .qspi_channelcfg.ch.mode.shiftClock = IfxQspi_ShiftClock_shiftTransmitDataOnLeadingEdge,
+            .qspi_channelcfg.ch.mode.dataHeading = IfxQspi_DataHeading_msbFirst,
+            .qspi_channelcfg.ch.mode.dataWidth = 16,
+            .qspi_channelcfg.ch.mode.csActiveLevel = Ifx_ActiveState_low,
+            .qspi_channelcfg.ch.mode.csLeadDelay = IfxQspi_SlsoTiming_3,
+            .qspi_channelcfg.ch.mode.csTrailDelay = IfxQspi_SlsoTiming_3,
+            .qspi_channelcfg.ch.mode.csInactiveDelay = IfxQspi_SlsoTiming_3,
+            .qspi_channelcfg.ch.mode.parityCheck = FALSE,
+            .qspi_channelcfg.ch.mode.parityMode = IfxQspi_ParityMode_even,
+            .qspi_channelcfg.ch.errorChecks.baudrate = FALSE,
+            .qspi_channelcfg.ch.errorChecks.phase = FALSE,
+            .qspi_channelcfg.ch.errorChecks.receive = FALSE,
+            .qspi_channelcfg.ch.errorChecks.transmit = FALSE,
+            .qspi_channelcfg.ch.channelId = IfxQspi_ChannelId_0,
+            .qspi_channelcfg.channelBasedCs = IfxQspi_SpiMaster_ChannelBasedCs_disabled,
+            .qspi_channelcfg.mode = IfxQspi_SpiMaster_Mode_short,
+            .qspi_channelcfg.dummyTxValue = 0xFFFFFFFFu,
+            .qspi_channelcfg.dummyRxValue = 0u,
+            .qspi_channelcfg.spiMaster = NULL_PTR,
+            .qspi_channelcfg.qspi = NULL_PTR,
+            .qspi_channelcfg.dma = NULL_PTR,
+
+            .qspi_sls.output.pin = &IfxQspi3_SLSO0_P02_4_OUT,
+            .qspi_sls.output.mode = IfxPort_OutputMode_pushPull,
+            .qspi_sls.output.driver = IfxPort_PadDriver_cmosAutomotiveSpeed1,
+        },
+        .rx_dma_cfg =
+        {
+            .dma_module = &MODULE_DMA,
+            .dma_modulecfg.dma = &MODULE_DMA,
+
+            .dma_channelcfg.module = NULL_PTR,
+
+            .dma_channelcfg.channelId = DMA_CHANNEL_MAGNETIC_ENCODER2_QSPI_TO_INTERRUPT,
+            .dma_channelcfg.sourceAddress = 0,
+            .dma_channelcfg.destinationAddress = 0,
+            .dma_channelcfg.shadowAddress = 0,
+            .dma_channelcfg.readDataCrc = 0,
+            .dma_channelcfg.sourceDestinationAddressCrc = 0,
+            .dma_channelcfg.transferCount = 1,
+            .dma_channelcfg.blockMode = IfxDma_ChannelMove_1,
+            .dma_channelcfg.requestMode = IfxDma_ChannelRequestMode_oneTransferPerRequest,
+            .dma_channelcfg.operationMode = IfxDma_ChannelOperationMode_continuous,
+            .dma_channelcfg.moveSize = IfxDma_ChannelMoveSize_16bit,
+            .dma_channelcfg.pattern = IfxDma_ChannelPattern_0_disable,
+            .dma_channelcfg.requestSource = IfxDma_ChannelRequestSource_peripheral,
+            .dma_channelcfg.busPriority = DMA_PRIORITY_MAGNETIC_ENCODER2_QSPI_TO_INTERRUPT,
+            .dma_channelcfg.hardwareRequestEnabled = TRUE,
+            .dma_channelcfg.sourceAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.sourceAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.sourceAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.destinationAddressIncrementStep = IfxDma_ChannelIncrementStep_1,
+            .dma_channelcfg.destinationAddressIncrementDirection = IfxDma_ChannelIncrementDirection_positive,
+            .dma_channelcfg.destinationAddressCircularRange = IfxDma_ChannelIncrementCircular_none,
+            .dma_channelcfg.shadowControl = IfxDma_ChannelShadow_none,
+            .dma_channelcfg.sourceCircularBufferEnabled = TRUE,
+            .dma_channelcfg.destinationCircularBufferEnabled = TRUE,
+            .dma_channelcfg.timestampEnabled = FALSE,
+            .dma_channelcfg.wrapSourceInterruptEnabled = FALSE,
+            .dma_channelcfg.wrapDestinationInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptEnabled = TRUE,
+            .dma_channelcfg.channelInterruptControl = IfxDma_ChannelInterruptControl_thresholdLimitMatch,
+            .dma_channelcfg.interruptRaiseThreshold = 0,
+            .dma_channelcfg.transactionRequestLostInterruptEnabled = FALSE,
+            .dma_channelcfg.channelInterruptPriority = ISR_CONFIG_PRIORITY_MAGNETIC_ENCODER2_BUSINESS_INTERRUPT,
+            .dma_channelcfg.channelInterruptTypeOfService = ISR_CONFIG_TOS_MAGNETIC_ENCODER2_BUSINESS_INTERRUPT,
+        },
+    },
+};
+
+device_magnetic_encoder_runtime_t device_magnetic_encoder_runtime_table[DEVICE_MAGNETIC_ENCODER_COUNT] =
+{
+    {
+        .magnetic_encoder_id = DEVICE_MAGNETIC_ENCODER_1,
+        .dma_command_buffer = 0xFFFF,
+        .dma_receive_buffer = 0u,
+        .device_magnetic_encoder_callback = NULL_PTR,
+    },
+    {
+        .magnetic_encoder_id = DEVICE_MAGNETIC_ENCODER_2,
+        .dma_command_buffer = 0xFFFF,
+        .dma_receive_buffer = 0u,
+        .device_magnetic_encoder_callback = NULL_PTR,
+    },
+};
+
+device_magnetic_encoder_cfg_t* device_magnetic_encoder_cfg_table_get(void)
+{
+    return device_magnetic_encoder_cfg_table;
+}
+
+device_magnetic_encoder_runtime_t* device_magnetic_encoder_runtime_table_get(void)
+{
+    return device_magnetic_encoder_runtime_table;
+}

@@ -1,0 +1,6 @@
+#ifndef MAD_CIRCUITS_APP_TASK_ASYNCHRONOUS_PHOTOTUBE_H
+#define MAD_CIRCUITS_APP_TASK_ASYNCHRONOUS_PHOTOTUBE_H
+
+void app_task_asynchronous_phototube_run(void);
+
+#endif

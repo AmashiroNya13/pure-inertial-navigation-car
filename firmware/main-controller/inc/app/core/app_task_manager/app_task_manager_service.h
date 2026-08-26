@@ -1,0 +1,14 @@
+#ifndef MAD_CIRCUITS_APP_CORE_APP_TASK_MANAGER_SERVICE_H
+#define MAD_CIRCUITS_APP_CORE_APP_TASK_MANAGER_SERVICE_H
+
+#include "Ifx_Types.h"
+
+#ifndef MAD_CIRCUITS_APP_CORE_APP_TASK_MANAGER_CALLBACK_T_DEFINED
+#define MAD_CIRCUITS_APP_CORE_APP_TASK_MANAGER_CALLBACK_T_DEFINED
+typedef void (*app_task_manager_callback_t)(void);
+#endif
+
+void app_task_manager_app_task_service_register(app_task_manager_callback_t app_task_service_callback);
+void app_task_manager_app_task_service_run(void);
+
+#endif

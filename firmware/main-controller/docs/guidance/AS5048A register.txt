@@ -1,0 +1,142 @@
+通信帧结构
+从芯片 SPI 收到的 16‑bit 原始数据同时包含状态位和 14‑bit 有效数据：
+/* ===== SPI 帧格式 ===== */
+union AS5048A_Frame {
+    uint16_t raw;                // 原始 SPI 帧
+    struct {
+        uint16_t data    : 14;   // bit[13:0]  14-bit 有效载荷
+        uint16_t ef      : 1;    // bit[14]    错误标志 (Error Flag)
+        uint16_t parity  : 1;    // bit[15]    偶校验位 (Even Parity)
+    };
+};
+
+寄存器定义（按地址枚举）
+/* ===== 寄存器地址枚举 ===== */
+typedef enum {
+    AS5048A_REG_NOP               = 0x0000,   // 空操作
+    AS5048A_REG_ERROR             = 0x0001,   // 错误寄存器
+    AS5048A_REG_PROG_CTRL         = 0x0003,   // OTP 编程控制
+    AS5048A_REG_ZERO_MSB          = 0x0016,   // 零点高 8 位
+    AS5048A_REG_ZERO_LSB          = 0x0017,   // 零点低 6 位
+    AS5048A_REG_AGC               = 0x3FFD,   // AGC + 诊断
+    AS5048A_REG_MAGNITUDE         = 0x3FFE,   // 磁场幅值
+    AS5048A_REG_ANGLE             = 0x3FFF    // 角度数据
+} as5048a_reg_t;
+
+
+
+详细寄存器结构体定义
+
+1. 错误状态寄存器（x0001）
+错误标志由通信错误触发（奇偶错、时钟数错误、无效命令、帧错），一旦置位会保持直到被清除。
+/* ===== x0001 - 错误寄存器 ===== */
+union AS5048A_ERROR_REG {
+    uint16_t raw;
+    struct {
+        uint16_t framing_error  : 1;   // bit[0] 帧错误
+        uint16_t cmd_invalid    : 1;   // bit[1] 无效命令
+        uint16_t parity_error   : 1;   // bit[2] 奇偶校验失败
+        uint16_t reserved_3_13  : 11;  // bit[3..13] 保留
+        uint16_t error_flag     : 1;   // bit[14] 总错误标志
+        uint16_t parity         : 1;   // bit[15] 偶校验位
+    };
+};
+
+2. 编程控制寄存器（x0003）
+用于一次性可编程（OTP）存储器操作，仅需一次性配置即可永久保存零位设置。OTP 烧录成功后不可逆转。
+/* ===== x0003 - 编程控制寄存器 ===== */
+union AS5048A_PROG_CTRL_REG {
+    uint16_t raw;
+    struct {
+        uint16_t prog_enable    : 1;   // bit[0]  编程使能
+        uint16_t _reserved1     : 3;   // bit[1..3] 保留
+        uint16_t burn           : 1;   // bit[4]  烧录 OTP 位
+        uint16_t _reserved2     : 1;   // bit[5]  保留
+        uint16_t verify         : 1;   // bit[6]  OTP 验证
+        uint16_t _reserved_7_13 : 7;   // bit[7..13] 保留
+        uint16_t _reserved14    : 1;   // bit[14] 保留
+        uint16_t parity         : 1;   // bit[15] 偶校验位
+    };
+};
+
+3. 零点寄存器（x0016 + x0017）
+/* ===== x0016 - 零点高 8 位 ===== */
+union AS5048A_ZERO_MSB_REG {
+    uint16_t raw;
+    struct {
+        uint16_t zero_lsb_part  : 6;   // bit[0..5]  零点低 6 位（与 x0017 的 low6 拼接）
+        uint16_t zero_msb       : 8;   // bit[6..13] 零点高 8 位
+        uint16_t _reserved14    : 1;   // bit[14] 保留
+        uint16_t parity         : 1;   // bit[15] 偶校验位
+    };
+};
+
+/* ===== x0017 - 零点低 6 位 ===== */
+union AS5048A_ZERO_LSB_REG {
+    uint16_t raw;
+    struct {
+        uint16_t zero_low6      : 6;   // bit[0..5]  零点低 6 位（与 x0016 的 zero_lsb_part 相同）
+        uint16_t _reserved_6_13 : 8;   // bit[6..13] 保留
+        uint16_t _reserved14    : 1;   // bit[14] 保留
+        uint16_t parity         : 1;   // bit[15] 偶校验位
+    };
+};
+
+4. AGC + 诊断寄存器（x3FFD）
+诊断标志用于指示内部误差和磁场强度范围，其中 OCF/COF 指示 DSP 算法是否就绪或溢出，COMP_low/COMP_high 用于校验磁铁间隙。
+/* ===== x3FFD - AGC + 诊断寄存器 ===== */
+union AS5048A_AGC_DIAG_REG {
+    uint16_t raw;
+    struct {
+        uint16_t agc_value      : 8;   // bit[0..7]  自动增益控制值（磁场强度）
+        uint16_t ocf            : 1;   // bit[8]     偏移补偿完成标志（1=已完成）
+        uint16_t comp_low       : 1;   // bit[9]     磁场过弱标志
+        uint16_t comp_high      : 1;   // bit[10]    磁场过强标志
+        uint16_t _reserved_11   : 1;   // bit[11]    保留
+        uint16_t reserved_12_13 : 2;   // bit[12..13] 保留（数据手册中常为 0）
+        uint16_t _reserved14    : 1;   // bit[14]    保留
+        uint16_t parity         : 1;   // bit[15]    偶校验位
+    };
+};
+
+/* ----- AGC/诊断寄存器字段枚举 ----- */
+typedef enum {
+    AS5048A_OCF_IDLE    = 0,           // 偏移补偿未开始/中断
+    AS5048A_OCF_DONE    = 1,           // 偏移补偿已完成
+
+    AS5048A_COMP_FIELD_OK   = 0,       // 磁场强度正常
+    AS5048A_COMP_FIELD_LOW  = 1,       // 磁场过弱
+    AS5048A_COMP_FIELD_HIGH = 1        // 磁场过强
+} as5048a_diag_flags_t;
+
+5. 磁场幅值寄存器（x3FFE）
+输出为线性幅值原始值，典型范围 0–8191（满量程 8191 对应最大灵敏度）。
+/* ===== x3FFE - 磁场幅值寄存器 ===== */
+union AS5048A_MAGNITUDE_REG {
+    uint16_t raw;
+    struct {
+        uint16_t magnitude      : 14;  // bit[0..13] 磁场强度幅值（0–8191）
+        uint16_t _reserved14    : 1;   // bit[14] 保留
+        uint16_t parity         : 1;   // bit[15] 偶校验位
+    };
+};
+
+6. 角度寄存器（x3FFF）
+/* ===== x3FFF - 角度寄存器 ===== */
+union AS5048A_ANGLE_REG {
+    uint16_t raw;
+    struct {
+        uint16_t angle          : 14;  // bit[0..13] 角度值（0~16383，对应 0~360°）
+        uint16_t _reserved14    : 1;   // bit[14] 保留
+        uint16_t parity         : 1;   // bit[15] 偶校验位
+    };
+};
+
+命令枚举：
+/* ===== SPI 命令枚举 ===== */
+typedef enum {
+    AS5048A_CMD_READ_MASK  = 0x4000,   // bit14 = 1（读）
+    AS5048A_CMD_WRITE_MASK = 0x0000,   // bit14 = 0（写）
+    AS5048A_CMD_NOP        = 0x0000,   // NOP 命令（地址为 0x0000）
+    AS5048A_CMD_CLEAR      = 0x0001    // 清除错误标志（对地址 0x0001 执行读）
+} as5048a_cmd_t;

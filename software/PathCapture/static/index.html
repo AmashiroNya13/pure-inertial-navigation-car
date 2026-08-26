@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>惯导路径查看器</title>
+    <link rel="stylesheet" href="/static/style.css?v=10">
+</head>
+<body>
+    <main id="app">
+        <header id="topbar">
+            <section class="serial-connect" aria-label="串口连接">
+                <select id="port-select" title="串口端口">
+                    <option value="">选择串口</option>
+                </select>
+                <button id="refresh-ports-btn" class="icon-button" title="刷新串口">&#8635;</button>
+                <select id="baudrate-select" title="波特率">
+                    <option value="115200">115200</option>
+                    <option value="230400">230400</option>
+                    <option value="460800">460800</option>
+                    <option value="500000">500000</option>
+                    <option value="576000">576000</option>
+                    <option value="921600">921600</option>
+                    <option value="1000000">1000000</option>
+                    <option value="1152000">1152000</option>
+                    <option value="1500000">1500000</option>
+                    <option value="2000000" selected>2000000</option>
+                </select>
+                <button id="connect-btn" class="primary-button">连接</button>
+                <span id="conn-indicator" class="status-dot disconnected"></span>
+                <span id="conn-text">未连接</span>
+            </section>
+
+            <section class="command-entry" aria-label="串口命令">
+                <select id="command-template" title="选择后生成可编辑的命令示例">
+                    <option value="">快捷命令</option>
+                    <option value="vrspd 0.8">固定复现速度</option>
+                    <option value="vpath lookahead 280">前瞻距离</option>
+                    <option value="vpath tangent 50">前瞻切线距离</option>
+                    <option value="vpath speedlookahead 700">速度预瞄距离</option>
+                    <option value="vangpid 1500 0 40">角度环 PID</option>
+                    <option value="vpid 5 10 0">左右速度环 PI</option>
+                    <option value="vpid l 5 10 0">左轮速度环 PI</option>
+                    <option value="vpid r 5 10 0">右轮速度环 PI</option>
+                    <option value="vpid status">查询速度环 PI</option>
+                    <option value="vwcirc 93.9">设置轮周长 93.9 mm</option>
+                    <option value="vwcirc">查询轮周长</option>
+                    <option value="vload 3000">自动下地速度环测试</option>
+                    <option value="vload 3000 3000">自动下地左右轮独立测试</option>
+                    <option value="vload stop">停止自动下地测试</option>
+                    <option value="vload ff on">启用下地测试速度前馈</option>
+                    <option value="vload ff off">禁用下地测试速度前馈</option>
+                    <option value="vload ff status">查询下地测试速度前馈</option>
+                    <option value="vspd 3000">持续速度环测试</option>
+                    <option value="vspd 0">停止持续速度环测试</option>
+                    <option value="vtelemetry binary">复现遥测：高效二进制</option>
+                    <option value="vtelemetry text">复现遥测：兼容文本</option>
+                    <option value="vtelemetry status">查询复现遥测格式</option>
+                    <option value="vaff 0 0 3000">速度加速 / 减速前馈</option>
+                    <option value="vaff status">查询速度加速度前馈</option>
+                    <option value="vang2d 10 40 12 25">角度环二自由度</option>
+                    <option value="vang2d status">查询角度环扩展参数</option>
+                    <option value="vang2d on">启用角度环扩展</option>
+                    <option value="vang2d off">关闭角度环扩展</option>
+                    <option value="vpath speed planned">打开规划速度</option>
+                    <option value="vpath speed fixed">关闭规划速度</option>
+                    <option value="vpath mark on">开启直线终点预瞄</option>
+                    <option value="vpath mark off">关闭直线终点预瞄</option>
+                    <option value="vpath mark status">查询直线终点预瞄</option>
+                    <option value="ptcorr monitor on">光电仅观察（不修正）</option>
+                    <option value="ptcorr monitor off">关闭光电观察</option>
+                    <option value="ptcorr on">开启光电坐标修正</option>
+                    <option value="ptcorr off">关闭光电坐标修正</option>
+                    <option value="ptcorr status">查询光电修正状态</option>
+                    <option value="ptcorr print 20">光电诊断每 20 帧回传</option>
+                    <option value="ptcorr print off">关闭光电诊断回传</option>
+                    <option value="vpath slip on">开启打滑里程修正</option>
+                    <option value="vpath slip off">关闭打滑里程修正</option>
+                    <option value="vpath slip status">查询打滑里程修正</option>
+                    <option value="ptcal drive 0.5">一键行驶式光电标定（0.5 m/s）</option>
+                    <option value="ptcal drive status">查询行驶式光电标定</option>
+                    <option value="ptcal drive abort">中止行驶式光电标定</option>
+                </select>
+                <input id="command-input" type="text" maxlength="128"
+                       placeholder="输入串口命令，例如 vangpid 1500 0 40"
+                       autocomplete="off" spellcheck="false">
+                <button id="send-command-btn">发送</button>
+            </section>
+
+            <button id="theme-toggle-btn" class="icon-button" title="切换主题">&#9680;</button>
+        </header>
+
+        <section id="controlbar">
+            <div class="mode-block">
+                <span class="control-label">小车状态</span>
+                <span id="mode-badge" class="mode-badge mode-idle">空闲</span>
+                <span id="mode-reason" class="mode-reason">等待小车回包</span>
+            </div>
+
+            <div class="run-actions">
+                <button id="record-start-btn" class="record-button">开始录制</button>
+                <button id="record-stop-btn">停止并保存录制</button>
+                <button id="replay-start-btn" class="primary-button">开始复现</button>
+                <button id="phototube-cal-btn" class="calibration-button">一键光电标定</button>
+            </div>
+
+            <nav id="workspace-tabs" class="segmented-control" aria-label="工作区">
+                <button class="workspace-tab active" data-workspace="live">实时监控</button>
+                <button class="workspace-tab" data-workspace="planning">规划验证</button>
+                <button class="workspace-tab" data-workspace="external">外部路径</button>
+            </nav>
+
+            <button id="emergency-stop-btn" class="emergency-stop">立即停止 VSTOP</button>
+
+            <div class="view-actions">
+                <button id="auto-fit-btn">适应画面</button>
+                <button id="origin-view-btn" title="将坐标原点 (0,0) 放到画布中心">定位零点</button>
+                <button id="zoom-in-btn" class="icon-button" title="放大">+</button>
+                <button id="zoom-out-btn" class="icon-button" title="缩小">-</button>
+                <button id="save-btn">保存数据</button>
+                <button id="export-raw-btn" title="导出本次连接收到的全部原始串口行">导出原始数据</button>
+                <button id="load-btn">导入文件</button>
+                <button id="clear-btn" class="force-clear-button" title="立即清空前端与后台缓存，不等待串口或回放结束">强制清空</button>
+            </div>
+        </section>
+
+        <section id="workspace">
+            <div id="map-pane">
+                <div id="layerbar">
+                    <label><input type="checkbox" id="show-predefined" checked><i class="legend blue"></i>录制路径</label>
+                    <label id="geometry-planned-legend"><input type="checkbox" id="show-geometry-plan" checked><i class="legend orange"></i>几何规划路径</label>
+                    <label class="planning-layer"><input type="checkbox" id="show-firmware-plan" checked><i class="legend violet"></i>主控规划路径</label>
+                    <label class="external-layer"><input type="checkbox" id="show-external-route" checked><i class="legend cyan"></i>外部节点路径</label>
+                    <label class="external-layer"><input type="checkbox" id="show-external-network" checked><i class="legend graphite"></i>原始节点连线</label>
+                    <label class="external-layer"><input type="checkbox" id="show-external-segments" checked><i class="legend magenta"></i>外部切弯路径</label>
+                    <label class="external-layer"><input type="checkbox" id="show-external-shoulders" checked><i class="legend shoulder"></i>路肩</label>
+                    <label class="runtime-layer"><input type="checkbox" id="show-realtime" checked><i class="legend red"></i>复现轨迹</label>
+                    <label class="runtime-layer"><input type="checkbox" id="show-slip-correction" checked><i class="legend slip"></i>滑移修正标记</label>
+                    <label class="runtime-layer"><input type="checkbox" id="show-phototube-observation" checked><i class="legend phototube"></i>光电观测</label>
+                    <label class="runtime-layer"><input type="checkbox" id="show-lookahead" checked><i class="legend green"></i>当前前瞻点</label>
+                    <label class="runtime-layer"><input type="checkbox" id="show-lookahead-history">历史前瞻点</label>
+                    <label class="runtime-layer"><input type="checkbox" id="vehicle-sim-enabled">车体仿真</label>
+                    <details id="simulation-lookahead-config" class="layer-config runtime-layer">
+                        <summary>
+                            <input type="checkbox" id="show-simulation-lookahead" checked aria-label="显示仿真预瞄点">
+                            <i class="legend simulation-lookahead"></i>
+                            <span>仿真预瞄点</span>
+                            <small id="simulation-lookahead-source">模拟参数</small>
+                        </summary>
+                        <div class="layer-config-panel">
+                            <label>前馈 <input id="simulation-steering-lookahead-mm" type="number" min="0" max="2000" step="10" value="400"> mm</label>
+                            <label>切线 <input id="simulation-tangent-distance-mm" type="number" min="0" max="500" step="5" value="50"> mm</label>
+                            <label>速度预瞄 <input id="simulation-speed-preview-mm" type="number" min="0" max="3000" step="10" value="100"> mm</label>
+                            <span>仅在没有主控真实目标回包时使用</span>
+                        </div>
+                    </details>
+                    <label class="runtime-layer"><input type="checkbox" id="show-diagnostics">控制诊断</label>
+                    <span id="lookahead-state" class="lookahead-state" data-mode="waiting">前瞻：等待数据</span>
+                    <span id="slip-state" class="slip-state" data-mode="waiting">滑移：等待数据</span>
+                    <span id="phototube-state" class="phototube-state" data-mode="waiting">光电：未监视</span>
+                    <label class="geometry-toggle"><input type="checkbox" id="geometry-validation">几何规划验证</label>
+                    <label class="geometry-method" id="geometry-method-wrap" hidden>
+                        <select id="geometry-algorithm" title="几何规划算法">
+                            <option value="global" selected>全局曲率样条（推荐）</option>
+                            <option value="legacy">分段回旋圆弧（旧）</option>
+                        </select>
+                    </label>
+                    <div class="curvature-limit-control" id="curvature-limit-wrap" hidden>
+                        <label><input type="checkbox" id="curvature-limit" checked>限制最小半径</label>
+                        <input type="number" id="minimum-radius-mm" min="60" max="1000" step="10" value="150" title="最小转弯半径">
+                        <span>mm</span>
+                        <label class="corridor-optimizer-toggle"><input type="checkbox" id="corridor-optimizer">横向偏移优化（实验）</label>
+                    </div>
+                    <span id="geometry-summary" hidden></span>
+                </div>
+                <section id="planning-tools" class="workspace-tools" hidden>
+                    <div class="tool-group">
+                        <strong>几何</strong>
+                        <label>算法
+                            <select id="planning-algorithm">
+                                <option value="global" selected>全局曲率样条</option>
+                                <option value="legacy">分段回旋圆弧</option>
+                            </select>
+                        </label>
+                        <label><input type="checkbox" id="planning-radius-limit" checked>最小半径</label>
+                        <input id="planning-radius-mm" type="number" min="60" max="1000" step="10" value="150">
+                        <span>mm</span>
+                    </div>
+                    <div class="tool-group">
+                        <strong>主控速度规划</strong>
+                        <label><input type="checkbox" id="speed-plan-enabled" checked>显示</label>
+                        <label>最高 <input id="speed-max" type="number" min="400" max="5000" step="100" value="3200"> mm/s</label>
+                        <label>横向 <input id="speed-lateral-accel" type="number" min="1000" max="50000" step="1000" value="25000"> mm/s²</label>
+                        <label>加减速 <input id="speed-long-accel" type="number" min="1000" max="50000" step="1000" value="25000"> mm/s²</label>
+                    </div>
+                    <div class="tool-group lookahead-controls">
+                        <strong>前瞻仿真</strong>
+                        <label>横向偏移 <input id="planning-lateral-offset-mm" type="number" min="-500" max="500" step="5" value="0"> mm</label>
+                        <label>转向 <input id="steering-lookahead-mm" type="number" min="0" max="1000" step="10" value="250"> mm</label>
+                        <label>切线 <input id="tangent-distance-mm" type="number" min="5" max="300" step="5" value="30"> mm</label>
+                        <label>速度 <input id="speed-preview-mm" type="number" min="0" max="1500" step="10" value="300"> mm</label>
+                        <input id="planning-progress" type="range" min="0" max="1000" step="1" value="0" title="路径进度">
+                        <span id="planning-progress-label">0.00 m</span>
+                        <span id="planning-metrics"></span>
+                    </div>
+                    <div class="tool-group flash-upload-controls">
+                        <strong>主控 Flash</strong>
+                        <button id="planning-upload-btn" class="primary-button" disabled>写入几何规划路径</button>
+                        <button id="planning-upload-cancel-btn" hidden>取消</button>
+                        <span id="planning-upload-status">统一 5 mm 点距</span>
+                    </div>
+                </section>
+                <section id="external-tools" class="workspace-tools" hidden>
+                    <div class="tool-group">
+                        <strong>节点图导入</strong>
+                        <button id="external-load-btn">导入节点 JSON</button>
+                        <button id="external-paste-btn">粘贴 JSON</button>
+                        <label>路线
+                            <select id="external-source">
+                                <option value="nodes">节点折线路径</option>
+                                <option value="segments" selected>外部切弯路径</option>
+                            </select>
+                        </label>
+                        <label>原点 <select id="external-origin"><option value="">起点节点</option></select></label>
+                        <span id="external-origin-position">导出起点 -</span>
+                    </div>
+                    <div class="tool-group">
+                        <strong>坐标对齐</strong>
+                        <label><input type="checkbox" id="external-align" checked>首段对齐 +X</label>
+                        <label>旋转
+                            <select id="external-rotation">
+                                <option value="0" selected>0°</option><option value="90">+90°</option>
+                                <option value="-90">-90°</option><option value="180">180°</option>
+                            </select>
+                        </label>
+                        <label><input type="checkbox" id="external-mirror-y">镜像 Y</label>
+                        <label><input type="checkbox" id="external-reverse">反向路线</label>
+                        <label>偏置 X <input id="external-offset-x" type="number" step="10" value="0"> mm</label>
+                        <label>偏置 Y <input id="external-offset-y" type="number" step="10" value="0"> mm</label>
+                        <label>路肩最小净距 <input id="external-shoulder-distance" type="number" min="0" step="10" value="150"> mm</label>
+                        <label>宽度 <input id="external-shoulder-width" type="number" min="1" step="5" value="40"> mm</label>
+                        <button id="external-use-raw-btn" class="primary-button">作为规划原始路径</button>
+                    </div>
+                    <div class="tool-group flash-upload-controls">
+                        <strong>主控 Flash</strong>
+                        <button id="external-upload-btn" class="primary-button" disabled>写入外部切弯路径</button>
+                        <button id="external-upload-cancel-btn" hidden>取消</button>
+                        <span id="external-upload-status">统一 5 mm 点距</span>
+                    </div>
+                    <span id="external-summary">尚未导入节点图</span>
+                </section>
+                <section id="simulation-tools" class="workspace-tools simulation-tools">
+                    <div class="tool-group vehicle-sim-controls">
+                        <strong>车体碰撞仿真</strong>
+                        <label>路径
+                            <select id="vehicle-sim-source">
+                                <option value="auto">自动选择</option>
+                                <option value="replay" selected>复现轨迹</option>
+                                <option value="recorded">录制路径</option>
+                                <option value="geometry">几何规划路径</option>
+                                <option value="firmware">主控速度规划路径</option>
+                                <option value="external-nodes">外部节点路径</option>
+                                <option value="external-segments">外部切弯路径</option>
+                            </select>
+                        </label>
+                        <label><input id="vehicle-sim-use-speed" type="checkbox" checked>使用规划速度</label>
+                        <label>固定速度 <input id="vehicle-sim-fixed-speed" type="number" min="10" max="10000" step="100" value="1200"> mm/s</label>
+                        <button id="vehicle-sim-play">从起点播放</button>
+                        <label class="vehicle-sim-progress-wrap">进度
+                            <input id="vehicle-sim-progress" type="range" min="0" max="1" step="0.001" value="0" disabled title="拖动定位仿真时间">
+                            <span id="vehicle-sim-progress-label">00:00.000 / 00:00.000</span>
+                        </label>
+                        <label>长 <input id="vehicle-length-mm" type="number" min="20" max="1000" step="5" value="150"> mm</label>
+                        <label>宽 <input id="vehicle-width-mm" type="number" min="20" max="1000" step="5" value="140"> mm</label>
+                        <label>转心距车尾 <input id="vehicle-pivot-mm" type="number" min="0" max="1000" step="5" value="50"> mm</label>
+                        <button id="vehicle-sim-clear">清除碰撞记录</button>
+                    </div>
+                </section>
+                <div id="canvas-container">
+                    <canvas id="canvas"></canvas>
+                    <aside id="vehicle-sim-panel" hidden>
+                        <div class="vehicle-sim-heading">
+                            <strong>车体安全</strong>
+                            <span id="vehicle-sim-state">未运行</span>
+                        </div>
+                        <div id="vehicle-sim-detail">导入外部路径后开始仿真</div>
+                        <ol id="vehicle-collision-events"></ol>
+                    </aside>
+                    <div id="point-tooltip" hidden></div>
+                    <div id="zoom-hint">滚轮缩放，拖动平移，悬停查看点数据</div>
+                </div>
+                <div id="analysis-charts">
+                <section id="curvature-pane" hidden aria-label="曲率随路程变化">
+                    <div class="curvature-heading">
+                        <strong>曲率</strong>
+                        <span class="curvature-series"><i class="legend blue"></i>规划前</span>
+                        <span class="curvature-series"><i class="legend orange"></i>规划后</span>
+                        <span class="curvature-series" id="curvature-bound-legend"><i class="limit-line"></i>曲率上限</span>
+                        <span>横轴：路程 m</span>
+                        <span>纵轴：曲率 1/m</span>
+                    </div>
+                    <canvas id="curvature-canvas"></canvas>
+                </section>
+                <section id="speed-pane" hidden aria-label="速度规划约束">
+                    <div class="curvature-heading">
+                        <strong>速度规划</strong>
+                        <span class="chart-series curve-cap">曲率</span>
+                        <span class="chart-series wheel-cap">轮速</span>
+                        <span class="chart-series accel-cap">前向加速</span>
+                        <span class="chart-series brake-cap">反向制动</span>
+                        <span class="chart-series final-speed">最终速度</span>
+                        <span>横轴：路程 m</span><span>纵轴：m/s</span>
+                    </div>
+                    <canvas id="speed-canvas"></canvas>
+                </section>
+                </div>
+                <div id="statusbar">
+                    <span id="sb-coords">X: 0.0 cm&nbsp;&nbsp;Y: 0.0 cm</span>
+                    <span id="sb-scale">缩放 1.00x</span>
+                    <span id="sb-points">录制 0 点 / 复现 0 点</span>
+                    <span id="sb-fps">0 FPS</span>
+                </div>
+            </div>
+
+            <aside id="serial-pane">
+                <div class="pane-heading">
+                    <strong>串口收发</strong>
+                    <button id="clear-console-btn" class="small-button">清空显示</button>
+                </div>
+                <div id="serial-console" role="log" aria-live="polite"></div>
+            </aside>
+        </section>
+
+        <section id="playbackbar">
+            <div class="run-picker">
+                <label for="run-select">复现记录</label>
+                <select id="run-select"><option value="">暂无记录</option></select>
+                <button id="live-view-btn">返回实时</button>
+            </div>
+            <div class="playback-controls">
+                <button id="playback-reset-btn" class="icon-button" title="回到开头">&#124;&lt;</button>
+                <button id="playback-toggle-btn" class="play-button">播放</button>
+                <span id="playback-time">00:00.000 / 00:00.000</span>
+                <div class="playback-timeline">
+                    <input id="playback-slider" type="range" min="0" max="0" step="0.001" value="0">
+                    <div id="slip-timeline-markers" aria-hidden="true"></div>
+                </div>
+                <select id="playback-speed" title="回放倍速">
+                    <option value="0.25">0.25x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="4">4x</option>
+                </select>
+            </div>
+        </section>
+    </main>
+
+    <input type="file" id="file-input" accept=".json,.pathcapture,.dat,.log,.txt" hidden>
+    <input type="file" id="external-file-input" accept=".json" hidden>
+    <dialog id="external-paste-dialog">
+        <form method="dialog" class="paste-dialog-content">
+            <div class="paste-dialog-heading">
+                <strong>粘贴节点图 JSON</strong>
+                <button value="cancel" class="icon-button" title="关闭">×</button>
+            </div>
+            <textarea id="external-paste-text" spellcheck="false" placeholder="粘贴节点 Web 中“生成给 AI 的数据”文本"></textarea>
+            <div class="paste-dialog-actions">
+                <button value="cancel">取消</button>
+                <button id="external-paste-import-btn" value="default" class="primary-button">导入节点图</button>
+            </div>
+        </form>
+    </dialog>
+    <div id="toast-container"></div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/static/geometry-planner.js?v=5"></script>
+    <script src="/static/firmware-speed-planner.js?v=2"></script>
+    <script src="/static/external-path.js?v=11"></script>
+    <script src="/static/vehicle-simulator.js?v=4"></script>
+    <script src="/static/path-upload.js?v=2"></script>
+    <script src="/static/app.js?v=36"></script>
+</body>
+</html>

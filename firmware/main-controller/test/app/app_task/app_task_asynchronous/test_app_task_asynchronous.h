@@ -1,0 +1,8 @@
+#ifndef TEST_APP_TASK_ASYNCHRONOUS_H
+#define TEST_APP_TASK_ASYNCHRONOUS_H
+
+void app_test_app_task_asynchronous_imu_callback(void);
+void app_test_app_task_asynchronous_encoder_callback(void);
+void app_test_app_task_asynchronous_phototube_callback(void);
+
+#endif

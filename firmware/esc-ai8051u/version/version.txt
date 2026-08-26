@@ -1,0 +1,7 @@
+本项目有两个版本文件
+
+一个是BLDC项目版本，在bldc文件夹下的bldc_version.txt
+
+一个是单片机底层驱动版本,在Libraries\doc目录下
+
+

@@ -1,0 +1,200 @@
+常用寄存器
+功能分类	寄存器名称	地址	简要描述
+身份验证	WHO_AM_I	0x0F	只读，固定值 0x70，用于确认 SPI/I²C 通信正常
+系统控制	CTRL3	0x12	配置 BDU（数据更新锁存）、IF_INC（地址自增）、软件复位等
+加速度计	CTRL1	0x10	设置加速度计 ODR 和功耗模式（必须配置以启用）
+CTRL8	0x17	设置加速度计量程（±2/4/8/16g），以及 LPF2/HPF 带宽
+X_OFS_USR	0x73	加速度计 X 轴用户偏移校正
+Y_OFS_USR	0x74	加速度计 Y 轴用户偏移校正
+Z_OFS_USR	0x75	加速度计 Z 轴用户偏移校正
+陀螺仪	CTRL2	0x11	设置陀螺仪 ODR 和功耗模式（必须配置以启用）
+CTRL6	0x15	设置陀螺仪量程（±125/250/500/1000/2000/4000 dps）和 LPF1 带宽
+数据就绪	STATUS_REG	0x1E	读取加速度计、陀螺仪、温度的新数据就绪标志
+中断引脚	INT1_CTRL	0x0D	将数据就绪、FIFO 状态等信号路由到 INT1 引脚
+INT2_CTRL	0x0E	将数据就绪、FIFO 状态、嵌入式功能结束等信号路由到 INT2
+MD1_CFG	0x5E	将特定事件（敲击、自由落体、6D 等）路由到 INT1
+MD2_CFG	0x5F	将特定事件（敲击、自由落体、6D 等）路由到 INT2
+FIFO	FIFO_CTRL1	0x07	设置 FIFO 水印阈值（低 8 位，单位：字）
+FIFO_CTRL2	0x08	配置 FIFO 模式（连续、水印停止等）、压缩、ODR 变化记录
+FIFO_CTRL3	0x09	设置加速度计和陀螺仪数据批处理到 FIFO 的速率（BDR）
+FIFO_CTRL4	0x0A	设置温度、EIS 批处理速率，选择 FIFO 工作模式（连续、FIFO、触发模式等）
+COUNTER_BDR_REG1/2	0x0B/0x0C	设置批处理事件计数器阈值，用于定时触发 FIFO 读取
+运动检测	TAP_CFG0	0x56	使能敲击检测方向，选择滤波路径，配置中断锁存
+TAP_CFG1	0x57	设置敲击检测优先级、X 轴阈值
+TAP_CFG2	0x58	设置 Y 轴敲击阈值
+TAP_THS_6D	0x59	设置 Z 轴敲击阈值、6D/4D 方向阈值
+TAP_DUR	0x5A	设置敲击检测的时间参数（冲击、静音、双击间隔）
+WAKE_UP_THS	0x5B	设置唤醒阈值，选择单/双击模式
+WAKE_UP_DUR	0x5C	设置唤醒持续时间、自由落体持续时间、睡眠持续时间
+FREE_FALL	0x5D	设置自由落体阈值和持续时间
+嵌入式功能	FUNC_CFG_ACCESS	0x01	使能访问嵌入式功能寄存器（FSM、MLC、计步器等）
+EMB_FUNC_EN_A	0x04	使能计步器、倾斜、显著运动、MLC（先执行）、SFLP
+EMB_FUNC_EN_B	0x05	使能 FSM、MLC（后执行）、FIFO 压缩
+PAGE_SEL	0x02	选择高级功能页面（用于配置 FSM/MLC 程序、计步器参数等）
+FSM_ENABLE	0x46	使能各个有限状态机程序（1-8）
+FSM_ODR	0x5F	设置 FSM 运算的输入数据速率
+MLC_ODR	0x60	设置机器学习核心的运算数据速率
+STEP_COUNTER_L/H	0x62/0x63	只读，步数计数器值（可配置复位）
+EMB_FUNC_INIT_A/B	0x66/0x67	初始化嵌入式功能（计步器、MLC、FSM 等）
+ODR 高精度	HAODR_CFG	0x62	高精度 ODR 模式下的 ODR 集选择
+EIS/OIS	CTRL_EIS	0x6B	配置 EIS 通道（ODR、LPF、满量程、输出路由）
+UI_CTRL1_OIS	0x70	配置 OIS 接口（SPI 模式、OIS 使能、读取使能）
+UI_CTRL2_OIS	0x71	配置 OIS 陀螺仪 LPF 带宽和满量程
+UI_CTRL3_OIS	0x72	配置 OIS 加速度计带宽和满量程
+
+
+
+主寄存器（Primary Interface，SPI/I²C/I3C）
+寄存器名称	地址	类型	简要描述
+FUNC_CFG_ACCESS	0x01	R/W	使能访问嵌入式功能、传感器集线器、FSM写控制等
+PIN_CTRL	0x02	R/W	SDO、OCS_Aux、SDO_Aux 引脚上拉控制
+IF_CFG	0x03	R/W	接口配置（SPI 3/4线、上拉、中断极性等）
+ODR_TRIG_CFG	0x06	R/W	ODR触发模式配置
+FIFO_CTRL1	0x07	R/W	FIFO 水印阈值（低8位）
+FIFO_CTRL2	0x08	R/W	FIFO 模式、压缩、ODR变化等控制
+FIFO_CTRL3	0x09	R/W	FIFO 批处理速率（陀螺仪、加速度计）
+FIFO_CTRL4	0x0A	R/W	FIFO 批处理（温度、EIS）、时间戳、FIFO模式选择
+COUNTER_BDR_REG1	0x0B	R/W	批处理事件计数器阈值高2位，触发源选择
+COUNTER_BDR_REG2	0x0C	R/W	批处理事件计数器阈值低8位
+INT1_CTRL	0x0D	R/W	INT1 中断源使能（数据就绪、FIFO状态等）
+INT2_CTRL	0x0E	R/W	INT2 中断源使能（数据就绪、FIFO状态、嵌入式功能等）
+CTRL1	0x10	R/W	加速度计工作模式、ODR
+CTRL2	0x11	R/W	陀螺仪工作模式、ODR
+CTRL3	0x12	R/W	系统控制（BDU、地址自增、软件复位、启动）
+CTRL4	0x13	R/W	中断路由、数据就绪脉冲、温度中断等
+CTRL5	0x14	R/W	总线可用时间、I3C中断使能
+CTRL6	0x15	R/W	陀螺仪 LPF1 带宽、满量程
+CTRL7	0x16	R/W	模拟集线器/Qvar 使能、输入阻抗、LPF1使能
+CTRL8	0x17	R/W	加速度计 LPF2/HPF 带宽、双通道模式、满量程
+CTRL9	0x18	R/W	加速度计滤波路径选择、用户偏移配置
+CTRL10	0x19	R/W	自测试使能、嵌入式功能调试
+WAKE_UP_SRC	0x45	R/W	唤醒中断源（注：只读，但列为R/W？实际只读，数据手册标记为R）
+TAP_CFG0	0x56	R/W	敲击检测配置（方向使能、滤波、中断锁存）
+TAP_CFG1	0x57	R/W	敲击优先级、X轴阈值
+TAP_CFG2	0x58	R/W	Y轴敲击阈值
+TAP_THS_6D	0x59	R/W	6D/4D 阈值、Z轴敲击阈值
+TAP_DUR	0x5A	R/W	敲击持续时间、静音时间、冲击时间
+WAKE_UP_THS	0x5B	R/W	唤醒阈值、单/双击使能、用户偏移选择
+WAKE_UP_DUR	0x5C	R/W	自由落体持续时间、唤醒持续时间、睡眠持续时间
+FREE_FALL	0x5D	R/W	自由落体阈值、持续时间
+MD1_CFG	0x5E	R/W	将特定事件路由到 INT1
+MD2_CFG	0x5F	R/W	将特定事件路由到 INT2
+HAODR_CFG	0x62	R/W	高精度 ODR 模式 ODR 集选择
+EMB_FUNC_CFG	0x63	R/W	嵌入式功能配置（双通道批处理、屏蔽等）
+UI_HANDSHAKE_CTRL	0x64	R/W	UI 与 SPI2 共享寄存器握手控制
+UI_SPI2_SHARED_0..5	0x65-0x6A	R/W	UI 与 SPI2 共享的 6 个通用寄存器
+CTRL_EIS	0x6B	R/W	EIS 通道配置（ODR、LPF、满量程、输出路由）
+UI_INT_OIS	0x6F	R/W	OIS 中断配置（主界面完全控制模式）
+UI_CTRL1_OIS	0x70	R/W	OIS 接口配置（SPI 3/4线、OIS使能、读取使能）
+UI_CTRL2_OIS	0x71	R/W	OIS 陀螺仪 LPF1 带宽、满量程
+UI_CTRL3_OIS	0x72	R/W	OIS 加速度计带宽、满量程
+X_OFS_USR	0x73	R/W	加速度计 X 轴用户偏移
+Y_OFS_USR	0x74	R/W	加速度计 Y 轴用户偏移
+Z_OFS_USR	0x75	R/W	加速度计 Z 轴用户偏移
+
+辅助 SPI 寄存器（Auxiliary SPI，SPI2）
+寄存器名称	地址	类型	简要描述
+SPI2_HANDSHAKE_CTRL	0x6E	R/W	SPI2 与 UI 共享寄存器握手控制
+SPI2_INT_OIS	0x6F	R/W	OIS 中断、自测试配置（SPI2 完全控制模式）
+SPI2_CTRL1_OIS	0x70	R/W	OIS 接口配置（SPI 3/4线、OIS使能、读取使能）
+SPI2_CTRL2_OIS	0x71	R/W	OIS 陀螺仪 LPF1 带宽、满量程
+SPI2_CTRL3_OIS	0x72	R/W	OIS 加速度计带宽、满量程
+
+嵌入式功能寄存器（需通过 FUNC_CFG_ACCESS 使能）
+寄存器名称	地址	类型	简要描述
+PAGE_SEL	0x02	R/W	选择高级功能页面（0、1、2）
+EMB_FUNC_EN_A	0x04	R/W	使能 MLC、显著运动、倾斜、计步器、SFLP
+EMB_FUNC_EN_B	0x05	R/W	使能 MLC（后执行）、FIFO 压缩、FSM
+PAGE_ADDRESS	0x08	R/W	高级功能页面寄存器地址
+PAGE_VALUE	0x09	R/W	高级功能页面寄存器数据
+EMB_FUNC_INT1	0x0A	R/W	将嵌入式功能事件路由到 INT1
+FSM_INT1	0x0B	R/W	将 FSM 中断路由到 INT1
+MLC_INT1	0x0D	R/W	将 MLC 中断路由到 INT1
+EMB_FUNC_INT2	0x0E	R/W	将嵌入式功能事件路由到 INT2
+FSM_INT2	0x0F	R/W	将 FSM 中断路由到 INT2
+MLC_INT2	0x11	R/W	将 MLC 中断路由到 INT2
+PAGE_RW	0x17	R/W	高级功能页面读写使能，中断锁存
+EMB_FUNC_FIFO_EN_A	0x44	R/W	嵌入式功能 FIFO 批处理使能（MLC结果、步数、SFLP等）
+EMB_FUNC_FIFO_EN_B	0x45	R/W	嵌入式功能 FIFO 批处理使能（MLC滤波器/特征）
+FSM_ENABLE	0x46	R/W	使能各 FSM 程序（1-8）
+FSM_LONG_COUNTER_L	0x48	R/W	FSM 长计数器低8位
+FSM_LONG_COUNTER_H	0x49	R/W	FSM 长计数器高8位
+INT_ACK_MASK	0x4B	R/W	中断确认掩码（控制读取状态寄存器时是否复位）
+SFLP_ODR	0x5E	R/W	SFLP 算法输出数据速率
+FSM_ODR	0x5F	R/W	FSM 输出数据速率
+MLC_ODR	0x60	R/W	MLC 输出数据速率
+EMB_FUNC_SRC	0x64	R/W	步数复位、步检测状态等（部分位只读）
+EMB_FUNC_INIT_A	0x66	R/W	嵌入式功能初始化请求（MLC、显著运动、倾斜等）
+EMB_FUNC_INIT_B	0x67	R/W	嵌入式功能初始化请求（MLC、FIFO压缩、FSM）
+
+嵌入式高级功能页面寄存器（需 PAGE_SEL 选择）
+页面 0（PAGE_SEL = 0000）
+寄存器名称	地址	类型	简要描述
+SFLP_GAME_GBIASX_L	0x6E	R/W	SFLP 算法 X 轴陀螺仪偏置（低8位）
+SFLP_GAME_GBIASX_H	0x6F	R/W	SFLP 算法 X 轴陀螺仪偏置（高8位）
+SFLP_GAME_GBIASY_L	0x70	R/W	SFLP 算法 Y 轴陀螺仪偏置（低8位）
+SFLP_GAME_GBIASY_H	0x71	R/W	SFLP 算法 Y 轴陀螺仪偏置（高8位）
+SFLP_GAME_GBIASZ_L	0x72	R/W	SFLP 算法 Z 轴陀螺仪偏置（低8位）
+SFLP_GAME_GBIASZ_H	0x73	R/W	SFLP 算法 Z 轴陀螺仪偏置（高8位）
+FSM_EXT_SENSITIVITY_L	0xBA	R/W	FSM 外部传感器灵敏度（低8位）
+FSM_EXT_SENSITIVITY_H	0xBB	R/W	FSM 外部传感器灵敏度（高8位）
+FSM_EXT_OFFX_L	0xC0	R/W	外部传感器 X 偏移（低8位）
+FSM_EXT_OFFX_H	0xC1	R/W	外部传感器 X 偏移（高8位）
+FSM_EXT_OFFY_L	0xC2	R/W	外部传感器 Y 偏移（低8位）
+FSM_EXT_OFFY_H	0xC3	R/W	外部传感器 Y 偏移（高8位）
+FSM_EXT_OFFZ_L	0xC4	R/W	外部传感器 Z 偏移（低8位）
+FSM_EXT_OFFZ_H	0xC5	R/W	外部传感器 Z 偏移（高8位）
+FSM_EXT_MATRIX_XX_L	0xC6	R/W	变换矩阵 (1,1) 系数低8位
+FSM_EXT_MATRIX_XX_H	0xC7	R/W	变换矩阵 (1,1) 系数高8位
+FSM_EXT_MATRIX_XY_L	0xC8	R/W	变换矩阵 (1,2) 系数低8位
+FSM_EXT_MATRIX_XY_H	0xC9	R/W	变换矩阵 (1,2) 系数高8位
+FSM_EXT_MATRIX_XZ_L	0xCA	R/W	变换矩阵 (1,3) 系数低8位
+FSM_EXT_MATRIX_XZ_H	0xCB	R/W	变换矩阵 (1,3) 系数高8位
+FSM_EXT_MATRIX_YY_L	0xCC	R/W	变换矩阵 (2,2) 系数低8位
+FSM_EXT_MATRIX_YY_H	0xCD	R/W	变换矩阵 (2,2) 系数高8位
+FSM_EXT_MATRIX_YZ_L	0xCE	R/W	变换矩阵 (2,3) 系数低8位
+FSM_EXT_MATRIX_YZ_H	0xCF	R/W	变换矩阵 (2,3) 系数高8位
+FSM_EXT_MATRIX_ZZ_L	0xD0	R/W	变换矩阵 (3,3) 系数低8位
+FSM_EXT_MATRIX_ZZ_H	0xD1	R/W	变换矩阵 (3,3) 系数高8位
+EXT_CFG_A	0xD4	R/W	外部传感器 Y/Z 轴坐标旋转
+EXT_CFG_B	0xD5	R/W	外部传感器 X 轴坐标旋转
+
+页面 1（PAGE_SEL = 0001）
+寄存器名称	地址	类型	简要描述
+FSM_LC_TIMEOUT_L	0x7A	R/W	FSM 长计数器超时值低8位
+FSM_LC_TIMEOUT_H	0x7B	R/W	FSM 长计数器超时值高8位
+FSM_PROGRAMS	0x7C	R/W	FSM 程序数量（≤8）
+FSM_START_ADD_L	0x7E	R/W	FSM 程序起始地址低8位
+FSM_START_ADD_H	0x7F	R/W	FSM 程序起始地址高8位
+PEDO_CMD_REG	0x83	R/W	计步器命令（进位使能、假阳性抑制）
+PEDO_DEB_STEPS_CONF	0x84	R/W	计步器去抖阈值（最小步数）
+PEDO_SC_DELTAT_L	0xD0	R/W	步数检测时间周期低8位（1 LSB = 6.4 ms）
+PEDO_SC_DELTAT_H	0xD1	R/W	步数检测时间周期高8位
+MLC_EXT_SENSITIVITY_L	0xE8	R/W	MLC 外部传感器灵敏度低8位
+MLC_EXT_SENSITIVITY_H	0xE9	R/W	MLC 外部传感器灵敏度高8位
+
+页面 2（PAGE_SEL = 0010）
+寄存器名称	地址	类型	简要描述
+EXT_FORMAT	0x00	R/W	外部传感器数据格式（2字节或3字节）
+EXT_3BYTE_SENSITIVITY_L	0x02	R/W	3字节外部传感器灵敏度低8位
+EXT_3BYTE_SENSITIVITY_H	0x03	R/W	3字节外部传感器灵敏度高8位
+EXT_3BYTE_OFFSET_XL	0x06	R/W	3字节外部传感器偏移最低8位
+EXT_3BYTE_OFFSET_L	0x07	R/W	3字节外部传感器偏移中间8位
+EXT_3BYTE_OFFSET_H	0x08	R/W	3字节外部传感器偏移最高8位
+
+传感器集线器寄存器（需 SHUB_REG_ACCESS 使能）
+寄存器名称	地址	类型	简要描述
+MASTER_CONFIG	0x14	R/W	传感器集线器主配置（复位、写一次、触发源、直通、使能）
+SLV0_ADD	0x15	R/W	从设备0 I²C 地址及读/写方向
+SLV0_SUBADD	0x16	R/W	从设备0 寄存器地址
+SLV0_CONFIG	0x17	R/W	从设备0 配置（通信速率、批处理使能、读取次数）
+SLV1_ADD	0x18	R/W	从设备1 I²C 地址及读使能
+SLV1_SUBADD	0x19	R/W	从设备1 寄存器地址
+SLV1_CONFIG	0x1A	R/W	从设备1 配置（批处理使能、读取次数）
+SLV2_ADD	0x1B	R/W	从设备2 I²C 地址及读使能
+SLV2_SUBADD	0x1C	R/W	从设备2 寄存器地址
+SLV2_CONFIG	0x1D	R/W	从设备2 配置（批处理使能、读取次数）
+SLV3_ADD	0x1E	R/W	从设备3 I²C 地址及读使能
+SLV3_SUBADD	0x1F	R/W	从设备3 寄存器地址
+SLV3_CONFIG	0x20	R/W	从设备3 配置（批处理使能、读取次数）
+DATAWRITE_SLV0	0x21	R/W	向从设备0 写入的数据（当方向为写时）

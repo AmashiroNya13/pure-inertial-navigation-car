@@ -1,0 +1,3470 @@
+Port class
+
+enum
+
+typedef enum
+{
+    IfxPort_ControlledBy_port = 0,  // 端口由 PORT 模块控制
+    IfxPort_ControlledBy_hsct = 1   // 端口由 HSCT 模块控制
+} IfxPort_ControlledBy;
+
+typedef enum
+{
+    IfxPort_InputMode_undefined    = -1,       // 未定义输入模式
+    IfxPort_InputMode_noPullDevice = 0 << 3,   // 输入，无上下拉
+    IfxPort_InputMode_pullDown     = 1U << 3,  // 输入，下拉
+    IfxPort_InputMode_pullUp       = 2U << 3   // 输入，上拉
+} IfxPort_InputMode;
+
+typedef enum
+{
+    IfxPort_Mode_inputNoPullDevice      = 0,      // 输入，无上下拉
+    IfxPort_Mode_inputPullDown          = 8U,     // 输入，下拉
+    IfxPort_Mode_inputPullUp            = 0x10U,  // 输入，上拉
+    IfxPort_Mode_outputPushPullGeneral  = 0x80U,  // 推挽输出，GPIO 通用输出
+    IfxPort_Mode_outputPushPullAlt1     = 0x88U,  // 推挽输出，复用功能 Alt1
+    IfxPort_Mode_outputPushPullAlt2     = 0x90U,  // 推挽输出，复用功能 Alt2
+    IfxPort_Mode_outputPushPullAlt3     = 0x98U,  // 推挽输出，复用功能 Alt3
+    IfxPort_Mode_outputPushPullAlt4     = 0xA0U,  // 推挽输出，复用功能 Alt4
+    IfxPort_Mode_outputPushPullAlt5     = 0xA8U,  // 推挽输出，复用功能 Alt5
+    IfxPort_Mode_outputPushPullAlt6     = 0xB0U,  // 推挽输出，复用功能 Alt6
+    IfxPort_Mode_outputPushPullAlt7     = 0xB8U,  // 推挽输出，复用功能 Alt7
+    IfxPort_Mode_outputOpenDrainGeneral = 0xC0U,  // 开漏输出，GPIO 通用输出
+    IfxPort_Mode_outputOpenDrainAlt1    = 0xC8U,  // 开漏输出，复用功能 Alt1
+    IfxPort_Mode_outputOpenDrainAlt2    = 0xD0U,  // 开漏输出，复用功能 Alt2
+    IfxPort_Mode_outputOpenDrainAlt3    = 0xD8U,  // 开漏输出，复用功能 Alt3
+    IfxPort_Mode_outputOpenDrainAlt4    = 0xE0U,  // 开漏输出，复用功能 Alt4
+    IfxPort_Mode_outputOpenDrainAlt5    = 0xE8U,  // 开漏输出，复用功能 Alt5
+    IfxPort_Mode_outputOpenDrainAlt6    = 0xF0U,  // 开漏输出，复用功能 Alt6
+    IfxPort_Mode_outputOpenDrainAlt7    = 0xF8U   // 开漏输出，复用功能 Alt7
+} IfxPort_Mode;
+
+typedef enum
+{
+    IfxPort_OutputIdx_general = 0x10U << 3,  // 通用输出
+    IfxPort_OutputIdx_alt1    = 0x11U << 3,  // 复用输出 Alt1
+    IfxPort_OutputIdx_alt2    = 0x12U << 3,  // 复用输出 Alt2
+    IfxPort_OutputIdx_alt3    = 0x13U << 3,  // 复用输出 Alt3
+    IfxPort_OutputIdx_alt4    = 0x14U << 3,  // 复用输出 Alt4
+    IfxPort_OutputIdx_alt5    = 0x15U << 3,  // 复用输出 Alt5
+    IfxPort_OutputIdx_alt6    = 0x16U << 3,  // 复用输出 Alt6
+    IfxPort_OutputIdx_alt7    = 0x17U << 3   // 复用输出 Alt7
+} IfxPort_OutputIdx;
+
+typedef enum
+{
+    IfxPort_OutputMode_pushPull  = 0x10U << 3,  // 推挽输出
+    IfxPort_OutputMode_openDrain = 0x18U << 3,  // 开漏输出
+    IfxPort_OutputMode_none      = 0             // 无输出模式
+} IfxPort_OutputMode;
+
+typedef enum
+{
+    IfxPort_PadDriver_cmosAutomotiveSpeed1 = 0,   // CMOS automotive speed grade 1
+    IfxPort_PadDriver_cmosAutomotiveSpeed2 = 1,   // CMOS automotive speed grade 2
+    IfxPort_PadDriver_cmosAutomotiveSpeed3 = 2,   // CMOS automotive speed grade 3
+    IfxPort_PadDriver_cmosAutomotiveSpeed4 = 3,   // CMOS automotive speed grade 4
+    IfxPort_PadDriver_lvdsSpeed1           = 4,   // LVDS speed grade 1
+    IfxPort_PadDriver_lvdsSpeed2           = 5,   // LVDS speed grade 2
+    IfxPort_PadDriver_lvdsSpeed3           = 6,   // LVDS speed grade 3
+    IfxPort_PadDriver_lvdsSpeed4           = 7,   // LVDS speed grade 4
+    IfxPort_PadDriver_ttlSpeed1            = 8,   // TTL speed grade 1
+    IfxPort_PadDriver_ttlSpeed2            = 9,   // TTL speed grade 2
+    IfxPort_PadDriver_ttlSpeed3            = 10,  // TTL speed grade 3
+    IfxPort_PadDriver_ttlSpeed4            = 11   // TTL speed grade 4
+} IfxPort_PadDriver;
+// 与 TC38x 源文档差异：TC26B 没有 `IfxPort_PadDriver_ttl3v3Speed1..4`，但有 `lvdsSpeed1..4`。
+
+typedef enum
+{
+    IfxPort_PadSupply_5v = 0,  // 选择 5V 供电
+    IfxPort_PadSupply_3v = 1   // 选择 3.3V 供电
+} IfxPort_PadSupply;
+// 与 TC38x 源文档差异：源文档记录为 `3v = 0, 5v = 1`，但 TC26B iLLD 实际是 `5v = 0, 3v = 1`。
+
+typedef enum
+{
+    IfxPort_State_notChanged = (0 << 16) | (0 << 0),  // 引脚状态不变
+    IfxPort_State_high       = (0 << 16) | (1U << 0), // 引脚输出高
+    IfxPort_State_low        = (1U << 16) | (0 << 0), // 引脚输出低
+    IfxPort_State_toggled    = (1U << 16) | (1U << 0) // 引脚翻转
+} IfxPort_State;
+
+typedef enum
+{
+    IfxPort_Index_00   = 0,   // PORT00
+    IfxPort_Index_02   = 2,   // PORT02
+    IfxPort_Index_10   = 10,  // PORT10
+    IfxPort_Index_11   = 11,  // PORT11
+    IfxPort_Index_13   = 13,  // PORT13
+    IfxPort_Index_14   = 14,  // PORT14
+    IfxPort_Index_15   = 15,  // PORT15
+    IfxPort_Index_20   = 20,  // PORT20
+    IfxPort_Index_21   = 21,  // PORT21
+    IfxPort_Index_22   = 22,  // PORT22
+    IfxPort_Index_23   = 23,  // PORT23
+    IfxPort_Index_32   = 32,  // PORT32
+    IfxPort_Index_33   = 33,  // PORT33
+    IfxPort_Index_none = -1   // 无效端口
+} IfxPort_Index;
+
+// TC26B 中不存在、因此不应从 TC38x 文档直接照搬的 Port 枚举：
+// - IfxPort_LvdsMode
+// - IfxPort_PinFunctionMode
+// - IfxPort_LvdsDirection
+// - IfxPort_LvdsPath
+// - IfxPort_LvdsPullDown
+// - IfxPort_LvdsTerminationMode
+
+
+struct
+
+typedef struct
+{
+    Ifx_P *port;     // 端口指针，例如 &MODULE_P33
+    uint8  pinIndex; // 引脚索引
+} IfxPort_Pin;
+
+typedef struct
+{
+    Ifx_P            *port;      // 端口指针
+    uint8             pinIndex;  // 引脚索引
+    IfxPort_OutputIdx mode;      // 输出索引
+    IfxPort_PadDriver padDriver; // pad driver 配置
+} IfxPort_Pin_Config;
+
+typedef struct
+{
+    IFX_CONST IfxPort_Pin *pin;      // 指向 pin map 中的引脚描述
+    IfxPort_Mode           mode;     // 引脚模式
+    IfxPort_PadDriver      padDriver; // pad driver
+} IfxPort_Io_ConfigPin;
+
+typedef struct
+{
+    uint32                size;     // pinTable 中元素个数
+    IfxPort_Io_ConfigPin *pinTable; // 配置表首地址
+} IfxPort_Io_Config;
+
+// 与 TC38x 源文档差异：TC26B 当前 iLLD 没有 `IfxPort_LvdsConfig` 结构体。
+// TC3xx 的统一 LVDS 配置结构在 TC26B 中被拆成了更具体的 LVDS High / Medium 函数参数。
+
+
+important functions
+
+单个引脚配置函数
+void IfxPort_setPinMode(Ifx_P *port, uint8 pinIndex, IfxPort_Mode mode);  // 配置引脚输入/输出模式
+void IfxPort_setPinModeInput(Ifx_P *port, uint8 pinIndex, IfxPort_InputMode mode);  // 配置引脚为输入模式
+void IfxPort_setPinModeOutput(Ifx_P *port, uint8 pinIndex, IfxPort_OutputMode mode, IfxPort_OutputIdx index);  // 配置引脚为输出模式
+void IfxPort_setPinPadDriver(Ifx_P *port, uint8 pinIndex, IfxPort_PadDriver padDriver);  // 配置引脚 pad driver
+boolean IfxPort_getPinState(Ifx_P *port, uint8 pinIndex);  // 读取引脚状态
+void IfxPort_setPinState(Ifx_P *port, uint8 pinIndex, IfxPort_State action);  // 设置引脚状态
+void IfxPort_setPinHigh(Ifx_P *port, uint8 pinIndex);  // 置高
+void IfxPort_setPinLow(Ifx_P *port, uint8 pinIndex);  // 置低
+void IfxPort_togglePin(Ifx_P *port, uint8 pinIndex);  // 翻转
+
+引脚组配置函数
+void IfxPort_setGroupModeInput(Ifx_P *port, uint8 pinIndex, uint16 mask, IfxPort_InputMode mode);  // 配置一组引脚为输入模式
+void IfxPort_setGroupModeOutput(Ifx_P *port, uint8 pinIndex, uint16 mask, IfxPort_OutputMode mode, IfxPort_OutputIdx index);  // 配置一组引脚为输出模式
+void IfxPort_setGroupPadDriver(Ifx_P *port, uint8 pinIndex, uint16 mask, IfxPort_PadDriver padDriver);  // 配置一组引脚的 pad driver
+uint32 IfxPort_getGroupState(Ifx_P *port, uint8 pinIndex, uint16 mask);  // 获取一组引脚状态
+void IfxPort_setGroupState(Ifx_P *port, uint8 pinIndex, uint16 mask, uint16 data);  // 设置一组引脚状态
+
+Port/Io 表驱动初始化函数
+void IfxPort_Io_initModule(const IfxPort_Io_Config *config);  // 用配置表一次性初始化多个引脚
+
+
+others functions
+
+紧急停止相关函数
+boolean IfxPort_disableEmergencyStop(Ifx_P *port, uint8 pinIndex);  // 禁用紧急停止功能，带有效性检查
+boolean IfxPort_enableEmergencyStop(Ifx_P *port, uint8 pinIndex);  // 启用紧急停止功能，带有效性检查
+void IfxPort_resetESR(Ifx_P *port, uint8 pinIndex);  // 直接清除 ESR 请求
+void IfxPort_setESR(Ifx_P *port, uint8 pinIndex);  // 直接置位 ESR 请求
+
+端口地址和索引函数
+Ifx_P *IfxPort_getAddress(IfxPort_Index port);  // 获取指定端口模块地址
+IfxPort_Index IfxPort_getIndex(Ifx_P *port);  // 根据端口地址反查端口索引
+
+LVDS 相关函数
+void IfxPort_setPinModeLvdsHigh(Ifx_P *port, uint8 pinIndex, IfxPort_Mode mode, IfxPort_ControlledBy enablePortControlled);  // 配置 LVDS-H 模式
+void IfxPort_setPinModeLvdsMedium(Ifx_P *port, uint8 pinIndex, IfxPort_PadDriver lvdsPadDriver, IfxPort_PadSupply padSupply);  // 配置 LVDS-M 模式
+
+// 与 TC38x 源文档差异：TC26B 没有统一的
+// `IfxPort_setPinModeLVDS(Ifx_P *port, uint8 pinIndex, IfxPort_Mode pinMode, IfxPort_LvdsConfig *lvds)`。
+// 目标 TC26B 需要改用 `IfxPort_setPinModeLvdsHigh()` 或 `IfxPort_setPinModeLvdsMedium()`。
+
+// 与 TC38x 源文档差异：TC26B 当前 iLLD 中不存在以下 Port 函数，不能直接照搬：
+// - void IfxPort_setPinFunctionMode(Ifx_P *port, uint8 pinIndex, IfxPort_PinFunctionMode mode);
+// - void IfxPort_setPinControllerSelection(Ifx_P *port, uint8 pinIndex);
+// - void IfxPort_resetPinControllerSelection(Ifx_P *port, uint8 pinIndex);
+// - void IfxPort_modifyPinControllerSelection(Ifx_P *port, uint8 pinIndex, boolean mode);
+
+
+QSPI class
+
+enum
+
+typedef enum
+{
+    IfxQspi_ChannelId_0,     // 通道0
+    IfxQspi_ChannelId_1,     // 通道1
+    IfxQspi_ChannelId_2,     // 通道2
+    IfxQspi_ChannelId_3,     // 通道3
+    IfxQspi_ChannelId_4,     // 通道4
+    IfxQspi_ChannelId_5,     // 通道5
+    IfxQspi_ChannelId_6,     // 通道6
+    IfxQspi_ChannelId_7,     // 通道7
+    IfxQspi_ChannelId_8,     // 通道8
+    IfxQspi_ChannelId_9,     // 通道9
+    IfxQspi_ChannelId_10,    // 通道10
+    IfxQspi_ChannelId_11,    // 通道11
+    IfxQspi_ChannelId_12,    // 通道12
+    IfxQspi_ChannelId_13,    // 通道13
+    IfxQspi_ChannelId_14,    // 通道14
+    IfxQspi_ChannelId_15     // 通道15
+} IfxQspi_ChannelId;
+
+typedef enum
+{
+    IfxQspi_ClockPolarity_idleLow = 0,  // 空闲时钟线为低
+    IfxQspi_ClockPolarity_idleHigh      // 空闲时钟线为高
+} IfxQspi_ClockPolarity;
+
+typedef enum
+{
+    IfxQspi_DataHeading_lsbFirst = 0,  // LSB先发送
+    IfxQspi_DataHeading_msbFirst = 1   // MSB先发送
+} IfxQspi_DataHeading;
+
+typedef enum
+{
+    IfxQspi_DataLengthUnit_bit  = 0,  // 数据长度以位为单位
+    IfxQspi_DataLengthUnit_byte = 1   // 数据长度以字节为单位
+} IfxQspi_DataLengthUnit;
+
+typedef enum
+{
+    IfxQspi_DelayLength_1 = 0,  // 延迟长度为1个TPER单位
+    IfxQspi_DelayLength_2 = 1,  // 延迟长度为2个TPER单位
+    IfxQspi_DelayLength_3 = 2,  // 延迟长度为3个TPER单位
+    IfxQspi_DelayLength_4 = 3,  // 延迟长度为4个TPER单位
+    IfxQspi_DelayLength_5 = 4,  // 延迟长度为5个TPER单位
+    IfxQspi_DelayLength_6 = 5,  // 延迟长度为6个TPER单位
+    IfxQspi_DelayLength_7 = 6,  // 延迟长度为7个TPER单位
+    IfxQspi_DelayLength_8 = 7   // 延迟长度为8个TPER单位
+} IfxQspi_DelayLength;
+
+typedef enum
+{
+    IfxQspi_DelayPrescalar_1     = 0,  // 预分频1
+    IfxQspi_DelayPrescalar_4     = 1,  // 预分频4
+    IfxQspi_DelayPrescalar_16    = 2,  // 预分频16
+    IfxQspi_DelayPrescalar_64    = 3,  // 预分频64
+    IfxQspi_DelayPrescalar_256   = 4,  // 预分频256
+    IfxQspi_DelayPrescalar_1024  = 5,  // 预分频1024
+    IfxQspi_DelayPrescalar_4096  = 6,  // 预分频4096
+    IfxQspi_DelayPrescalar_16384 = 7   // 预分频16384
+} IfxQspi_DelayPrescalar;
+
+typedef enum
+{
+    IfxQspi_Error_none                      = 0,   // 无错误
+    IfxQspi_Error_parity                    = 1,   // 奇偶校验错误
+    IfxQspi_Error_configuration             = 2,   // 配置错误
+    IfxQspi_Error_baudrate                  = 4,   // 波特率错误
+    IfxQspi_Error_txfifoOverflow            = 8,   // TX FIFO溢出错误
+    IfxQspi_Error_txfifoUnderflow           = 16,  // TX FIFO下溢错误
+    IfxQspi_Error_rxfifoOverflow            = 32,  // RX FIFO溢出错误
+    IfxQspi_Error_rxfifoUnderflow           = 64,  // RX FIFO下溢错误
+    IfxQspi_Error_expectTimeout             = 128, // 期望超时错误
+    IfxQspi_Error_slsiMisplacedInactivation = 256  // SLSI错误放置，仅从机模式有意义
+} IfxQspi_Error;
+
+typedef enum
+{
+    IfxQspi_ExpectTimeout_64      = 0,   // 期望相位超时64
+    IfxQspi_ExpectTimeout_128     = 1,   // 期望相位超时128
+    IfxQspi_ExpectTimeout_256     = 2,   // 期望相位超时256
+    IfxQspi_ExpectTimeout_512     = 3,   // 期望相位超时512
+    IfxQspi_ExpectTimeout_1024    = 4,   // 期望相位超时1024
+    IfxQspi_ExpectTimeout_2048    = 5,   // 期望相位超时2048
+    IfxQspi_ExpectTimeout_4096    = 6,   // 期望相位超时4096
+    IfxQspi_ExpectTimeout_8192    = 7,   // 期望相位超时8192
+    IfxQspi_ExpectTimeout_16384   = 8,   // 期望相位超时16384
+    IfxQspi_ExpectTimeout_32768   = 9,   // 期望相位超时32768
+    IfxQspi_ExpectTimeout_65536   = 10,  // 期望相位超时65536
+    IfxQspi_ExpectTimeout_131072  = 11,  // 期望相位超时131072
+    IfxQspi_ExpectTimeout_262144  = 12,  // 期望相位超时262144
+    IfxQspi_ExpectTimeout_524288  = 13,  // 期望相位超时524288
+    IfxQspi_ExpectTimeout_1048576 = 14,  // 期望相位超时1048576
+    IfxQspi_ExpectTimeout_2097152 = 15   // 期望相位超时2097152
+} IfxQspi_ExpectTimeout;
+
+typedef enum
+{
+    IfxQspi_Mode_master      = 0,  // QSPI处于主模式
+    IfxQspi_Mode_pwmOverQspi = 1,  // QSPI处于PWM over QSPI模式
+    IfxQspi_Mode_slave       = 2   // QSPI处于从模式
+} IfxQspi_Mode;
+
+typedef enum
+{
+    IfxQspi_ParityMode_even = 0,  // 偶校验
+    IfxQspi_ParityMode_odd        // 奇校验
+} IfxQspi_ParityMode;
+
+typedef enum
+{
+    IfxQspi_PauseRunTransition_pause = 0,  // 暂停请求
+    IfxQspi_PauseRunTransition_run   = 1   // 运行请求
+} IfxQspi_PauseRunTransition;
+
+typedef enum
+{
+    IfxQspi_Phase_wait        = 0,  // 帧等待阶段
+    IfxQspi_Phase_idleA       = 1,  // 帧空闲A阶段
+    IfxQspi_Phase_idleB       = 2,  // 帧空闲B阶段
+    IfxQspi_Phase_lead        = 3,  // 帧前导阶段
+    IfxQspi_Phase_data        = 4,  // 帧数据阶段
+    IfxQspi_Phase_trail       = 5,  // 帧后沿阶段
+    IfxQspi_Phase_expect      = 6,  // 帧期望阶段
+    IfxQspi_Phase_leadStrobe  = 7,  // 帧前导选通阶段
+    IfxQspi_Phase_trailStrobe = 8   // 帧后沿选通阶段
+} IfxQspi_Phase;
+
+typedef enum
+{
+    IfxQspi_PhaseTransitionEvent_endOfWait                 = 0,  // BUSY，等待阶段结束
+    IfxQspi_PhaseTransitionEvent_serialClockPolarityChange = 1,  // SCLKPC，串行时钟极性变化
+    IfxQspi_PhaseTransitionEvent_startOfFrame              = 2,  // SOF，帧开始
+    IfxQspi_PhaseTransitionEvent_transmitBufferEmptied     = 3,  // TBE，发送缓冲区已空
+    IfxQspi_PhaseTransitionEvent_receiveBufferFilled       = 4,  // RBF，接收缓冲区已满
+    IfxQspi_PhaseTransitionEvent_endOfFrame                = 5,  // EOF，帧结束
+    IfxQspi_PhaseTransitionEvent_dataNotAvailable          = 6,  // DNA，数据不可用/期望阶段开始
+    IfxQspi_PhaseTransitionEvent_endOfExpect               = 7   // CONT，期望阶段结束
+} IfxQspi_PhaseTransitionEvent;
+
+typedef enum
+{
+    IfxQspi_Reset_none                = 0,   // 无复位
+    IfxQspi_Reset_stateMachineAndFifo = 7,   // 状态机与FIFO复位
+    IfxQspi_Reset_kernel              = 15   // 模块内核复位
+} IfxQspi_Reset;
+// 与 TC38x 源文档差异：TC26B iLLD 中没有 `IfxQspi_Reset_registers = 2` 这个独立枚举项。
+
+typedef enum
+{
+    IfxQspi_RxFifoInt_0,     // RXFIFO中断阈值0
+    IfxQspi_RxFifoInt_1,     // RXFIFO中断阈值1
+    IfxQspi_RxFifoInt_2,     // RXFIFO中断阈值2
+    IfxQspi_RxFifoInt_3      // RXFIFO中断阈值3
+} IfxQspi_RxFifoInt;
+
+typedef enum
+{
+    IfxQspi_ShiftClock_shiftTransmitDataOnLeadingEdge = 0,  // 在前导沿移位发送数据
+    IfxQspi_ShiftClock_shiftTransmitDataOnTrailingEdge      // 在后沿移位发送数据
+} IfxQspi_ShiftClock;
+
+typedef enum
+{
+    IfxQspi_SleepMode_enable  = 0,  // 睡眠模式使能
+    IfxQspi_SleepMode_disable = 1   // 睡眠模式禁用
+} IfxQspi_SleepMode;
+
+typedef enum
+{
+    IfxQspi_SlsoTiming_0 = 0,  // 零延迟时钟
+    IfxQspi_SlsoTiming_1 = 1,  // 1个半时钟延迟
+    IfxQspi_SlsoTiming_2 = 2,  // 2个半时钟延迟
+    IfxQspi_SlsoTiming_3 = 3,  // 3个半时钟延迟
+    IfxQspi_SlsoTiming_4 = 4,  // 4个半时钟延迟
+    IfxQspi_SlsoTiming_5 = 5,  // 5个半时钟延迟
+    IfxQspi_SlsoTiming_6 = 6,  // 6个半时钟延迟
+    IfxQspi_SlsoTiming_7 = 7   // 7个半时钟延迟
+} IfxQspi_SlsoTiming;
+
+typedef enum
+{
+    IfxQspi_Status_ok      = 0,  // 状态正常
+    IfxQspi_Status_busy    = 1,  // 状态忙碌
+    IfxQspi_Status_unknown = 2   // 状态未知
+} IfxQspi_Status;
+
+typedef enum
+{
+    IfxQspi_StrobeDelay_1,     // SLSO延迟1个周期
+    IfxQspi_StrobeDelay_2,     // SLSO延迟2个周期
+    IfxQspi_StrobeDelay_3,     // SLSO延迟3个周期
+    IfxQspi_StrobeDelay_4,     // SLSO延迟4个周期
+    IfxQspi_StrobeDelay_5,     // SLSO延迟5个周期
+    IfxQspi_StrobeDelay_6,     // SLSO延迟6个周期
+    IfxQspi_StrobeDelay_7,     // SLSO延迟7个周期
+    IfxQspi_StrobeDelay_8,     // SLSO延迟8个周期
+    IfxQspi_StrobeDelay_9,     // SLSO延迟9个周期
+    IfxQspi_StrobeDelay_10,    // SLSO延迟10个周期
+    IfxQspi_StrobeDelay_11,    // SLSO延迟11个周期
+    IfxQspi_StrobeDelay_12,    // SLSO延迟12个周期
+    IfxQspi_StrobeDelay_13,    // SLSO延迟13个周期
+    IfxQspi_StrobeDelay_14,    // SLSO延迟14个周期
+    IfxQspi_StrobeDelay_15,    // SLSO延迟15个周期
+    IfxQspi_StrobeDelay_16,    // SLSO延迟16个周期
+    IfxQspi_StrobeDelay_17,    // SLSO延迟17个周期
+    IfxQspi_StrobeDelay_18,    // SLSO延迟18个周期
+    IfxQspi_StrobeDelay_19,    // SLSO延迟19个周期
+    IfxQspi_StrobeDelay_20,    // SLSO延迟20个周期
+    IfxQspi_StrobeDelay_21,    // SLSO延迟21个周期
+    IfxQspi_StrobeDelay_22,    // SLSO延迟22个周期
+    IfxQspi_StrobeDelay_23,    // SLSO延迟23个周期
+    IfxQspi_StrobeDelay_24,    // SLSO延迟24个周期
+    IfxQspi_StrobeDelay_25,    // SLSO延迟25个周期
+    IfxQspi_StrobeDelay_26,    // SLSO延迟26个周期
+    IfxQspi_StrobeDelay_27,    // SLSO延迟27个周期
+    IfxQspi_StrobeDelay_28,    // SLSO延迟28个周期
+    IfxQspi_StrobeDelay_29,    // SLSO延迟29个周期
+    IfxQspi_StrobeDelay_30,    // SLSO延迟30个周期
+    IfxQspi_StrobeDelay_31,    // SLSO延迟31个周期
+    IfxQspi_StrobeDelay_32     // SLSO延迟32个周期
+} IfxQspi_StrobeDelay;
+
+typedef enum
+{
+    IfxQspi_TxFifoInt_1,     // TXFIFO中断阈值1
+    IfxQspi_TxFifoInt_2,     // TXFIFO中断阈值2
+    IfxQspi_TxFifoInt_3,     // TXFIFO中断阈值3
+    IfxQspi_TxFifoInt_4      // TXFIFO中断阈值4
+} IfxQspi_TxFifoInt;
+
+typedef enum
+{
+    IfxQspi_FifoMode_combinedMove = 0,  // 组合移动模式
+    IfxQspi_FifoMode_singleMove   = 1,  // 单次移动模式
+    IfxQspi_FifoMode_batchMove    = 2   // 批量移动模式
+} IfxQspi_FifoMode;
+
+typedef enum
+{
+    IfxQspi_SuspendMode_none = 0,  // 无挂起
+    IfxQspi_SuspendMode_hard = 1,  // 硬挂起
+    IfxQspi_SuspendMode_soft = 2   // 软挂起
+} IfxQspi_SuspendMode;
+
+typedef enum
+{
+    IfxQspi_SpiMaster_ChannelBasedCs_disabled = 0,  // SLSO在整帧期间保持有效
+    IfxQspi_SpiMaster_ChannelBasedCs_enabled  = 1   // SLSO按每个字节切换
+} IfxQspi_SpiMaster_ChannelBasedCs;
+
+typedef enum
+{
+    IfxQspi_SpiMaster_Mode_short           = 0,  // short mode
+    IfxQspi_SpiMaster_Mode_long            = 1,  // long mode
+    IfxQspi_SpiMaster_Mode_shortContinuous = 2,  // short continuous mode
+    IfxQspi_SpiMaster_Mode_longContinuous  = 3,  // long continuous mode
+    IfxQspi_SpiMaster_Mode_xxl             = 4   // xxl mode
+} IfxQspi_SpiMaster_Mode;
+
+
+struct
+
+typedef uint32 IfxQspi_SlsoTiming_HalfTsclk;
+
+typedef struct
+{
+    boolean baudrate;   // TRUE表示检查波特率错误
+    boolean phase;      // TRUE表示检查相位错误
+    boolean receive;    // TRUE表示检查接收错误
+    boolean transmit;   // TRUE表示检查发送错误
+} IfxQspi_ErrorChecks;
+
+typedef struct
+{
+    IfxQspi_SlsoTiming_HalfTsclk csInactiveDelay;  // CS inactive delay，单位Tsclk/2
+    IfxQspi_SlsoTiming_HalfTsclk csLeadDelay;      // CS lead delay，单位Tsclk/2
+    IfxQspi_SlsoTiming_HalfTsclk csTrailDelay;     // CS trail delay，单位Tsclk/2
+    boolean                      enabled;          // 通道使能
+    boolean                      autoCS;           // 1表示片选由硬件控制
+    boolean                      loopback;         // 1表示回环模式
+    boolean                      clockPolarity;    // 时钟极性
+    boolean                      shiftClock;       // 时钟相位
+    boolean                      dataHeading;      // 数据高低位方向
+    uint8                        dataWidth;        // 数据位宽，2..32位
+    boolean                      csActiveLevel;    // 片选有效电平
+    boolean                      parityCheck;      // 奇偶校验使能
+    boolean                      parityMode;       // 奇偶模式
+} IfxQspi_chMode;
+
+typedef struct
+{
+    uint8 pre;    // 预分频值
+    uint8 delay;  // 延迟倍率
+} IfxQspi_DelayConst;
+
+typedef struct
+{
+    IfxQspi_DelayPrescalar idlePrescalar;      // idle delay预分频
+    IfxQspi_DelayLength    idleDelay;          // idle delay长度
+    IfxQspi_DelayPrescalar leadingPrescalar;   // leading delay预分频
+    IfxQspi_DelayLength    leadingDelay;       // leading delay长度
+    IfxQspi_DelayPrescalar trailingPrescalar;  // trailing delay预分频
+    IfxQspi_DelayLength    trailingDelay;      // trailing delay长度
+} IfxQspi_DelayParameters;
+
+typedef struct
+{
+    boolean onTransfer;  // 当前是否正在传输
+    boolean byteAccess;  // 当前是否按8/16bit访问
+} IfxQspi_Flags;
+
+typedef struct
+{
+    void     *data;       // 数据指针
+    Ifx_SizeT remaining;  // 剩余待传输数量
+} IfxQspi_Job;
+
+typedef struct
+{
+    float32             baudrate;     // 波特率
+    IfxQspi_chMode      mode;         // 通道模式
+    IfxQspi_ErrorChecks errorChecks;  // 错误检查开关
+    IfxQspi_ChannelId   channelId;    // 通道号
+} IfxQspi_chConfig;
+
+typedef struct
+{
+    IFX_CONST IfxQspi_Slsi_In *pin;  // SLSI输入引脚
+    IfxPort_InputMode          mode; // 输入模式
+} IfxQspi_SpiMaster_Input;
+
+typedef struct
+{
+    IFX_CONST IfxQspi_Slso_Out *pin;  // SLSO输出引脚
+    IfxPort_OutputMode          mode; // 输出模式
+    IfxPort_PadDriver           driver; // pad driver
+} IfxQspi_SpiMaster_Output;
+
+typedef struct
+{
+    IfxDma_Dma_Channel rxDmaChannel;   // RX DMA通道句柄
+    IfxDma_Dma_Channel txDmaChannel;   // TX DMA通道句柄
+    IfxDma_ChannelId   rxDmaChannelId; // RX DMA通道号
+    IfxDma_ChannelId   txDmaChannelId; // TX DMA通道号
+    boolean            useDma;         // 是否使用DMA
+} IfxQspi_SpiMaster_Dma;
+
+typedef struct
+{
+    IfxDma_ChannelId rxDmaChannelId;  // RX DMA通道号
+    IfxDma_ChannelId txDmaChannelId;  // TX DMA通道号
+    boolean          useDma;          // 是否使用DMA
+} IfxQspi_SpiMaster_DmaConfig;
+
+typedef struct
+{
+    boolean parityError;          // 奇偶错误
+    boolean configurationError;   // 配置错误
+    boolean baudrateError;        // 波特率错误
+    boolean txFifoOverflowError;  // TX FIFO溢出
+    boolean txFifoUnderflowError; // TX FIFO下溢
+    boolean rxFifoOverflowError;  // RX FIFO溢出
+    boolean rxFifoUnderflowError; // RX FIFO下溢
+    boolean expectTimeoutError;   // expect超时
+} IfxQspi_SpiMaster_ErrorFlags;
+
+typedef union
+{
+    IfxQspi_SpiMaster_Input  input;   // 作为SLSI输入配置
+    IfxQspi_SpiMaster_Output output;  // 作为SLSO输出配置
+} IfxQspi_SpiMaster_InputOutput;
+
+typedef struct
+{
+    IFX_CONST IfxQspi_Sclk_Out *sclk;   // SCLK输出引脚
+    IfxPort_OutputMode          sclkMode; // SCLK输出模式
+    IFX_CONST IfxQspi_Mtsr_Out *mtsr;   // MTSR输出引脚
+    IfxPort_OutputMode          mtsrMode; // MTSR输出模式
+    IFX_CONST IfxQspi_Mrst_In  *mrst;   // MRST输入引脚
+    IfxPort_InputMode           mrstMode; // MRST输入模式
+    IfxPort_PadDriver           pinDriver; // 公共pad driver
+} IfxQspi_SpiMaster_Pins;
+
+typedef struct
+{
+    IfxQspi_SpiMaster               *spiMaster;      // 指向所属master句柄
+    Ifx_QSPI_BACON                   bacon;          // BACON配置寄存器镜像
+    IfxPort_Pin                      slso;           // SLSO引脚
+    uint32                           dummyTxValue;   // 仅接收时发送的dummy值
+    uint32                           dummyRxValue;   // 仅发送时接收占位值
+    IfxQspi_ChannelId                channelId;      // 通道号
+    Ifx_ActiveState                  slsoActiveState; // SLSO有效状态
+    uint8                            dataWidth;      // FIFO写入位宽
+    boolean                          firstWrite;     // 是否首次写入
+    IfxQspi_SpiMaster_ChannelBasedCs channelBasedCs; // SLSO行为
+    IfxQspi_SpiMaster_Mode           mode;           // 工作模式
+    IfxQspi_SpiMaster_ErrorFlags     errorFlags;     // 错误标志
+    uint32                           txCount;        // 发送计数
+    uint32                           rxCount;        // 接收计数
+    IfxQspi_Flags                    flags;          // 运行标志
+    IfxQspi_ErrorChecks              errorChecks;    // 错误检查配置
+    uint32                           baudrate;       // 实际波特率
+    IfxQspi_Job                      tx;             // 发送作业
+    IfxQspi_Job                      rx;             // 接收作业
+    boolean                          useSlso;        // 是否自动启用SLSO
+} IfxQspi_SpiMaster_Channel;
+
+typedef struct
+{
+    IfxQspi_chConfig                 ch;             // 通道基础配置
+    uint32                           dummyTxValue;   // 仅接收时发送的dummy值
+    uint32                           dummyRxValue;   // 仅发送时接收占位值
+    IfxQspi_SpiMaster_InputOutput    sls;            // SLSI/SLSO配置联合体
+    IfxQspi_SpiMaster_ChannelBasedCs channelBasedCs; // SLSO行为
+    IfxQspi_SpiMaster_Mode           mode;           // 工作模式
+    IfxQspi_SpiMaster               *spiMaster;      // master句柄
+    Ifx_QSPI                        *qspi;           // QSPI寄存器基址
+    IfxQspi_SpiMaster_Dma           *dma;            // DMA句柄
+} IfxQspi_SpiMaster_ChannelConfig;
+
+typedef struct
+{
+    IfxQspi_Mode                      mode;                       // 接口工作模式
+    Ifx_QSPI                         *qspi;                       // QSPI寄存器基址
+    boolean                           allowSleepMode;             // 是否允许睡眠
+    boolean                           pauseOnBaudrateSpikeErrors; // 波特率/尖峰错误时暂停
+    IfxQspi_PauseRunTransition        pauseRunTransition;         // 上电后pause或run
+    IfxQspi_TxFifoInt                 txFifoThreshold;            // TXFIFO阈值
+    IfxQspi_RxFifoInt                 rxFifoThreshold;            // RXFIFO阈值
+    IFX_CONST IfxQspi_SpiMaster_Pins *pins;                       // 主机引脚配置
+    IfxQspi_SpiMaster_DmaConfig       dma;                        // DMA配置
+    IfxQspi_FifoMode                  txFifoMode;                 // TX FIFO模式
+    IfxQspi_FifoMode                  rxFifoMode;                 // RX FIFO模式
+    Ifx_Priority                      rxPriority;                 // RX中断优先级
+    Ifx_Priority                      txPriority;                 // TX中断优先级
+    Ifx_Priority                      erPriority;                 // ER中断优先级
+    Ifx_SizeT                         bufferSize;                 // 缓冲能力
+    void                             *buffer;                     // 缓冲区地址
+    float32                           maximumBaudrate;            // 模块最大波特率规划值
+    IfxSrc_Tos                        isrProvider;                // 中断服务提供者
+} IfxQspi_SpiMaster_Config;
+
+typedef struct IfxQspi_SpiMaster_s IfxQspi_SpiMaster;
+
+typedef struct
+{
+    uint8 globalTQ;   // 模块全局Time Quantum分频
+    uint8 channelQ;   // 通道级分频
+    uint8 aSegment;   // A段位域
+    uint8 bSegment;   // B段位域
+    uint8 cSegment;   // C段位域
+} IfxQspi_SpiMaster_BitTiming;
+
+typedef struct
+{
+    IfxDma_Dma_Channel rxDmaChannel;   // RX DMA通道句柄
+    IfxDma_Dma_Channel txDmaChannel;   // TX DMA通道句柄
+    IfxDma_ChannelId   rxDmaChannelId; // RX DMA通道号
+    IfxDma_ChannelId   txDmaChannelId; // TX DMA通道号
+    boolean            useDma;         // 是否使用DMA
+} IfxQspi_SpiSlave_Dma;
+
+typedef struct
+{
+    IfxDma_ChannelId rxDmaChannelId;  // RX DMA通道号
+    IfxDma_ChannelId txDmaChannelId;  // TX DMA通道号
+    boolean          useDma;          // 是否使用DMA
+} IfxQspi_SpiSlave_DmaConfig;
+
+typedef struct
+{
+    boolean parityError;               // 奇偶错误
+    boolean configurationError;        // 配置错误
+    boolean baudrateError;             // 波特率错误
+    boolean txFifoOverflowError;       // TX FIFO溢出
+    boolean txFifoUnderflowError;      // TX FIFO下溢
+    boolean rxFifoOverflowError;       // RX FIFO溢出
+    boolean rxFifoUnderflowError;      // RX FIFO下溢
+    boolean expectTimeoutError;        // expect超时
+    boolean slsiMisplacedInactivation; // SLSI错误放置
+} IfxQspi_SpiSlave_ErrorFlags;
+
+typedef struct
+{
+    IFX_CONST IfxQspi_Sclk_In  *sclk;      // SCLK输入引脚
+    IfxPort_InputMode           sclkMode;  // SCLK输入模式
+    IFX_CONST IfxQspi_Mtsr_In  *mtsr;      // MTSR输入引脚
+    IfxPort_InputMode           mtsrMode;  // MTSR输入模式
+    IFX_CONST IfxQspi_Mrst_Out *mrst;      // MRST输出引脚
+    IfxPort_OutputMode          mrstMode;  // MRST输出模式
+    IFX_CONST IfxQspi_Slsi_In  *slsi;      // SLSI输入引脚
+    IfxPort_InputMode           slsiMode;  // SLSI输入模式
+    IfxPort_PadDriver           pinDriver; // 公共pad driver
+} IfxQspi_SpiSlave_Pins;
+
+typedef struct
+{
+    IfxQspi_ClockPolarity clockPolarity; // 时钟极性
+    IfxQspi_ShiftClock    shiftClock;    // 时钟相位
+    IfxQspi_DataHeading   dataHeading;   // MSB/LSB先后
+    uint8                 dataWidth;     // 数据位宽，2..32位
+    IfxQspi_ParityMode    parityMode;    // 奇偶模式
+} IfxQspi_SpiSlave_Protocol;
+
+typedef struct
+{
+    Ifx_QSPI                   *qspi;       // QSPI寄存器基址
+    uint8                       dataWidth;  // FIFO写入位宽
+    IfxQspi_Job                 rxJob;      // 接收作业
+    IfxQspi_Job                 txJob;      // 发送作业
+    boolean                     onTransfer; // 当前是否正在传输
+    IfxQspi_SpiSlave_Dma        dma;        // DMA句柄
+    IfxQspi_SpiSlave_ErrorFlags errorFlags; // 错误标志
+} IfxQspi_SpiSlave;
+
+typedef struct
+{
+    IfxQspi_Mode                    mode;                       // 接口工作模式
+    Ifx_Priority                    rxPriority;                 // RX中断优先级
+    Ifx_Priority                    txPriority;                 // TX中断优先级
+    Ifx_Priority                    erPriority;                 // ER中断优先级
+    IfxSrc_Tos                      isrProvider;                // 中断服务提供者
+    Ifx_SizeT                       bufferSize;                 // 缓冲能力
+    void                           *buffer;                     // 缓冲区地址
+    float32                         maximumBaudrate;            // 模块最大波特率规划值
+    Ifx_QSPI                       *qspi;                       // QSPI寄存器基址
+    boolean                         allowSleepMode;             // 是否允许睡眠
+    boolean                         pauseOnBaudrateSpikeErrors; // 波特率/尖峰错误时暂停
+    IfxQspi_PauseRunTransition      pauseRunTransition;         // 上电后pause或run
+    IfxQspi_TxFifoInt               txFifoThreshold;            // TXFIFO阈值
+    IfxQspi_RxFifoInt               rxFifoThreshold;            // RXFIFO阈值
+    IFX_CONST IfxQspi_SpiSlave_Pins *pins;                      // 从机引脚配置
+    IfxQspi_SpiSlave_Protocol       protocol;                   // 协议配置
+    IfxQspi_SpiSlave_DmaConfig      dma;                        // DMA配置
+    IfxQspi_FifoMode                txFifoMode;                 // TX FIFO模式
+    IfxQspi_FifoMode                rxFifoMode;                 // RX FIFO模式
+} IfxQspi_SpiSlave_Config;
+
+
+important functions
+
+标准Qspi配置与收发函数
+void IfxQspi_setEnableModuleRequest(Ifx_QSPI *qspi);  // 使能模块
+void IfxQspi_setDisableModuleRequest(Ifx_QSPI *qspi);  // 失能模块
+void IfxQspi_setSleepMode(Ifx_QSPI *qspi, IfxQspi_SleepMode mode);  // 配置睡眠模式
+void IfxQspi_requestReset(Ifx_QSPI *qspi, IfxQspi_Reset reset);  // 请求复位
+void IfxQspi_resetModule(Ifx_QSPI *qspi);  // 内核级模块复位
+void IfxQspi_run(Ifx_QSPI *qspi);  // 请求模块进入运行态
+void IfxQspi_pause(Ifx_QSPI *qspi);  // 请求模块进入暂停态
+void IfxQspi_writeBasicConfiguration(Ifx_QSPI *qspi, uint32 baconVal);  // 写BACON配置
+void IfxQspi_writeBasicConfigurationBeginStream(Ifx_QSPI *qspi, uint32 baconVal);  // 写BACON并清LAST，开始连续流
+void IfxQspi_writeBasicConfigurationEndStream(Ifx_QSPI *qspi, uint32 baconVal);  // 写BACON并置LAST，结束连续流
+void IfxQspi_writeExtendedConfiguration(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint32 econVal);  // 写ECON配置
+void IfxQspi_writeMixedDataTransmitFifo(Ifx_QSPI *qspi, uint32 mixEntryVal);  // 写混合配置+数据到MIXEDENTRY
+void IfxQspi_writeTransmitFifo(Ifx_QSPI *qspi, uint32 data);  // 写发送FIFO
+uint32 IfxQspi_readReceiveFifo(Ifx_QSPI *qspi);  // 读接收FIFO
+void IfxQspi_write8(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint8 *data, Ifx_SizeT count);  // 按8bit写FIFO
+void IfxQspi_write16(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint16 *data, Ifx_SizeT count);  // 按16bit写FIFO
+void IfxQspi_write32(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint32 *data, Ifx_SizeT count);  // 按32bit写FIFO
+void IfxQspi_read8(Ifx_QSPI *qspi, uint8 *data, Ifx_SizeT count);  // 按8bit读FIFO
+void IfxQspi_read16(Ifx_QSPI *qspi, uint16 *data, Ifx_SizeT count);  // 按16bit读FIFO
+void IfxQspi_read32(Ifx_QSPI *qspi, uint32 *data, Ifx_SizeT count);  // 按32bit读FIFO
+uint32 IfxQspi_calculateBasicConfigurationValue(Ifx_QSPI *qspi, const IfxQspi_ChannelId channelId, const IfxQspi_chMode *chMode, const float baudrate);  // 计算BACON配置值
+uint32 IfxQspi_calculateExtendedConfigurationValue(Ifx_QSPI *qspi, const uint8 cs, const IfxQspi_chConfig *chConfig);  // 计算ECON配置值
+float IfxQspi_calcRealBaudrate(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId);  // 读取实际波特率
+void IfxQspi_calculateDelayConstants(const Ifx_QSPI *qspi, const IfxQspi_ChannelId channelId, const IfxQspi_chMode *chMode, IfxQspi_DelayConst *delayConst);  // 计算delay常量
+
+Qspi主机封装函数
+void IfxQspi_SpiMaster_initModuleConfig(IfxQspi_SpiMaster_Config *config, Ifx_QSPI *qspi);  // 填充主机模块默认配置
+void IfxQspi_SpiMaster_initModule(IfxQspi_SpiMaster *handle, const IfxQspi_SpiMaster_Config *config);  // 初始化主机模块
+void IfxQspi_SpiMaster_initChannelConfig(IfxQspi_SpiMaster_ChannelConfig *chConfig, IfxQspi_SpiMaster *handle);  // 填充主机通道默认配置
+IfxQspi_Status IfxQspi_SpiMaster_initChannel(IfxQspi_SpiMaster_Channel *chHandle, const IfxQspi_SpiMaster_ChannelConfig *chConfig);  // 初始化主机通道
+IfxQspi_Status IfxQspi_SpiMaster_exchange(IfxQspi_SpiMaster_Channel *chHandle, const void *src, void *dest, Ifx_SizeT count);  // 主机收发交换
+IfxQspi_Status IfxQspi_SpiMaster_getStatus(IfxQspi_SpiMaster_Channel *chHandle);  // 查询主机通道状态
+IfxQspi_Status IfxQspi_SpiMaster_setChannelBaudrate(IfxQspi_SpiMaster_Channel *chHandle, float32 baudrate);  // 重新设置主机通道波特率
+IfxQspi_chConfig IfxQspi_SpiMaster_getChannelConfig(IfxQspi_SpiMaster_Channel *chHandle);  // 读取主机通道配置
+void IfxQspi_SpiMaster_updateDelayParameters(IfxQspi_SpiMaster_Channel *chHandle, IfxQspi_DelayParameters *config);  // 更新主机通道delay参数
+void IfxQspi_SpiMaster_getHandleDelayParameters(IfxQspi_SpiMaster_Channel *chHandle, IfxQspi_DelayParameters *params);  // 读取主机通道delay参数
+
+Qspi从机封装函数
+void IfxQspi_SpiSlave_initModuleConfig(IfxQspi_SpiSlave_Config *config, Ifx_QSPI *qspi);  // 填充从机模块默认配置
+void IfxQspi_SpiSlave_initModule(IfxQspi_SpiSlave *handle, const IfxQspi_SpiSlave_Config *config);  // 初始化从机模块
+IfxQspi_Status IfxQspi_SpiSlave_exchange(IfxQspi_SpiSlave *handle, const void *src, void *dest, Ifx_SizeT count);  // 从机收发交换
+IfxQspi_Status IfxQspi_SpiSlave_getStatus(IfxQspi_SpiSlave *handle);  // 查询从机状态
+
+
+others functions
+
+标准Qspi辅助函数
+void IfxQspi_clearAllEventFlags(Ifx_QSPI *qspi);  // 清除全部事件标志
+void IfxQspi_clearRxReq(Ifx_QSPI *qspi);  // 清除RX请求
+void IfxQspi_clearTxReq(Ifx_QSPI *qspi);  // 清除TX请求
+void IfxQspi_configPT1Event(Ifx_QSPI *qspi, IfxQspi_PhaseTransitionEvent pt1Config);  // 配置PT1事件
+void IfxQspi_configPT2Event(Ifx_QSPI *qspi, IfxQspi_PhaseTransitionEvent pt2Config);  // 配置PT2事件
+void IfxQspi_enableLoopbackMode(Ifx_QSPI *qspi, boolean enable);  // 使能/关闭回环
+void IfxQspi_enablePT1Event(Ifx_QSPI *qspi, boolean enable);  // 使能/关闭PT1事件
+void IfxQspi_enablePT2Event(Ifx_QSPI *qspi, boolean enable);  // 使能/关闭PT2事件
+void IfxQspi_enableUsrEvent(Ifx_QSPI *qspi, boolean enable);  // 使能/关闭用户事件
+uint16 IfxQspi_getErrorFlags(Ifx_QSPI *qspi);  // 读取错误标志位
+IfxQspi_Mode IfxQspi_getMode(Ifx_QSPI *qspi);  // 读取当前模式
+float IfxQspi_getModuleFrequency(Ifx_QSPI *qspi);  // 读取模块频率
+IfxQspi_Phase IfxQspi_getPhase(Ifx_QSPI *qspi);  // 读取当前相位
+uint8 IfxQspi_getReceiveFifoLevel(Ifx_QSPI *qspi);  // 读取RX FIFO level
+float IfxQspi_getTimeQuantaFrequency(Ifx_QSPI *qspi);  // 读取TQ频率
+uint8 IfxQspi_getTransmitFifoLevel(Ifx_QSPI *qspi);  // 读取TX FIFO level
+boolean IfxQspi_isModuleEnabled(Ifx_QSPI *qspi);  // 查询模块是否使能
+boolean IfxQspi_isModuleSuspended(Ifx_QSPI *qspi);  // 查询模块是否挂起
+void IfxQspi_setSuspendMode(Ifx_QSPI *qspi, IfxQspi_SuspendMode mode);  // 设置挂起模式
+void IfxQspi_setReceiveFifoInterrruptThreshold(Ifx_QSPI *qspi, IfxQspi_RxFifoInt rxFifoInt);  // 设置RX FIFO中断阈值
+void IfxQspi_setTransmitFifoInterrruptThreshold(Ifx_QSPI *qspi, IfxQspi_TxFifoInt txFifoInt);  // 设置TX FIFO中断阈值
+uint32 IfxQspi_calculatePrescaler(Ifx_QSPI *qspi, float baudrate);  // 计算预分频
+uint32 IfxQspi_calculateTimeQuantumLength(Ifx_QSPI *qspi, float maxBaudrate);  // 计算time quantum长度
+Ifx_QSPI *IfxQspi_getAddress(IfxQspi_Index qspi);  // 根据索引获取模块地址
+IfxQspi_Index IfxQspi_getIndex(Ifx_QSPI *qspi);  // 根据模块地址反查索引
+uint32 IfxQspi_recalcBasicConfiguration(uint32 oldBACON, Ifx_SizeT numOfData, boolean shortData, boolean lastData);  // 基于旧BACON重算配置
+void IfxQspi_setSlaveSelectOutputControl(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, boolean outputEnable, boolean activeLevel);  // 配置片选输出控制
+volatile Ifx_SRC_SRCR *IfxQspi_getErrorSrc(Ifx_QSPI *qspi);  // 获取错误SRC
+volatile Ifx_SRC_SRCR *IfxQspi_getReceiveSrc(Ifx_QSPI *qspi);  // 获取接收SRC
+volatile Ifx_SRC_SRCR *IfxQspi_getTransmitSrc(Ifx_QSPI *qspi);  // 获取发送SRC
+void IfxQspi_initMrstInPin(const IfxQspi_Mrst_In *mrstIn, IfxPort_InputMode mrstInMode);  // 初始化MRST输入引脚
+void IfxQspi_initMrstOutPin(const IfxQspi_Mrst_Out *mrstOut, IfxPort_OutputMode mrstOutMode, IfxPort_PadDriver padDriver);  // 初始化MRST输出引脚
+void IfxQspi_initMtsrInPin(const IfxQspi_Mtsr_In *mtsrIn, IfxPort_InputMode mtsrInMode);  // 初始化MTSR输入引脚
+void IfxQspi_initMtsrOutPin(const IfxQspi_Mtsr_Out *mtsrOut, IfxPort_OutputMode mtsrOutMode, IfxPort_PadDriver padDriver);  // 初始化MTSR输出引脚
+void IfxQspi_initSclkInPin(const IfxQspi_Sclk_In *sclkIn, IfxPort_InputMode sclkInMode);  // 初始化SCLK输入引脚
+void IfxQspi_initSclkOutPin(const IfxQspi_Sclk_Out *sclkOut, IfxPort_OutputMode sclkOutMode, IfxPort_PadDriver padDriver);  // 初始化SCLK输出引脚
+void IfxQspi_initSlsi(const IfxQspi_Slsi_In *slsi, IfxPort_InputMode slsiMode);  // 初始化SLSI输入引脚
+void IfxQspi_initSlso(const IfxQspi_Slso_Out *slso, IfxPort_OutputMode slsoMode, IfxPort_PadDriver padDriver, IfxPort_OutputIdx outIndex);  // 初始化SLSO输出引脚
+IfxQspi_FifoMode IfxQspi_getRxFifoMode(Ifx_QSPI *qspi);  // 读取RX FIFO模式
+IfxQspi_FifoMode IfxQspi_getTxFifoMode(Ifx_QSPI *qspi);  // 读取TX FIFO模式
+void IfxQspi_permutateBigEndian(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint8 bigEndian);  // 配置大端排列
+void IfxQspi_setBitsegment1(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint8 bitSegment1);  // 设置bit segment1
+void IfxQspi_setBitsegment2(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint8 bitSegment2);  // 设置bit segment2
+void IfxQspi_setBitsegment3(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint8 bitSegment3);  // 设置bit segment3
+void IfxQspi_setRxFifoMode(Ifx_QSPI *qspi, IfxQspi_FifoMode mode);  // 设置RX FIFO模式
+void IfxQspi_setTimeQuantum(Ifx_QSPI *qspi, IfxQspi_ChannelId channelId, uint32 timeQuantum);  // 设置time quantum
+
+Qspi主机辅助函数
+uint32 IfxQspi_SpiMaster_readReceiveFifo(IfxQspi_SpiMaster *handle);  // 从主机句柄读RX FIFO
+void IfxQspi_SpiMaster_writeBasicConfiguration(IfxQspi_SpiMaster *handle, uint32 baconVal);  // 通过主机句柄写BACON
+void IfxQspi_SpiMaster_writeExtendedConfiguration(IfxQspi_SpiMaster_Channel *chHandle, uint32 econVal);  // 通过主机通道写ECON
+void IfxQspi_SpiMaster_writeMixedDataConfiguration(IfxQspi_SpiMaster *handle, uint32 mixEntryVal);  // 通过主机句柄写mixed entry
+void IfxQspi_SpiMaster_writeTransmitFifo(IfxQspi_SpiMaster_Channel *chHandle, uint32 data);  // 通过主机通道写TX FIFO
+void IfxQspi_SpiMaster_packLongModeBuffer(IfxQspi_SpiMaster_Channel *chHandle, void *data, uint32 *longFifoBuffer, Ifx_SizeT dataLength);  // 打包long mode缓冲
+void IfxQspi_SpiMaster_initPin(const IfxQspi_SpiMaster_Pins *pins);  // 初始化主机引脚
+void IfxQspi_SpiMaster_initInterrupt(Ifx_QSPI *qspiSFR, const IfxQspi_SpiMaster_Config *config);  // 初始化主机中断
+void IfxQspi_SpiMaster_setBaudRateGlobalBitFields(IfxQspi_SpiMaster *handle, const IfxQspi_SpiMaster_BitTiming *bitTimingParams);  // 直接设置全局波特率位域
+void IfxQspi_SpiMaster_setBaudRateChannelBitFields(IfxQspi_SpiMaster *handle, const IfxQspi_ChannelId channelId, const IfxQspi_SpiMaster_BitTiming *bitTimingParams);  // 直接设置通道波特率位域
+void IfxQspi_SpiMaster_isrDmaReceive(IfxQspi_SpiMaster *qspiHandle);  // 主机DMA接收ISR
+void IfxQspi_SpiMaster_isrDmaTransmit(IfxQspi_SpiMaster *qspiHandle);  // 主机DMA发送ISR
+void IfxQspi_SpiMaster_isrError(IfxQspi_SpiMaster *handle);  // 主机错误ISR
+IfxQspi_PhaseTransitionEvent IfxQspi_SpiMaster_isrPhaseTransition(IfxQspi_SpiMaster *handle);  // 主机相位切换ISR
+void IfxQspi_SpiMaster_isrReceive(IfxQspi_SpiMaster *handle);  // 主机接收ISR
+void IfxQspi_SpiMaster_isrTransmit(IfxQspi_SpiMaster *handle);  // 主机发送ISR
+IfxQspi_PhaseTransitionEvent IfxQspi_SpiMaster_isrUserDefined(IfxQspi_SpiMaster *handle);  // 主机用户事件ISR
+
+Qspi从机辅助函数
+uint32 IfxQspi_SpiSlave_readReceiveFifo(IfxQspi_SpiSlave *handle);  // 从从机句柄读RX FIFO
+void IfxQspi_SpiSlave_writeTransmitFifo(IfxQspi_SpiSlave *handle, uint32 data);  // 通过从机句柄写TX FIFO
+void IfxQspi_SpiSlave_initPin(const IfxQspi_SpiSlave_Pins *pins);  // 初始化从机引脚
+void IfxQspi_SpiSlave_initInterrupt(Ifx_QSPI *qspiSFR, const IfxQspi_SpiSlave_Config *config);  // 初始化从机中断
+void IfxQspi_SpiSlave_isrDmaReceive(IfxQspi_SpiSlave *qspiHandle);  // 从机DMA接收ISR
+void IfxQspi_SpiSlave_isrDmaTransmit(IfxQspi_SpiSlave *qspiHandle);  // 从机DMA发送ISR
+void IfxQspi_SpiSlave_isrError(IfxQspi_SpiSlave *handle);  // 从机错误ISR
+void IfxQspi_SpiSlave_isrReceive(IfxQspi_SpiSlave *handle);  // 从机接收ISR
+void IfxQspi_SpiSlave_isrTransmit(IfxQspi_SpiSlave *handle);  // 从机发送ISR
+
+// 与 TC38x 源文档差异：当前 TC26B `IfxQspi_Reset` 只有 `none/stateMachineAndFifo/kernel`，没有独立 `registers` 复位枚举。
+// 与 TC38x 源文档差异：源文档中的 `IfxQspi_CaptureControlEdgeConfiguration`、`IfxQspi_CaptureControlInputSelection` 在当前 TC26B `IfxQspi.h` 中不存在，不能直接照搬。
+
+
+ASCLIN class
+
+enum
+
+typedef enum
+{
+    IfxAsclin_Checksum_classic  = 0,  // 经典校验和
+    IfxAsclin_Checksum_enhanced = 1   // 增强校验和
+} IfxAsclin_Checksum;
+
+typedef enum
+{
+    IfxAsclin_ChecksumInjection_notWritten = 0,  // 校验和字节不写入RxFIFO
+    IfxAsclin_ChecksumInjection_written    = 1   // 校验和字节写入RxFIFO
+} IfxAsclin_ChecksumInjection;
+
+typedef enum
+{
+    IfxAsclin_ClockPolarity_idleLow  = 0,  // 空闲时钟低
+    IfxAsclin_ClockPolarity_idleHigh = 1   // 空闲时钟高
+} IfxAsclin_ClockPolarity;
+
+typedef enum
+{
+    IfxAsclin_ClockSource_noClock         = 0,   // 无时钟
+    IfxAsclin_ClockSource_kernelClock     = 1,   // 内核时钟 fclc
+    IfxAsclin_ClockSource_oscillatorClock = 2,   // 晶振时钟 foso0
+    IfxAsclin_ClockSource_flexRayClock    = 4,   // FlexRay 时钟 feray
+    IfxAsclin_ClockSource_ascFastClock    = 8,   // fasclinf 时钟
+    IfxAsclin_ClockSource_ascSlowClock    = 16   // fasclins 时钟
+} IfxAsclin_ClockSource;
+// 与 TC38x 源文档差异：源文档只列了 `ascFastClock = 2`、`ascSlowClock = 4`；TC26B `IfxAsclin.h` 实际还包含 `kernelClock`、`oscillatorClock`、`flexRayClock`，且取值不同。
+
+typedef enum
+{
+    IfxAsclin_CtsInputSelect_0,  // CTS输入引脚0
+    IfxAsclin_CtsInputSelect_1,  // CTS输入引脚1
+    IfxAsclin_CtsInputSelect_2,  // CTS输入引脚2
+    IfxAsclin_CtsInputSelect_3   // CTS输入引脚3
+} IfxAsclin_CtsInputSelect;
+
+typedef enum
+{
+    IfxAsclin_DataBufferMode_normal = 0,  // 正常模式，每个接收字节移入RxFIFO
+    IfxAsclin_DataBufferMode_timeStampSingle  // 单字节时间戳模式
+} IfxAsclin_DataBufferMode;
+
+typedef enum
+{
+    IfxAsclin_DataLength_1  = 0,  // 每传输1位
+    IfxAsclin_DataLength_2,       // 每传输2位
+    IfxAsclin_DataLength_3,       // 每传输3位
+    IfxAsclin_DataLength_4,       // 每传输4位
+    IfxAsclin_DataLength_5,       // 每传输5位
+    IfxAsclin_DataLength_6,       // 每传输6位
+    IfxAsclin_DataLength_7,       // 每传输7位
+    IfxAsclin_DataLength_8,       // 每传输8位
+    IfxAsclin_DataLength_9,       // 每传输9位
+    IfxAsclin_DataLength_10,      // 每传输10位
+    IfxAsclin_DataLength_11,      // 每传输11位
+    IfxAsclin_DataLength_12,      // 每传输12位
+    IfxAsclin_DataLength_13,      // 每传输13位
+    IfxAsclin_DataLength_14,      // 每传输14位
+    IfxAsclin_DataLength_15,      // 每传输15位
+    IfxAsclin_DataLength_16       // 每传输16位
+} IfxAsclin_DataLength;
+
+typedef enum
+{
+    IfxAsclin_FrameMode_initialise = 0,  // 初始化模式
+    IfxAsclin_FrameMode_asc        = 1,  // ASC模式
+    IfxAsclin_FrameMode_spi        = 2,  // SPI模式
+    IfxAsclin_FrameMode_lin        = 3   // LIN模式
+} IfxAsclin_FrameMode;
+
+typedef enum
+{
+    IfxAsclin_HeaderResponseSelect_headerAndResponse = 0,  // 需要Header和Response
+    IfxAsclin_HeaderResponseSelect_headerOnly        = 1   // 仅需要Header
+} IfxAsclin_HeaderResponseSelect;
+
+typedef enum
+{
+    IfxAsclin_IdleDelay_0,
+    IfxAsclin_IdleDelay_1,
+    IfxAsclin_IdleDelay_2,
+    IfxAsclin_IdleDelay_3,
+    IfxAsclin_IdleDelay_4,
+    IfxAsclin_IdleDelay_5,
+    IfxAsclin_IdleDelay_6,
+    IfxAsclin_IdleDelay_7
+} IfxAsclin_IdleDelay;
+
+typedef enum
+{
+    IfxAsclin_LeadDelay_0,
+    IfxAsclin_LeadDelay_1,
+    IfxAsclin_LeadDelay_2,
+    IfxAsclin_LeadDelay_3,
+    IfxAsclin_LeadDelay_4,
+    IfxAsclin_LeadDelay_5,
+    IfxAsclin_LeadDelay_6,
+    IfxAsclin_LeadDelay_7
+} IfxAsclin_LeadDelay;
+
+typedef enum
+{
+    IfxAsclin_LinMode_slave  = 0,  // LIN从模式
+    IfxAsclin_LinMode_master = 1   // LIN主模式
+} IfxAsclin_LinMode;
+
+typedef enum
+{
+    IfxAsclin_LinResponseTimeoutMode_frameTimeout    = 0,  // 超时阈值为帧超时
+    IfxAsclin_LinResponseTimeoutMode_responseTimeout = 1   // 超时阈值为响应超时
+} IfxAsclin_LinResponseTimeoutMode;
+
+typedef enum
+{
+    IfxAsclin_OversamplingFactor_4  = 3,   // 过采样因子4
+    IfxAsclin_OversamplingFactor_5  = 4,   // 过采样因子5
+    IfxAsclin_OversamplingFactor_6  = 5,   // 过采样因子6
+    IfxAsclin_OversamplingFactor_7  = 6,   // 过采样因子7
+    IfxAsclin_OversamplingFactor_8  = 7,   // 过采样因子8
+    IfxAsclin_OversamplingFactor_9  = 8,   // 过采样因子9
+    IfxAsclin_OversamplingFactor_10 = 9,   // 过采样因子10
+    IfxAsclin_OversamplingFactor_11 = 10,  // 过采样因子11
+    IfxAsclin_OversamplingFactor_12 = 11,  // 过采样因子12
+    IfxAsclin_OversamplingFactor_13 = 12,  // 过采样因子13
+    IfxAsclin_OversamplingFactor_14 = 13,  // 过采样因子14
+    IfxAsclin_OversamplingFactor_15 = 14,  // 过采样因子15
+    IfxAsclin_OversamplingFactor_16 = 15   // 过采样因子16
+} IfxAsclin_OversamplingFactor;
+
+typedef enum
+{
+    IfxAsclin_ParityType_even = 0,  // 偶校验
+    IfxAsclin_ParityType_odd  = 1   // 奇校验
+} IfxAsclin_ParityType;
+
+typedef enum
+{
+    IfxAsclin_ReceiveBufferMode_rxFifo   = 0,  // RxFIFO模式
+    IfxAsclin_ReceiveBufferMode_rxBuffer = 1   // 单级RxBuffer模式
+} IfxAsclin_ReceiveBufferMode;
+
+typedef enum
+{
+    IfxAsclin_RtsCtsPolarity_activeHigh = 0,  // RTS/CTS高电平有效
+    IfxAsclin_RtsCtsPolarity_activeLow  = 1   // RTS/CTS低电平有效
+} IfxAsclin_RtsCtsPolarity;
+
+typedef enum
+{
+    IfxAsclin_RxFifoInterruptLevel_1,
+    IfxAsclin_RxFifoInterruptLevel_2,
+    IfxAsclin_RxFifoInterruptLevel_3,
+    IfxAsclin_RxFifoInterruptLevel_4,
+    IfxAsclin_RxFifoInterruptLevel_5,
+    IfxAsclin_RxFifoInterruptLevel_6,
+    IfxAsclin_RxFifoInterruptLevel_7,
+    IfxAsclin_RxFifoInterruptLevel_8,
+    IfxAsclin_RxFifoInterruptLevel_9,
+    IfxAsclin_RxFifoInterruptLevel_10,
+    IfxAsclin_RxFifoInterruptLevel_11,
+    IfxAsclin_RxFifoInterruptLevel_12,
+    IfxAsclin_RxFifoInterruptLevel_13,
+    IfxAsclin_RxFifoInterruptLevel_14,
+    IfxAsclin_RxFifoInterruptLevel_15,
+    IfxAsclin_RxFifoInterruptLevel_16
+} IfxAsclin_RxFifoInterruptLevel;
+
+typedef enum
+{
+    IfxAsclin_RxFifoOutletWidth_0,
+    IfxAsclin_RxFifoOutletWidth_1,
+    IfxAsclin_RxFifoOutletWidth_2,
+    IfxAsclin_RxFifoOutletWidth_3
+} IfxAsclin_RxFifoOutletWidth;
+
+typedef enum
+{
+    IfxAsclin_RxInputSelect_0,
+    IfxAsclin_RxInputSelect_1,
+    IfxAsclin_RxInputSelect_2,
+    IfxAsclin_RxInputSelect_3,
+    IfxAsclin_RxInputSelect_4,
+    IfxAsclin_RxInputSelect_5,
+    IfxAsclin_RxInputSelect_6,
+    IfxAsclin_RxInputSelect_7
+} IfxAsclin_RxInputSelect;
+
+typedef enum
+{
+    IfxAsclin_SamplePointPosition_1  = 1,
+    IfxAsclin_SamplePointPosition_2  = 2,
+    IfxAsclin_SamplePointPosition_3  = 3,
+    IfxAsclin_SamplePointPosition_4  = 4,
+    IfxAsclin_SamplePointPosition_5  = 5,
+    IfxAsclin_SamplePointPosition_6  = 6,
+    IfxAsclin_SamplePointPosition_7  = 7,
+    IfxAsclin_SamplePointPosition_8  = 8,
+    IfxAsclin_SamplePointPosition_9  = 9,
+    IfxAsclin_SamplePointPosition_10 = 10,
+    IfxAsclin_SamplePointPosition_11 = 11,
+    IfxAsclin_SamplePointPosition_12 = 12,
+    IfxAsclin_SamplePointPosition_13 = 13,
+    IfxAsclin_SamplePointPosition_14 = 14,
+    IfxAsclin_SamplePointPosition_15 = 15
+} IfxAsclin_SamplePointPosition;
+
+typedef enum
+{
+    IfxAsclin_SamplesPerBit_one   = 0,  // 每比特1次采样
+    IfxAsclin_SamplesPerBit_three = 1   // 每比特3次采样
+} IfxAsclin_SamplesPerBit;
+
+typedef enum
+{
+    IfxAsclin_ShiftDirection_lsbFirst = 0,  // LSB优先
+    IfxAsclin_ShiftDirection_msbFirst = 1   // MSB优先
+} IfxAsclin_ShiftDirection;
+
+typedef enum
+{
+    IfxAsclin_SlavePolarity_idleLow  = 0,  // SLSO空闲低电平
+    IfxAsclin_SlavePolarity_idlehigh = 1   // SLSO空闲高电平
+} IfxAsclin_SlavePolarity;
+
+typedef enum
+{
+    IfxAsclin_SleepMode_enable  = 0,  // 使能休眠模式
+    IfxAsclin_SleepMode_disable = 1   // 禁用休眠模式
+} IfxAsclin_SleepMode;
+
+typedef enum
+{
+    IfxAsclin_Status_configurationError = 0,  // 配置错误
+    IfxAsclin_Status_noError            = 1   // 无错误
+} IfxAsclin_Status;
+
+typedef enum
+{
+    IfxAsclin_StopBit_0,
+    IfxAsclin_StopBit_1,
+    IfxAsclin_StopBit_2,
+    IfxAsclin_StopBit_3,
+    IfxAsclin_StopBit_4,
+    IfxAsclin_StopBit_5,
+    IfxAsclin_StopBit_6,
+    IfxAsclin_StopBit_7
+} IfxAsclin_StopBit;
+
+typedef enum
+{
+    IfxAsclin_SuspendMode_none = 0,  // 无暂停
+    IfxAsclin_SuspendMode_hard = 1,  // 硬暂停
+    IfxAsclin_SuspendMode_soft = 2   // 软暂停
+} IfxAsclin_SuspendMode;
+
+typedef enum
+{
+    IfxAsclin_TxFifoInletWidth_0,
+    IfxAsclin_TxFifoInletWidth_1,
+    IfxAsclin_TxFifoInletWidth_2,
+    IfxAsclin_TxFifoInletWidth_3
+} IfxAsclin_TxFifoInletWidth;
+
+typedef enum
+{
+    IfxAsclin_TxFifoInterruptLevel_0,
+    IfxAsclin_TxFifoInterruptLevel_1,
+    IfxAsclin_TxFifoInterruptLevel_2,
+    IfxAsclin_TxFifoInterruptLevel_3,
+    IfxAsclin_TxFifoInterruptLevel_4,
+    IfxAsclin_TxFifoInterruptLevel_5,
+    IfxAsclin_TxFifoInterruptLevel_6,
+    IfxAsclin_TxFifoInterruptLevel_7,
+    IfxAsclin_TxFifoInterruptLevel_8,
+    IfxAsclin_TxFifoInterruptLevel_9,
+    IfxAsclin_TxFifoInterruptLevel_10,
+    IfxAsclin_TxFifoInterruptLevel_11,
+    IfxAsclin_TxFifoInterruptLevel_12,
+    IfxAsclin_TxFifoInterruptLevel_13,
+    IfxAsclin_TxFifoInterruptLevel_14,
+    IfxAsclin_TxFifoInterruptLevel_15
+} IfxAsclin_TxFifoInterruptLevel;
+
+
+struct
+
+typedef struct
+{
+    Ifx_TickTime timestamp;
+    uint8        data;
+} IfxAsclin_DataBufferMode_TimeStampSingle;
+
+typedef struct
+{
+    uint8 parityError : 1;      // 奇偶错误
+    uint8 frameError : 1;       // 帧错误
+    uint8 rxFifoOverflow : 1;   // RX FIFO溢出
+    uint8 rxFifoUnderflow : 1;  // RX FIFO下溢
+    uint8 txFifoOverflow : 1;   // TX FIFO溢出
+} IfxAsclin_Asc_ErrorFlags;
+
+typedef struct
+{
+    float32                      baudrate;      // 目标波特率
+    uint16                       prescaler;     // 粗分频
+    IfxAsclin_OversamplingFactor oversampling;  // 过采样因子
+} IfxAsclin_Asc_BaudRate;
+
+typedef struct
+{
+    IfxAsclin_SamplesPerBit       medianFilter;        // 每bit采样次数/中值滤波
+    IfxAsclin_SamplePointPosition samplePointPosition; // 采样点位置
+} IfxAsclin_Asc_BitTimingControl;
+
+typedef struct
+{
+    IfxAsclin_TxFifoInletWidth     inWidth;                // TX FIFO入口宽度
+    IfxAsclin_RxFifoOutletWidth    outWidth;               // RX FIFO出口宽度
+    IfxAsclin_TxFifoInterruptLevel txFifoInterruptLevel;   // TX FIFO中断阈值
+    IfxAsclin_RxFifoInterruptLevel rxFifoInterruptLevel;   // RX FIFO中断阈值
+    IfxAsclin_ReceiveBufferMode    buffMode;               // 接收buffer模式
+} IfxAsclin_Asc_FifoControl;
+
+typedef struct
+{
+    IfxAsclin_IdleDelay      idleDelay;   // idle delay
+    IfxAsclin_StopBit        stopBit;     // 停止位数
+    IfxAsclin_FrameMode      frameMode;   // 工作模式
+    IfxAsclin_ShiftDirection shiftDir;    // 移位方向
+    IfxAsclin_ParityType     parityType;  // 奇偶类型
+    IfxAsclin_DataLength     dataLength;  // 数据位宽
+    boolean                  parityBit;   // 是否使能奇偶位
+} IfxAsclin_Asc_FrameControl;
+
+typedef struct
+{
+    uint16     txPriority;    // 发送中断优先级
+    uint16     rxPriority;    // 接收中断优先级
+    uint16     erPriority;    // 错误中断优先级
+    IfxSrc_Tos typeOfService; // 中断服务提供者
+} IfxAsclin_Asc_InterruptConfig;
+
+typedef struct
+{
+    IFX_CONST IfxAsclin_Cts_In  *cts;       // CTS引脚
+    IfxPort_InputMode            ctsMode;   // CTS输入模式
+    IFX_CONST IfxAsclin_Rx_In   *rx;        // RX引脚
+    IfxPort_InputMode            rxMode;    // RX输入模式
+    IFX_CONST IfxAsclin_Rts_Out *rts;       // RTS引脚
+    IfxPort_OutputMode           rtsMode;   // RTS输出模式
+    IFX_CONST IfxAsclin_Tx_Out  *tx;        // TX引脚
+    IfxPort_OutputMode           txMode;    // TX输出模式
+    IfxPort_PadDriver            pinDriver; // pad driver
+} IfxAsclin_Asc_Pins;
+
+typedef union
+{
+    uint8                    ALL;
+    IfxAsclin_Asc_ErrorFlags flags;
+} IfxAsclin_Asc_ErrorFlagsUnion;
+
+typedef struct
+{
+    Ifx_ASCLIN                   *asclin;           // ASCLIN寄存器基址
+    Ifx_Fifo                     *tx;               // 发送软件FIFO
+    Ifx_Fifo                     *rx;               // 接收软件FIFO
+    volatile boolean              txInProgress;     // 是否正在发送
+    volatile boolean              rxSwFifoOverflow; // 接收软件FIFO是否溢出
+    IfxAsclin_Asc_ErrorFlagsUnion errorFlags;       // 运行期错误标志
+    IfxAsclin_DataBufferMode      dataBufferMode;   // 接收buffer模式
+    volatile uint32               sendCount;        // 已发送字节数
+    volatile Ifx_TickTime         txTimestamp;      // 最近一次发送时间戳
+} IfxAsclin_Asc;
+
+typedef struct
+{
+    Ifx_ASCLIN                    *asclin;         // ASCLIN寄存器基址
+    IfxAsclin_Asc_BaudRate         baudrate;       // 波特率配置
+    IfxAsclin_Asc_BitTimingControl bitTiming;      // 位时序配置
+    IfxAsclin_Asc_FrameControl     frame;          // 帧配置
+    IfxAsclin_Asc_FifoControl      fifo;           // FIFO配置
+    IfxAsclin_Asc_InterruptConfig  interrupt;      // 中断配置
+    IFX_CONST IfxAsclin_Asc_Pins  *pins;           // 引脚配置
+    IfxAsclin_ClockSource          clockSource;    // 时钟源选择
+    IfxAsclin_Asc_ErrorFlagsUnion  errorFlags;     // 初始错误标志掩码/状态
+    Ifx_SizeT                      txBufferSize;   // 发送buffer大小
+    void                          *txBuffer;       // 发送buffer地址
+    Ifx_SizeT                      rxBufferSize;   // 接收buffer大小
+    void                          *rxBuffer;       // 接收buffer地址
+    boolean                        loopBack;       // 是否回环
+    IfxAsclin_DataBufferMode       dataBufferMode; // 接收buffer模式
+} IfxAsclin_Asc_Config;
+
+
+important functions
+
+标准ASCLIN基础配置函数
+void IfxAsclin_setEnableModuleRequest(Ifx_ASCLIN *asclin);  // 使能模块
+void IfxAsclin_setDisableModuleRequest(Ifx_ASCLIN *asclin);  // 失能模块
+void IfxAsclin_setSleepMode(Ifx_ASCLIN *asclin, IfxAsclin_SleepMode mode);  // 设置休眠模式
+void IfxAsclin_setPrescaler(Ifx_ASCLIN *asclin, uint16 prescaler);  // 设置预分频
+void IfxAsclin_setNumerator(Ifx_ASCLIN *asclin, uint16 numerator);  // 设置分数分频分子
+void IfxAsclin_setDenominator(Ifx_ASCLIN *asclin, uint16 denominator);  // 设置分数分频分母
+void IfxAsclin_setOversampling(Ifx_ASCLIN *asclin, IfxAsclin_OversamplingFactor ovsFactor);  // 设置过采样因子
+void IfxAsclin_setSampleMode(Ifx_ASCLIN *asclin, IfxAsclin_SamplesPerBit medianFilter);  // 设置采样模式
+void IfxAsclin_setSamplePointPosition(Ifx_ASCLIN *asclin, IfxAsclin_SamplePointPosition spPosition);  // 设置采样点位置
+void IfxAsclin_setDataLength(Ifx_ASCLIN *asclin, IfxAsclin_DataLength length);  // 设置数据位宽
+void IfxAsclin_setParityType(Ifx_ASCLIN *asclin, IfxAsclin_ParityType type);  // 设置奇偶类型
+void IfxAsclin_setStopBit(Ifx_ASCLIN *asclin, IfxAsclin_StopBit stopBit);  // 设置停止位
+void IfxAsclin_setShiftDirection(Ifx_ASCLIN *asclin, IfxAsclin_ShiftDirection dir);  // 设置移位方向
+void IfxAsclin_setIdleDelay(Ifx_ASCLIN *asclin, IfxAsclin_IdleDelay delay);  // 设置空闲延迟
+void IfxAsclin_setLeadDelay(Ifx_ASCLIN *asclin, IfxAsclin_LeadDelay delay);  // 设置引导延迟
+void IfxAsclin_setRxBufferMode(Ifx_ASCLIN *asclin, IfxAsclin_ReceiveBufferMode mode);  // 设置接收buffer模式
+void IfxAsclin_setRxFifoInterruptLevel(Ifx_ASCLIN *asclin, IfxAsclin_RxFifoInterruptLevel level);  // 设置RX FIFO中断阈值
+void IfxAsclin_setTxFifoInterruptLevel(Ifx_ASCLIN *asclin, IfxAsclin_TxFifoInterruptLevel level);  // 设置TX FIFO中断阈值
+void IfxAsclin_setRxFifoOutletWidth(Ifx_ASCLIN *asclin, IfxAsclin_RxFifoOutletWidth width);  // 设置RX FIFO读出宽度
+void IfxAsclin_setTxFifoInletWidth(Ifx_ASCLIN *asclin, IfxAsclin_TxFifoInletWidth width);  // 设置TX FIFO写入宽度
+void IfxAsclin_flushRxFifo(Ifx_ASCLIN *asclin);  // 清空RX FIFO
+void IfxAsclin_flushTxFifo(Ifx_ASCLIN *asclin);  // 清空TX FIFO
+
+ASC 封装函数
+void IfxAsclin_Asc_initModuleConfig(IfxAsclin_Asc_Config *config, Ifx_ASCLIN *asclin);  // 填充ASC默认配置
+IfxAsclin_Status IfxAsclin_Asc_initModule(IfxAsclin_Asc *asclin, const IfxAsclin_Asc_Config *config);  // 初始化ASC模块
+void IfxAsclin_Asc_disableModule(IfxAsclin_Asc *asclin);  // 关闭ASC模块
+void IfxAsclin_Asc_initiateTransmission(IfxAsclin_Asc *asclin);  // 启动发送过程
+boolean IfxAsclin_Asc_blockingWrite(IfxAsclin_Asc *asclin, uint8 data);  // 阻塞发送1字节
+uint8 IfxAsclin_Asc_blockingRead(IfxAsclin_Asc *asclin);  // 阻塞接收1字节
+boolean IfxAsclin_Asc_write(IfxAsclin_Asc *asclin, const void *data, Ifx_SizeT *count, Ifx_TickTime timeout);  // 流式发送
+boolean IfxAsclin_Asc_read(IfxAsclin_Asc *asclin, void *data, Ifx_SizeT *count, Ifx_TickTime timeout);  // 流式接收
+boolean IfxAsclin_Asc_canWriteCount(IfxAsclin_Asc *asclin, Ifx_SizeT count, Ifx_TickTime timeout);  // 检查是否可写入count字节
+boolean IfxAsclin_Asc_canReadCount(IfxAsclin_Asc *asclin, Ifx_SizeT count, Ifx_TickTime timeout);  // 检查是否可读取count字节
+
+
+others functions
+
+标准ASCLIN标志与状态函数
+void IfxAsclin_clearAllFlags(Ifx_ASCLIN *asclin);  // 清除全部标志
+void IfxAsclin_clearBreakDetectedFlag(Ifx_ASCLIN *asclin);  // 清除break检测标志
+void IfxAsclin_clearCollisionDetectionErrorFlag(Ifx_ASCLIN *asclin);  // 清除冲突检测错误标志
+void IfxAsclin_clearFallingEdgeDetectedFlag(Ifx_ASCLIN *asclin);  // 清除下降沿检测标志
+void IfxAsclin_clearFrameErrorFlag(Ifx_ASCLIN *asclin);  // 清除帧错误标志
+void IfxAsclin_clearHeaderTimeoutFlag(Ifx_ASCLIN *asclin);  // 清除header超时标志
+void IfxAsclin_clearKernelResetStatus(Ifx_ASCLIN *asclin);  // 清除kernel reset状态
+void IfxAsclin_clearLinAutoBaudDetectionErrorFlag(Ifx_ASCLIN *asclin);  // 清除LIN自动波特率检测错误
+void IfxAsclin_clearLinChecksumErrorFlag(Ifx_ASCLIN *asclin);  // 清除LIN checksum错误
+void IfxAsclin_clearLinParityErrorFlag(Ifx_ASCLIN *asclin);  // 清除LIN parity错误
+void IfxAsclin_clearParityErrorFlag(Ifx_ASCLIN *asclin);  // 清除parity错误
+void IfxAsclin_clearRaisingEdgeDetectedFlag(Ifx_ASCLIN *asclin);  // 清除上升沿检测标志
+void IfxAsclin_clearResponseTimeoutFlag(Ifx_ASCLIN *asclin);  // 清除response超时标志
+void IfxAsclin_clearRxFifoFillLevelFlag(Ifx_ASCLIN *asclin);  // 清除RX FIFO level标志
+void IfxAsclin_clearRxFifoOverflowFlag(Ifx_ASCLIN *asclin);  // 清除RX FIFO溢出标志
+void IfxAsclin_clearRxFifoUnderflowFlag(Ifx_ASCLIN *asclin);  // 清除RX FIFO下溢标志
+void IfxAsclin_clearRxHeaderEndFlag(Ifx_ASCLIN *asclin);  // 清除RX header end标志
+void IfxAsclin_clearRxResponseEndFlag(Ifx_ASCLIN *asclin);  // 清除RX response end标志
+void IfxAsclin_clearTransmissionCompletedFlag(Ifx_ASCLIN *asclin);  // 清除发送完成标志
+void IfxAsclin_clearTxFifoFillLevelFlag(Ifx_ASCLIN *asclin);  // 清除TX FIFO level标志
+void IfxAsclin_clearTxFifoOverflowFlag(Ifx_ASCLIN *asclin);  // 清除TX FIFO溢出标志
+void IfxAsclin_clearTxHeaderEndFlag(Ifx_ASCLIN *asclin);  // 清除TX header end标志
+void IfxAsclin_clearTxResponseEndFlag(Ifx_ASCLIN *asclin);  // 清除TX response end标志
+void IfxAsclin_setBrdLowerlimt(Ifx_ASCLIN *asclin, uint8 limit);  // 设置波特率检测下限
+void IfxAsclin_setBrdUpperlimt(Ifx_ASCLIN *asclin, uint8 limit);  // 设置波特率检测上限
+void IfxAsclin_setChecksumInjection(Ifx_ASCLIN *asclin, IfxAsclin_ChecksumInjection csi);  // 设置checksum注入行为
+void IfxAsclin_setChecksumMode(Ifx_ASCLIN *asclin, IfxAsclin_Checksum mode);  // 设置checksum模式
+void IfxAsclin_setFilterDepth(Ifx_ASCLIN *asclin, uint8 depth);  // 设置数字滤波深度
+void IfxAsclin_setHeaderResponseSelect(Ifx_ASCLIN *asclin, IfxAsclin_HeaderResponseSelect type);  // 设置header/response选择
+void IfxAsclin_setKernelResetOne(Ifx_ASCLIN *asclin);  // 置位KRST1
+void IfxAsclin_setKernelResetZero(Ifx_ASCLIN *asclin);  // 置位KRST0
+void IfxAsclin_setLinBreakLength(Ifx_ASCLIN *asclin, uint8 length);  // 设置LIN break长度
+void IfxAsclin_setLinHeaderTimeout(Ifx_ASCLIN *asclin, uint8 timeout);  // 设置LIN header超时
+void IfxAsclin_setLinMode(Ifx_ASCLIN *asclin, IfxAsclin_LinMode mode);  // 设置LIN主从模式
+void IfxAsclin_setLinResponseTimeoutMode(Ifx_ASCLIN *asclin, IfxAsclin_LinResponseTimeoutMode mode);  // 设置LIN response超时模式
+void IfxAsclin_setLinResponseTimeoutThreshold(Ifx_ASCLIN *asclin, uint16 threshold);  // 设置LIN response超时阈值
+void IfxAsclin_setTransmitHeaderRequestFlag(Ifx_ASCLIN *asclin);  // 触发header发送请求
+void IfxAsclin_setTransmitResponseRequestFlag(Ifx_ASCLIN *asclin);  // 触发response发送请求
+void IfxAsclin_setTransmitWakeRequestFlag(Ifx_ASCLIN *asclin);  // 触发wake发送请求
+boolean IfxAsclin_getBreakDetectedFlagStatus(Ifx_ASCLIN *asclin);  // 读break检测标志
+uint8 IfxAsclin_getClockSource(Ifx_ASCLIN *asclin);  // 读时钟源
+boolean IfxAsclin_getClockStatus(Ifx_ASCLIN *asclin);  // 读时钟状态
+boolean IfxAsclin_getCollisionDetectionErrorFlagStatus(Ifx_ASCLIN *asclin);  // 读冲突检测错误标志
+boolean IfxAsclin_getFallingEdgeDetectedFlagStatus(Ifx_ASCLIN *asclin);  // 读下降沿检测标志
+boolean IfxAsclin_getFrameErrorFlagStatus(Ifx_ASCLIN *asclin);  // 读帧错误标志
+boolean IfxAsclin_getHeaderTimeoutFlagStatus(Ifx_ASCLIN *asclin);  // 读header超时标志
+boolean IfxAsclin_getKernelResetStatus(Ifx_ASCLIN *asclin);  // 读kernel reset状态
+boolean IfxAsclin_getLinAutoBaudDetectionErrorFlagStatus(Ifx_ASCLIN *asclin);  // 读LIN自动波特率检测错误标志
+boolean IfxAsclin_getLinChecksumErrorFlagStatus(Ifx_ASCLIN *asclin);  // 读LIN checksum错误标志
+boolean IfxAsclin_getLinParityErrorFlagStatus(Ifx_ASCLIN *asclin);  // 读LIN parity错误标志
+boolean IfxAsclin_getModuleStatus(Ifx_ASCLIN *asclin);  // 读模块使能状态
+boolean IfxAsclin_getParityErrorFlagStatus(Ifx_ASCLIN *asclin);  // 读parity错误标志
+uint16 IfxAsclin_getPrescaler(Ifx_ASCLIN *asclin);  // 读预分频
+boolean IfxAsclin_getRaisingEdgeDetectedFlagStatus(Ifx_ASCLIN *asclin);  // 读上升沿检测标志
+boolean IfxAsclin_getReceiveSignalStatus(Ifx_ASCLIN *asclin);  // 读接收信号状态
+boolean IfxAsclin_getResponseTimeoutFlagStatus(Ifx_ASCLIN *asclin);  // 读response超时标志
+uint8 IfxAsclin_getRxFifoFillLevel(Ifx_ASCLIN *asclin);  // 读RX FIFO level
+boolean IfxAsclin_getRxFifoFillLevelFlagStatus(Ifx_ASCLIN *asclin);  // 读RX FIFO level标志
+uint8 IfxAsclin_getRxFifoOutletWidth(Ifx_ASCLIN *asclin);  // 读RX FIFO出口宽度
+boolean IfxAsclin_getRxFifoOverflowFlagStatus(Ifx_ASCLIN *asclin);  // 读RX FIFO溢出标志
+boolean IfxAsclin_getRxFifoUnderflowFlagStatus(Ifx_ASCLIN *asclin);  // 读RX FIFO下溢标志
+boolean IfxAsclin_getRxHeaderEndFlagStatus(Ifx_ASCLIN *asclin);  // 读RX header end标志
+boolean IfxAsclin_getRxResponseEndFlagStatus(Ifx_ASCLIN *asclin);  // 读RX response end标志
+boolean IfxAsclin_getTransmissionCompletedFlagStatus(Ifx_ASCLIN *asclin);  // 读发送完成标志
+boolean IfxAsclin_getTransmitSignalStatus(Ifx_ASCLIN *asclin);  // 读发送信号状态
+uint8 IfxAsclin_getTxFifoFillLevel(Ifx_ASCLIN *asclin);  // 读TX FIFO level
+boolean IfxAsclin_getTxFifoFillLevelFlagStatus(Ifx_ASCLIN *asclin);  // 读TX FIFO level标志
+uint8 IfxAsclin_getTxFifoInletWidth(Ifx_ASCLIN *asclin);  // 读TX FIFO入口宽度
+boolean IfxAsclin_getTxFifoOverflowFlagStatus(Ifx_ASCLIN *asclin);  // 读TX FIFO溢出标志
+boolean IfxAsclin_getTxHeaderEndFlagStatus(Ifx_ASCLIN *asclin);  // 读TX header end标志
+boolean IfxAsclin_getTxResponseEndFlagStatus(Ifx_ASCLIN *asclin);  // 读TX response end标志
+Ifx_ASCLIN *IfxAsclin_getAddress(IfxAsclin_Index asclin);  // 根据索引获取模块地址
+float32 IfxAsclin_getFaFrequency(Ifx_ASCLIN *asclin);  // 获取fa时钟频率
+IfxAsclin_Index IfxAsclin_getIndex(Ifx_ASCLIN *asclin);  // 根据模块地址反查索引
+float32 IfxAsclin_getOvsFrequency(Ifx_ASCLIN *asclin);  // 获取过采样时钟频率
+float32 IfxAsclin_getPdFrequency(Ifx_ASCLIN *asclin);  // 获取预分频后时钟频率
+
+ASC 辅助函数
+void IfxAsclin_Asc_isrError(IfxAsclin_Asc *asclin);  // ASC错误ISR
+void IfxAsclin_Asc_isrReceive(IfxAsclin_Asc *asclin);  // ASC接收ISR
+void IfxAsclin_Asc_isrTransmit(IfxAsclin_Asc *asclin);  // ASC发送ISR
+void IfxAsclin_Asc_clearRx(IfxAsclin_Asc *asclin);  // 清空软件RX buffer
+void IfxAsclin_Asc_clearTx(IfxAsclin_Asc *asclin);  // 清空软件TX buffer
+boolean IfxAsclin_Asc_flushTx(IfxAsclin_Asc *asclin, Ifx_TickTime timeout);  // 等待并刷新TX
+sint32 IfxAsclin_Asc_getReadCount(IfxAsclin_Asc *asclin);  // 获取可读字节数
+volatile boolean *IfxAsclin_Asc_getReadEvent(IfxAsclin_Asc *asclin);  // 获取读事件对象
+uint32 IfxAsclin_Asc_getSendCount(IfxAsclin_Asc *asclin);  // 获取已发送字节计数
+Ifx_TickTime IfxAsclin_Asc_getTxTimeStamp(IfxAsclin_Asc *asclin);  // 获取最近发送时间戳
+sint32 IfxAsclin_Asc_getWriteCount(IfxAsclin_Asc *asclin);  // 获取可写字节数
+volatile boolean *IfxAsclin_Asc_getWriteEvent(IfxAsclin_Asc *asclin);  // 获取写事件对象
+void IfxAsclin_Asc_resetSendCount(IfxAsclin_Asc *asclin);  // 清零发送计数
+
+
+VADC class
+
+enum
+
+typedef enum
+{
+    IfxVadc_AnalogConverterMode_off             = 0,  // 模拟转换器关闭
+    IfxVadc_AnalogConverterMode_slowStandby     = 1,  // 慢速待机模式
+    IfxVadc_AnalogConverterMode_fastStandby     = 2,  // 快速待机模式
+    IfxVadc_AnalogConverterMode_normalOperation = 3   // 正常操作模式
+} IfxVadc_AnalogConverterMode;
+
+typedef enum
+{
+    IfxVadc_ArbitrationRounds_4_slots  = 0,  // 仲裁轮包含4个仲裁槽
+    IfxVadc_ArbitrationRounds_8_slots  = 1,  // 仲裁轮包含8个仲裁槽
+    IfxVadc_ArbitrationRounds_16_slots = 2,  // 仲裁轮包含16个仲裁槽
+    IfxVadc_ArbitrationRounds_20_slots = 3   // 仲裁轮包含20个仲裁槽
+} IfxVadc_ArbitrationRounds;
+
+typedef enum
+{
+    IfxVadc_BoundaryExtension_standard            = 0,
+    IfxVadc_BoundaryExtension_fastCompareResult1  = 1,
+    IfxVadc_BoundaryExtension_fastCompareResult2  = 2,
+    IfxVadc_BoundaryExtension_fastCompareResult3  = 3,
+    IfxVadc_BoundaryExtension_fastCompareResult4  = 4,
+    IfxVadc_BoundaryExtension_fastCompareResult5  = 5,
+    IfxVadc_BoundaryExtension_fastCompareResult6  = 6,
+    IfxVadc_BoundaryExtension_fastCompareResult7  = 7,
+    IfxVadc_BoundaryExtension_fastCompareResult8  = 8,
+    IfxVadc_BoundaryExtension_fastCompareResult9  = 9,
+    IfxVadc_BoundaryExtension_fastCompareResult10 = 10,
+    IfxVadc_BoundaryExtension_fastCompareResult11 = 11,
+    IfxVadc_BoundaryExtension_fastCompareResult12 = 12,
+    IfxVadc_BoundaryExtension_fastCompareResult13 = 13,
+    IfxVadc_BoundaryExtension_fastCompareResult14 = 14,
+    IfxVadc_BoundaryExtension_fastCompareResult15 = 15
+} IfxVadc_BoundaryExtension;
+
+typedef enum
+{
+    IfxVadc_BoundarySelection_group0  = 0,
+    IfxVadc_BoundarySelection_group1  = 1,
+    IfxVadc_BoundarySelection_global0 = 2,
+    IfxVadc_BoundarySelection_global1 = 3
+} IfxVadc_BoundarySelection;
+
+typedef enum
+{
+    IfxVadc_ChannelId_none = -1,
+    IfxVadc_ChannelId_0    = 0,
+    IfxVadc_ChannelId_1    = 1,
+    IfxVadc_ChannelId_2    = 2,
+    IfxVadc_ChannelId_3    = 3,
+    IfxVadc_ChannelId_4    = 4,
+    IfxVadc_ChannelId_5    = 5,
+    IfxVadc_ChannelId_6    = 6,
+    IfxVadc_ChannelId_7    = 7,
+    IfxVadc_ChannelId_8    = 8,
+    IfxVadc_ChannelId_9    = 9,
+    IfxVadc_ChannelId_10   = 10,
+    IfxVadc_ChannelId_11   = 11,
+    IfxVadc_ChannelId_12   = 12,
+    IfxVadc_ChannelId_13   = 13,
+    IfxVadc_ChannelId_14   = 14,
+    IfxVadc_ChannelId_15   = 15
+} IfxVadc_ChannelId;
+
+typedef enum
+{
+    IfxVadc_ChannelReference_standard = 0,  // 使用Varef作为参考
+    IfxVadc_ChannelReference_channel0 = 1   // 使用CH0作为参考
+} IfxVadc_ChannelReference;
+
+typedef enum
+{
+    IfxVadc_ChannelResolution_12bit     = 0,  // 12位转换
+    IfxVadc_ChannelResolution_10bit     = 1,  // 10位转换
+    IfxVadc_ChannelResolution_8bit      = 2,  // 8位转换
+    IfxVadc_ChannelResolution_10bitFast = 5   // 10位快速比较
+} IfxVadc_ChannelResolution;
+
+typedef enum
+{
+    IfxVadc_ChannelResult_0 = 0,
+    IfxVadc_ChannelResult_1,
+    IfxVadc_ChannelResult_2,
+    IfxVadc_ChannelResult_3,
+    IfxVadc_ChannelResult_4,
+    IfxVadc_ChannelResult_5,
+    IfxVadc_ChannelResult_6,
+    IfxVadc_ChannelResult_7,
+    IfxVadc_ChannelResult_8,
+    IfxVadc_ChannelResult_9,
+    IfxVadc_ChannelResult_10,
+    IfxVadc_ChannelResult_11,
+    IfxVadc_ChannelResult_12,
+    IfxVadc_ChannelResult_13,
+    IfxVadc_ChannelResult_14,
+    IfxVadc_ChannelResult_15
+} IfxVadc_ChannelResult;
+
+typedef enum
+{
+    IfxVadc_ChannelSelectionStyle_channelNumber = 0,
+    IfxVadc_ChannelSelectionStyle_binary        = 1
+} IfxVadc_ChannelSelectionStyle;
+
+typedef enum
+{
+    IfxVadc_ConversionType_Compatible = 0
+} IfxVadc_ConversionType;
+
+typedef enum
+{
+    IfxVadc_EmuxCodingScheme_binary = 0,
+    IfxVadc_EmuxCodingScheme_gray   = 1
+} IfxVadc_EmuxCodingScheme;
+
+typedef enum
+{
+    IfxVadc_EmuxInterface_0 = 0,
+    IfxVadc_EmuxInterface_1 = 1
+} IfxVadc_EmuxInterface;
+
+typedef enum
+{
+    IfxVadc_EmuxSampleTimeControl_settingChanges = 0,
+    IfxVadc_EmuxSampleTimeControl_always         = 1
+} IfxVadc_EmuxSampleTimeControl;
+
+typedef enum
+{
+    IfxVadc_EmuxSelectValue_0 = 0,
+    IfxVadc_EmuxSelectValue_1,
+    IfxVadc_EmuxSelectValue_2,
+    IfxVadc_EmuxSelectValue_3,
+    IfxVadc_EmuxSelectValue_4,
+    IfxVadc_EmuxSelectValue_5,
+    IfxVadc_EmuxSelectValue_6,
+    IfxVadc_EmuxSelectValue_7
+} IfxVadc_EmuxSelectValue;
+
+typedef enum
+{
+    IfxVadc_ExternalMultiplexerMode_softwareControl = 0,
+    IfxVadc_ExternalMultiplexerMode_steady          = 1,
+    IfxVadc_ExternalMultiplexerMode_singleStep      = 2,
+    IfxVadc_ExternalMultiplexerMode_sequence        = 3
+} IfxVadc_ExternalMultiplexerMode;
+
+typedef enum
+{
+    IfxVadc_FifoMode_seperateResultRegister = 0,
+    IfxVadc_FifoMode_fifoStructure          = 1,
+    IfxVadc_FifoMode_maximumMode            = 2,
+    IfxVadc_FifoMode_minimumMode            = 3
+} IfxVadc_FifoMode;
+
+typedef enum
+{
+    IfxVadc_GatingMode_disabled   = 0,
+    IfxVadc_GatingMode_always     = 1,
+    IfxVadc_GatingMode_gatingHigh = 2,
+    IfxVadc_GatingMode_gatingLow  = 3
+} IfxVadc_GatingMode;
+
+typedef enum
+{
+    IfxVadc_GatingSource_0 = 0,
+    IfxVadc_GatingSource_1,
+    IfxVadc_GatingSource_2,
+    IfxVadc_GatingSource_3,
+    IfxVadc_GatingSource_4,
+    IfxVadc_GatingSource_5,
+    IfxVadc_GatingSource_6,
+    IfxVadc_GatingSource_7,
+    IfxVadc_GatingSource_8,
+    IfxVadc_GatingSource_9,
+    IfxVadc_GatingSource_10,
+    IfxVadc_GatingSource_11,
+    IfxVadc_GatingSource_12,
+    IfxVadc_GatingSource_13,
+    IfxVadc_GatingSource_14,
+    IfxVadc_GatingSource_15
+} IfxVadc_GatingSource;
+
+typedef enum
+{
+    IfxVadc_InputClasses_group0  = 0,
+    IfxVadc_InputClasses_group1  = 1,
+    IfxVadc_InputClasses_global0 = 2,
+    IfxVadc_InputClasses_global1 = 3
+} IfxVadc_InputClasses;
+
+typedef enum
+{
+    IfxVadc_LimitCheck_noCheck            = 0,
+    IfxVadc_LimitCheck_eventIfInArea      = 1,
+    IfxVadc_LimitCheck_eventIfOutsideArea = 2,
+    IfxVadc_LimitCheck_always             = 3
+} IfxVadc_LimitCheck;
+
+typedef enum
+{
+    IfxVadc_LowSupplyVoltageSelect_5V = 0,
+    IfxVadc_LowSupplyVoltageSelect_3V = 1
+} IfxVadc_LowSupplyVoltageSelect;
+
+typedef enum
+{
+    IfxVadc_RequestSlotPriority_lowest  = 0,
+    IfxVadc_RequestSlotPriority_low     = 1,
+    IfxVadc_RequestSlotPriority_high    = 2,
+    IfxVadc_RequestSlotPriority_highest = 3
+} IfxVadc_RequestSlotPriority;
+
+typedef enum
+{
+    IfxVadc_RequestSlotStartMode_waitForStart       = 0,
+    IfxVadc_RequestSlotStartMode_cancelInjectRepeat = 1
+} IfxVadc_RequestSlotStartMode;
+
+typedef enum
+{
+    IfxVadc_RequestSource_queue      = 0,
+    IfxVadc_RequestSource_scan       = 1,
+    IfxVadc_RequestSource_background = 2
+} IfxVadc_RequestSource;
+// 与 TC38x 源文档差异：TC26B `IfxVadc_RequestSource` 是 `queue/scan/background`，而不是 `queue0/queue1/queue2`。
+
+typedef enum
+{
+    IfxVadc_SleepMode_enable  = 0,
+    IfxVadc_SleepMode_disable = 1
+} IfxVadc_SleepMode;
+
+typedef enum
+{
+    IfxVadc_SrcNr_group0  = 0,
+    IfxVadc_SrcNr_group1  = 1,
+    IfxVadc_SrcNr_group2  = 2,
+    IfxVadc_SrcNr_group3  = 3,
+    IfxVadc_SrcNr_shared0 = 4,
+    IfxVadc_SrcNr_shared1 = 5,
+    IfxVadc_SrcNr_shared2 = 6,
+    IfxVadc_SrcNr_shared3 = 7
+} IfxVadc_SrcNr;
+
+typedef enum
+{
+    IfxVadc_Status_noError              = 0,
+    IfxVadc_Status_notInitialised       = 1,
+    IfxVadc_Status_invalidGroup         = 2,
+    IfxVadc_Status_invalidChannel       = 3,
+    IfxVadc_Status_queueFull            = 4,
+    IfxVadc_Status_noAccess             = 5,
+    IfxVadc_Status_channelsStillPending = 6
+} IfxVadc_Status;
+
+typedef enum
+{
+    IfxVadc_TriggerMode_noExternalTrigger = 0,
+    IfxVadc_TriggerMode_uponFallingEdge   = 1,
+    IfxVadc_TriggerMode_uponRisingEdge    = 2,
+    IfxVadc_TriggerMode_uponAnyEdge       = 3
+} IfxVadc_TriggerMode;
+
+typedef enum
+{
+    IfxVadc_TriggerSource_0 = 0,
+    IfxVadc_TriggerSource_1,
+    IfxVadc_TriggerSource_2,
+    IfxVadc_TriggerSource_3,
+    IfxVadc_TriggerSource_4,
+    IfxVadc_TriggerSource_5,
+    IfxVadc_TriggerSource_6,
+    IfxVadc_TriggerSource_7,
+    IfxVadc_TriggerSource_8,
+    IfxVadc_TriggerSource_9,
+    IfxVadc_TriggerSource_10,
+    IfxVadc_TriggerSource_11,
+    IfxVadc_TriggerSource_12,
+    IfxVadc_TriggerSource_13,
+    IfxVadc_TriggerSource_14,
+    IfxVadc_TriggerSource_15
+} IfxVadc_TriggerSource;
+
+
+struct
+
+typedef uint8 IfxVadc_Adc_SYNCTR_STSEL;
+
+typedef struct
+{
+    Ifx_VADC *vadc;  // 指向VADC模块寄存器的指针
+} IfxVadc_Adc;
+
+typedef struct
+{
+    IfxVadc_GatingSource  gatingSource;   // 使用的门控输入
+    IfxVadc_TriggerSource triggerSource;  // 使用的触发输入
+    IfxVadc_GatingMode    gatingMode;     // 门控模式
+    IfxVadc_TriggerMode   triggerMode;    // 触发模式
+} IfxVadc_Adc_GatingTriggerConfig;
+
+typedef struct
+{
+    IfxVadc_ArbitrationRounds arbiterRoundLength;              // 仲裁轮长度
+    boolean                   requestSlotQueueEnabled;         // 是否启用queue请求槽
+    boolean                   requestSlotScanEnabled;          // 是否启用scan请求槽
+    boolean                   requestSlotBackgroundScanEnabled; // 是否启用background scan请求槽
+} IfxVadc_Adc_ArbiterConfig;
+
+typedef struct
+{
+    boolean                         autoBackgroundScanEnabled; // 是否启用background autoscan
+    IfxVadc_Adc_GatingTriggerConfig triggerConfig;             // 触发/门控配置
+    IfxVadc_RequestSlotPriority     requestSlotPrio;           // 请求槽优先级
+    IfxVadc_RequestSlotStartMode    requestSlotStartMode;      // 请求槽启动模式
+} IfxVadc_Adc_BackgroundScanConfig;
+
+typedef struct
+{
+    float32                   sampleTime;  // 采样时间
+    IfxVadc_ChannelResolution resolution;  // 分辨率
+} IfxVadc_Adc_ClassConfig;
+
+typedef struct
+{
+    IfxVadc_Adc     module;   // 模块句柄
+    Ifx_VADC_G     *group;    // 组寄存器指针
+    IfxVadc_GroupId groupId;  // 组索引
+} IfxVadc_Adc_Group;
+
+typedef struct
+{
+    boolean                         flushQueueAfterInit;  // 初始化后是否清队列
+    IfxVadc_Adc_GatingTriggerConfig triggerConfig;        // 触发/门控配置
+    IfxVadc_RequestSlotPriority     requestSlotPrio;      // 请求槽优先级
+    IfxVadc_RequestSlotStartMode    requestSlotStartMode; // 请求槽启动模式
+} IfxVadc_Adc_QueueConfig;
+
+typedef struct
+{
+    boolean                         autoscanEnabled;      // 是否启用autoscan
+    IfxVadc_Adc_GatingTriggerConfig triggerConfig;        // 触发/门控配置
+    IfxVadc_RequestSlotPriority     requestSlotPrio;      // 请求槽优先级
+    IfxVadc_RequestSlotStartMode    requestSlotStartMode; // 请求槽启动模式
+} IfxVadc_Adc_ScanConfig;
+
+typedef struct
+{
+    IfxVadc_Emux_Out  *pins[3];    // Emux输出引脚
+    IfxPort_OutputMode outputMode; // 输出模式
+    IfxPort_PadDriver  padDriver;  // pad driver
+} IfxVadc_Adc_EmuxPinConfig;
+
+typedef struct
+{
+    IfxVadc_ChannelId            channel;    // 通道索引
+    IfxVadc_ChannelResult        resultreg;  // 分配的结果寄存器
+    IFX_CONST IfxVadc_Adc_Group *group;      // 所属组
+} IfxVadc_Adc_Channel;
+
+typedef struct
+{
+    boolean                      globalResultUsage;   // 是否额外写全局结果寄存器
+    boolean                      synchonize;          // 是否参与同步转换
+    boolean                      backgroundChannel;   // 是否作为background通道
+    boolean                      rightAlignedStorage; // 结果是否右对齐
+    Ifx_Priority                 resultPriority;      // 结果中断优先级
+    Ifx_Priority                 channelPriority;     // 通道事件中断优先级
+    IfxSrc_Tos                   resultServProvider;  // 结果中断服务提供者
+    IfxSrc_Tos                   channelServProvider; // 通道事件中断服务提供者
+    IfxVadc_SrcNr                resultSrcNr;         // 结果SRC节点号
+    IfxVadc_SrcNr                channelSrcNr;        // 通道事件SRC节点号
+    IfxVadc_ChannelId            channelId;           // 通道号
+    IfxVadc_InputClasses         inputClass;          // 输入类选择
+    IfxVadc_ChannelReference     reference;           // 参考选择
+    IfxVadc_ChannelResult        resultRegister;      // 结果寄存器选择
+    IfxVadc_BoundarySelection    lowerBoundary;       // 下边界选择
+    IfxVadc_BoundarySelection    upperBoundary;       // 上边界选择
+    IfxVadc_BoundaryExtension    boundaryMode;        // 边界扩展/快速比较模式
+    IfxVadc_LimitCheck           limitCheck;          // 限值检查方式
+    IFX_CONST IfxVadc_Adc_Group *group;               // 组句柄
+} IfxVadc_Adc_ChannelConfig;
+
+typedef struct
+{
+    Ifx_VADC                    *vadc;        // VADC模块寄存器基址
+    IfxVadc_Adc_ClassConfig      globalInputClass[IFXVADC_NUM_GLOBAL_INPUTCLASSES]; // 全局输入类配置
+    float32                      digitalFrequency; // 数字频率
+    float32                      analogFrequency;  // 模拟频率
+    float32                      moduleFrequency;  // 模块频率
+    boolean                      startupCalibration; // 是否启动校准
+    IfxVadc_LowSupplyVoltageSelect supplyVoltage; // 低压供电选择
+} IfxVadc_Adc_Config;
+
+typedef struct
+{
+    Ifx_VADC                       *vadc;                  // 模块寄存器基址
+    IfxVadc_ExternalMultiplexerMode mode;                  // 外部多路复用器模式
+    IfxVadc_EmuxSelectValue         startChannel;          // 外部通道起始值
+    IfxVadc_EmuxCodingScheme        code;                  // 二进制/格雷码
+    IfxVadc_EmuxSampleTimeControl   sampleTimeControl;     // 采样时间控制模式
+    IfxVadc_GroupId                 groupId;               // 组ID
+    uint8                           channels;              // 通道号
+    IfxVadc_EmuxInterface           emuxInterface;         // Emux接口
+    IfxVadc_Adc_EmuxPinConfig       emuxOutPinConfig;      // Emux输出引脚配置
+    IfxVadc_ChannelSelectionStyle   channelSelectionStyle; // 通道选择样式
+} IfxVadc_Adc_EmuxControl;
+
+typedef struct
+{
+    IFX_CONST IfxVadc_Adc           *module;                // 模块句柄
+    IfxVadc_GroupId                  groupId;               // 组ID
+    IfxVadc_GroupId                  master;                // 主组ID
+    IfxVadc_Adc_ClassConfig          inputClass[IFXVADC_NUM_INPUTCLASSES]; // 组输入类配置
+    IfxVadc_Adc_ScanConfig           scanRequest;           // scan请求配置
+    IfxVadc_Adc_QueueConfig          queueRequest;          // queue请求配置
+    IfxVadc_Adc_BackgroundScanConfig backgroundScanRequest; // background scan配置
+    boolean                          disablePostCalibration; // 是否关闭后校准
+    IfxVadc_Adc_ArbiterConfig        arbiter;               // 仲裁器配置
+} IfxVadc_Adc_GroupConfig;
+// 与 TC38x 源文档差异：TC26B `IfxVadc_Adc_GroupConfig` 只有一个 `queueRequest`，不再是 `queueRequest[3]`。
+
+
+important functions
+
+标准VADC基础函数
+void IfxVadc_configureWaitForReadMode(Ifx_VADC_G *group, uint32 resultIdx, boolean waitForRead);  // 配置组结果寄存器wait-for-read
+void IfxVadc_configureWaitForReadModeForGlobalResultRegister(Ifx_VADC *vadc, boolean waitForRead);  // 配置全局结果寄存器wait-for-read
+void IfxVadc_setBackgroundScan(Ifx_VADC *vadc, IfxVadc_GroupId groupId, uint32 channels, uint32 mask);  // 配置background scan
+void IfxVadc_setAutoBackgroundScan(Ifx_VADC *vadc, boolean autoBackgroundScanEnable);  // 配置background autoscan
+void IfxVadc_startBackgroundScan(Ifx_VADC *vadc);  // 启动background scan
+void IfxVadc_setScan(Ifx_VADC_G *group, uint32 channels, uint32 mask);  // 配置scan
+void IfxVadc_setAutoScan(Ifx_VADC_G *vadcG, boolean autoscanEnable);  // 配置autoscan
+void IfxVadc_startScan(Ifx_VADC_G *group);  // 启动scan
+void IfxVadc_addToQueue(Ifx_VADC_G *group, IfxVadc_ChannelId channel, uint32 options);  // 向queue加入通道
+void IfxVadc_clearQueue(Ifx_VADC_G *vadcG, boolean flushQueue);  // 清空queue
+void IfxVadc_startQueue(Ifx_VADC_G *group);  // 启动queue
+Ifx_VADC_RES IfxVadc_getResult(Ifx_VADC_G *group, uint32 resultIdx);  // 读取结果寄存器
+void IfxVadc_getGroupResult(Ifx_VADC_G *group, Ifx_VADC_RES *results, uint32 resultOffset, uint32 numResults);  // 批量读取组结果
+Ifx_VADC_GLOBRES IfxVadc_getGlobalResult(Ifx_VADC *vadc);  // 读取全局结果寄存器
+
+Vadc/Adc封装函数
+void IfxVadc_Adc_initModuleConfig(IfxVadc_Adc_Config *config, Ifx_VADC *vadc);  // 填充模块默认配置
+IfxVadc_Status IfxVadc_Adc_initModule(IfxVadc_Adc *vadc, const IfxVadc_Adc_Config *config);  // 初始化VADC模块
+void IfxVadc_Adc_disableModule(Ifx_VADC *vadc);  // 关闭VADC模块
+void IfxVadc_Adc_initGroupConfig(IfxVadc_Adc_GroupConfig *config, IfxVadc_Adc *vadc);  // 填充组默认配置
+IfxVadc_Status IfxVadc_Adc_initGroup(IfxVadc_Adc_Group *group, const IfxVadc_Adc_GroupConfig *config);  // 初始化VADC组
+void IfxVadc_Adc_initChannelConfig(IfxVadc_Adc_ChannelConfig *config, IfxVadc_Adc_Group *group);  // 填充通道默认配置
+IfxVadc_Status IfxVadc_Adc_initChannel(IfxVadc_Adc_Channel *channel, const IfxVadc_Adc_ChannelConfig *config);  // 初始化VADC通道
+void IfxVadc_Adc_setScan(IfxVadc_Adc_Group *group, uint32 channels, uint32 mask);  // 用句柄配置scan
+void IfxVadc_Adc_startScan(IfxVadc_Adc_Group *group);  // 用句柄启动scan
+void IfxVadc_Adc_setBackgroundScan(IfxVadc_Adc *vadc, IfxVadc_Adc_Group *group, uint32 channels, uint32 mask);  // 用句柄配置background scan
+void IfxVadc_Adc_startBackgroundScan(IfxVadc_Adc *vadc);  // 用句柄启动background scan
+void IfxVadc_Adc_addToQueue(IfxVadc_Adc_Channel *channel, uint32 options);  // 将通道加入queue
+void IfxVadc_Adc_clearQueue(IfxVadc_Adc_Group *group);  // 清空组queue
+void IfxVadc_Adc_startQueue(IfxVadc_Adc_Group *group);  // 启动组queue
+Ifx_VADC_RES IfxVadc_Adc_getResult(IfxVadc_Adc_Channel *channel);  // 读取通道结果
+void IfxVadc_Adc_configureWaitForReadMode(IfxVadc_Adc_Channel *channel, boolean waitForRead);  // 配置通道wait-for-read
+Ifx_VADC_RES IfxVadc_Adc_getResultBasedOnRequestSource(IfxVadc_Adc_Group *group, IfxVadc_ChannelId channel, IfxVadc_RequestSource sourceType);  // 按请求源读取结果
+void IfxVadc_Adc_initExternalMultiplexerModeConfig(IfxVadc_Adc_EmuxControl *config, IfxVadc_Adc *vadc);  // 填充EMUX默认配置
+void IfxVadc_Adc_initExternalMultiplexerMode(IfxVadc_Adc *vadc, IfxVadc_Adc_EmuxControl *control);  // 初始化EMUX模式
+
+
+others functions
+
+标准VADC辅助函数
+void IfxVadc_enableBackgroundScanSlotExternalTrigger(Ifx_VADC *vadc);  // 使能background scan外部触发
+IfxVadc_GatingMode IfxVadc_getBackgroundScanGatingMode(Ifx_VADC *vadc);  // 读取background scan门控模式
+IfxVadc_GatingSource IfxVadc_getBackgroundScanGatingSource(Ifx_VADC *vadc);  // 读取background scan门控源
+IfxVadc_RequestSlotPriority IfxVadc_getBackgroundScanSlotPriority(Ifx_VADC_G *vadcG);  // 读取background scan请求槽优先级
+IfxVadc_RequestSlotStartMode IfxVadc_getBackgroundScanSlotStartMode(Ifx_VADC_G *vadcG);  // 读取background scan请求槽启动模式
+IfxVadc_TriggerSource IfxVadc_getBackgroundScanTriggerInput(Ifx_VADC *vadc);  // 读取background scan触发源
+IfxVadc_TriggerMode IfxVadc_getBackgroundScanTriggerMode(Ifx_VADC *vadc);  // 读取background scan触发模式
+IfxVadc_ChannelResolution IfxVadc_getGlobalResolution(Ifx_VADC *vadc, uint8 inputClassNum);  // 读取全局输入类分辨率
+float32 IfxVadc_getGlobalSampleTime(Ifx_VADC *vadc, uint8 inputClassNum, float32 analogFrequency);  // 读取全局输入类采样时间
+boolean IfxVadc_isAutoBackgroundScanEnabled(Ifx_VADC *vadc);  // 查询background autoscan是否使能
+boolean IfxVadc_isRequestBackgroundScanSlotEnabled(Ifx_VADC_G *vadcG);  // 查询background scan请求槽是否使能
+IfxVadc_Status IfxVadc_getBackgroundScanStatus(Ifx_VADC *vadc);  // 读取background scan状态
+Ifx_VADC_RES IfxVadc_getResultBasedOnRequestSource(Ifx_VADC *vadc, Ifx_VADC_G *group, IfxVadc_ChannelId channel, IfxVadc_RequestSource sourceType);  // 标准接口按请求源读取结果
+void IfxVadc_disableScanSlotExternalTrigger(Ifx_VADC_G *vadcG);  // 关闭scan外部触发
+void IfxVadc_enableScanSlotExternalTrigger(Ifx_VADC_G *vadcG);  // 使能scan外部触发
+IfxVadc_GatingMode IfxVadc_getScanSlotGatingMode(Ifx_VADC_G *vadcG);  // 读取scan门控模式
+IfxVadc_GatingSource IfxVadc_getScanSlotGatingSource(Ifx_VADC_G *vadcG);  // 读取scan门控源
+IfxVadc_RequestSlotPriority IfxVadc_getScanSlotPriority(Ifx_VADC_G *vadcG);  // 读取scan请求槽优先级
+IfxVadc_RequestSlotStartMode IfxVadc_getScanSlotStartMode(Ifx_VADC_G *vadcG);  // 读取scan请求槽启动模式
+IfxVadc_TriggerSource IfxVadc_getScanSlotTriggerInput(Ifx_VADC_G *vadcG);  // 读取scan触发源
+IfxVadc_TriggerMode IfxVadc_getScanSlotTriggerMode(Ifx_VADC_G *vadcG);  // 读取scan触发模式
+boolean IfxVadc_isAutoScanEnabled(Ifx_VADC_G *vadcG);  // 查询autoscan是否使能
+boolean IfxVadc_isRequestScanSlotEnabled(Ifx_VADC_G *vadcG);  // 查询scan请求槽是否使能
+void IfxVadc_setScanSlotGatingConfig(Ifx_VADC_G *vadcG, IfxVadc_GatingSource gatingSource, IfxVadc_GatingMode gatingMode);  // 设置scan门控配置
+void IfxVadc_setScanSlotTriggerConfig(Ifx_VADC_G *vadcG, IfxVadc_TriggerMode triggerMode, IfxVadc_TriggerSource triggerSource);  // 设置scan触发配置
+IfxVadc_Status IfxVadc_getScanStatus(Ifx_VADC_G *group);  // 获取scan状态
+void IfxVadc_disableQueueSlotExternalTrigger(Ifx_VADC_G *vadcG);  // 关闭queue外部触发
+void IfxVadc_enableQueueSlotExternalTrigger(Ifx_VADC_G *vadcG);  // 使能queue外部触发
+IfxVadc_GatingMode IfxVadc_getQueueSlotGatingMode(Ifx_VADC_G *vadcG);  // 读取queue门控模式
+IfxVadc_GatingSource IfxVadc_getQueueSlotGatingSource(Ifx_VADC_G *vadcG);  // 读取queue门控源
+IfxVadc_RequestSlotPriority IfxVadc_getQueueSlotPriority(Ifx_VADC_G *vadcG);  // 读取queue请求槽优先级
+IfxVadc_RequestSlotStartMode IfxVadc_getQueueSlotStartMode(Ifx_VADC_G *vadcG);  // 读取queue请求槽启动模式
+IfxVadc_TriggerSource IfxVadc_getQueueSlotTriggerInput(Ifx_VADC_G *vadcG);  // 读取queue触发源
+IfxVadc_TriggerMode IfxVadc_getQueueSlotTriggerMode(Ifx_VADC_G *vadcG);  // 读取queue触发模式
+boolean IfxVadc_isRequestQueueSlotEnabled(Ifx_VADC_G *vadcG);  // 查询queue请求槽是否使能
+void IfxVadc_setQueueSlotGatingConfig(Ifx_VADC_G *vadcG, IfxVadc_GatingSource gatingSource, IfxVadc_GatingMode gatingMode);  // 设置queue门控配置
+void IfxVadc_setQueueSlotTriggerOperatingConfig(Ifx_VADC_G *vadcG, IfxVadc_TriggerMode triggerMode, IfxVadc_TriggerSource triggerSource);  // 设置queue触发配置
+IfxVadc_Status IfxVadc_getQueueStatus(Ifx_VADC_G *group);  // 获取queue状态
+void IfxVadc_initEmuxPin(const IfxVadc_Emux_Out *emux, IfxPort_OutputMode outputMode, IfxPort_PadDriver padDriver);  // 初始化Emux引脚
+void IfxVadc_initGxBflPin(const IfxVadc_GxBfl_Out *gxBfl, IfxPort_OutputMode outputMode, IfxPort_PadDriver padDriver);  // 初始化GxBfl引脚
+uint32 IfxVadc_calculateSampleTime(float32 analogFrequency, float32 sampleTime);  // 计算采样时间寄存器值
+float32 IfxVadc_getAdcAnalogFrequency(Ifx_VADC *vadc);  // 读取ADC模拟频率
+float32 IfxVadc_getAdcDigitalFrequency(Ifx_VADC *vadc);  // 读取ADC数字频率
+void IfxVadc_clearAllResultRequests(Ifx_VADC_G *vadcG);  // 清除全部结果请求
+IfxVadc_ArbitrationRounds IfxVadc_getArbiterRoundLength(Ifx_VADC_G *vadcG);  // 读取仲裁轮长度
+uint8 IfxVadc_getMasterIndex(Ifx_VADC_G *vadcG);  // 读取主组索引
+void IfxVadc_resetGroup(Ifx_VADC_G *vadcG);  // 复位组
+void IfxVadc_setAnalogConvertControl(Ifx_VADC_G *vadcG, IfxVadc_AnalogConverterMode analogConverterMode);  // 设置模拟转换器模式
+void IfxVadc_setArbitrationRoundLength(Ifx_VADC_G *vadcG, IfxVadc_ArbitrationRounds arbiterRoundLength);  // 设置仲裁轮长度
+void IfxVadc_setGroupResolution(Ifx_VADC_G *vadcG, uint8 inputClassNum, IfxVadc_ChannelResolution resolution);  // 设置组输入类分辨率
+
+Vadc/Adc辅助函数
+void IfxVadc_Adc_deInitModule(IfxVadc_Adc *vadc);  // 反初始化模块
+void IfxVadc_Adc_getModuleConfig(IfxVadc_Adc *vadc, IfxVadc_Adc_Config *config);  // 读取模块配置
+Ifx_VADC_G *IfxVadc_Adc_getGroupRegsFromGroup(const IfxVadc_Adc_Group *group);  // 从组句柄取组寄存器
+void IfxVadc_Adc_getGroupResult(IfxVadc_Adc_Group *group, Ifx_VADC_RES *results, uint32 resultOffset, uint32 numResults);  // 用组句柄批量读取结果
+Ifx_VADC *IfxVadc_Adc_getVadcFromGroup(const IfxVadc_Adc_Group *group);  // 从组句柄取模块寄存器
+void IfxVadc_Adc_deInitGroup(IfxVadc_Adc_Group *group);  // 反初始化组
+void IfxVadc_Adc_getGroupConfig(IfxVadc_Adc_Group *group, IfxVadc_Adc_GroupConfig *config);  // 读取组配置
+Ifx_VADC_RESD IfxVadc_Adc_getDebugResult(IfxVadc_Adc_Channel *channel);  // 读取通道debug结果
+void IfxVadc_Adc_getChannelConfig(IfxVadc_Adc_Channel *channel, IfxVadc_Adc_ChannelConfig *config);  // 读取通道配置
+float32 IfxVadc_Adc_getChannelConversionTime(IfxVadc_Adc_Channel *channel, IfxVadc_ConversionType conversionMode);  // 读取通道转换时间
+void IfxVadc_Adc_deInitChannel(IfxVadc_Adc_Channel *channel);  // 反初始化通道
+
+// 与 TC38x 源文档差异：源类名为 `EVADC class`，目标 TC26B 在 iLLD 中对应 `VADC class`，类型/函数前缀统一为 `IfxVadc_*`。
+// 与 TC38x 源文档差异：目标 TC26B `IfxVadc_Adc_GroupConfig` 的 queue 配置是单个 `queueRequest`，不是源里的 `queueRequest[3]`。
+// 与 TC38x 源文档差异：目标 TC26B 标准 `IfxVadc_startQueue(group)` 没有 `requestSource` 选择参数，不能保留源 EVADC 的 per-queue 启动语义。
+
+
+DMA class
+
+enum
+typedef enum
+{
+    IfxDma_BusMasterMode_user       = 0,  // 选择的硬件资源在用户模式下执行总线访问
+    IfxDma_BusMasterMode_supervisor = 1   // 选择的硬件资源在超级用户模式下执行总线访问
+} IfxDma_BusMasterMode;
+
+typedef enum
+{
+    IfxDma_ChannelBusPriority_low    = 0,  // 低优先级
+    IfxDma_ChannelBusPriority_medium = 1,  // 中优先级
+    IfxDma_ChannelBusPriority_high   = 2   // 高优先级
+} IfxDma_ChannelBusPriority;
+
+typedef enum
+{
+    IfxDma_ChannelIncrementCircular_none  = 0,   // 无循环缓冲区操作
+    IfxDma_ChannelIncrementCircular_2     = 1,   // 循环缓冲区大小为2字节
+    IfxDma_ChannelIncrementCircular_4     = 2,   // 循环缓冲区大小为4字节
+    IfxDma_ChannelIncrementCircular_8     = 3,   // 循环缓冲区大小为8字节
+    IfxDma_ChannelIncrementCircular_16    = 4,   // 循环缓冲区大小为16字节
+    IfxDma_ChannelIncrementCircular_32    = 5,   // 循环缓冲区大小为32字节
+    IfxDma_ChannelIncrementCircular_64    = 6,   // 循环缓冲区大小为64字节
+    IfxDma_ChannelIncrementCircular_128   = 7,   // 循环缓冲区大小为128字节
+    IfxDma_ChannelIncrementCircular_256   = 8,   // 循环缓冲区大小为256字节
+    IfxDma_ChannelIncrementCircular_512   = 9,   // 循环缓冲区大小为512字节
+    IfxDma_ChannelIncrementCircular_1024  = 10,  // 循环缓冲区大小为1024字节
+    IfxDma_ChannelIncrementCircular_2048  = 11,  // 循环缓冲区大小为2048字节
+    IfxDma_ChannelIncrementCircular_4096  = 12,  // 循环缓冲区大小为4096字节
+    IfxDma_ChannelIncrementCircular_8192  = 13,  // 循环缓冲区大小为8192字节
+    IfxDma_ChannelIncrementCircular_16384 = 14,  // 循环缓冲区大小为16384字节
+    IfxDma_ChannelIncrementCircular_32768 = 15   // 循环缓冲区大小为32768字节
+} IfxDma_ChannelIncrementCircular;
+
+typedef enum
+{
+    IfxDma_ChannelIncrementDirection_negative = 0,  // 指针递减
+    IfxDma_ChannelIncrementDirection_positive = 1   // 指针递增
+} IfxDma_ChannelIncrementDirection;
+
+typedef enum
+{
+    IfxDma_ChannelIncrementStep_1   = 0,  // 递增1个宽度
+    IfxDma_ChannelIncrementStep_2   = 1,  // 递增2个宽度
+    IfxDma_ChannelIncrementStep_4   = 2,  // 递增4个宽度
+    IfxDma_ChannelIncrementStep_8   = 3,  // 递增8个宽度
+    IfxDma_ChannelIncrementStep_16  = 4,  // 递增16个宽度
+    IfxDma_ChannelIncrementStep_32  = 5,  // 递增32个宽度
+    IfxDma_ChannelIncrementStep_64  = 6,  // 递增64个宽度
+    IfxDma_ChannelIncrementStep_128 = 7   // 递增128个宽度
+} IfxDma_ChannelIncrementStep;
+
+typedef enum
+{
+    IfxDma_ChannelInterruptControl_thresholdLimitMatch      = 0,  // 当传输计数(TCOUNT)等于阈值限制(IRDV)时中断
+    IfxDma_ChannelInterruptControl_transferCountDecremented = 1   // 当传输计数(TCOUNT)递减时中断
+} IfxDma_ChannelInterruptControl;
+
+typedef enum
+{
+    IfxDma_ChannelMove_1  = 0,  // 每次DMA传输1次DMA移动
+    IfxDma_ChannelMove_2  = 1,  // 每次DMA传输2次DMA移动
+    IfxDma_ChannelMove_4  = 2,  // 每次DMA传输4次DMA移动
+    IfxDma_ChannelMove_8  = 3,  // 每次DMA传输8次DMA移动
+    IfxDma_ChannelMove_16 = 4,  // 每次DMA传输16次DMA移动
+    IfxDma_ChannelMove_3  = 5,  // 每次DMA传输3次DMA移动
+    IfxDma_ChannelMove_5  = 6,  // 每次DMA传输5次DMA移动
+    IfxDma_ChannelMove_9  = 7   // 每次DMA传输9次DMA移动
+} IfxDma_ChannelMove;
+
+typedef enum
+{
+    IfxDma_ChannelMoveSize_8bit   = 0,  // 1次DMA移动为8位宽
+    IfxDma_ChannelMoveSize_16bit  = 1,  // 1次DMA移动为16位宽
+    IfxDma_ChannelMoveSize_32bit  = 2,  // 1次DMA移动为32位宽
+    IfxDma_ChannelMoveSize_64bit  = 3,  // 1次DMA移动为64位宽
+    IfxDma_ChannelMoveSize_128bit = 4,  // 1次DMA移动为128位宽
+    IfxDma_ChannelMoveSize_256bit = 5   // 1次DMA移动为256位宽
+} IfxDma_ChannelMoveSize;
+
+typedef enum
+{
+    IfxDma_ChannelOperationMode_single     = 0,  // 事务后通道禁用
+    IfxDma_ChannelOperationMode_continuous = 1   // 事务后通道保持启用
+} IfxDma_ChannelOperationMode;
+
+typedef enum
+{
+    IfxDma_ChannelPattern_0_disable = 0,  // 模式检测0禁用
+    IfxDma_ChannelPattern_0_mode1   = 1,  // 比较匹配配置1：MExR.RD[0]与PAT0[0]的模式比较，由PAT0[2]掩码
+    IfxDma_ChannelPattern_0_mode2   = 2,  // 比较匹配配置2：MExR.RD[0]与PAT0[1]的模式比较，由PAT0[3]掩码
+    IfxDma_ChannelPattern_0_mode3   = 3,  // 比较匹配配置3：当前读移动比较PAT0[0]、前一次读移动比较PAT0[1]
+    IfxDma_ChannelPattern_1_disable = 4,  // 模式检测1禁用
+    IfxDma_ChannelPattern_1_mode1   = 5,  // 比较匹配配置1：MExR.RD[0]与PAT1[0]的模式比较，由PAT1[2]掩码
+    IfxDma_ChannelPattern_1_mode2   = 6,  // 比较匹配配置2：MExR.RD[0]与PAT1[1]的模式比较，由PAT1[3]掩码
+    IfxDma_ChannelPattern_1_mode3   = 7   // 比较匹配配置3：当前读移动比较PAT1[0]、前一次读移动比较PAT1[1]
+} IfxDma_ChannelPattern;
+// MExPAT 寄存器布局：[7:0]=PAT0, [15:8]=PAT1, [23:16]=PAT2(mask0), [31:24]=PAT3(mask1)
+// 掩码语义：mask=1 的位参与比较，mask=0 的位忽略。比较公式：(data & mask) == (pattern & mask)
+
+typedef enum
+{
+    IfxDma_ChannelPriority_low    = 0,  // 低优先级
+    IfxDma_ChannelPriority_medium = 1,  // 中优先级
+    IfxDma_ChannelPriority_high   = 2   // 高优先级
+} IfxDma_ChannelPriority;
+
+typedef enum
+{
+    IfxDma_ChannelRequestMode_oneTransferPerRequest         = 0,  // 一个请求启动一次传输
+    IfxDma_ChannelRequestMode_completeTransactionPerRequest = 1   // 一个请求启动完整事务
+} IfxDma_ChannelRequestMode;
+
+typedef enum
+{
+    IfxDma_ChannelRequestSource_peripheral = 0,  // 通过硬件触发的传输请求
+    IfxDma_ChannelRequestSource_daisyChain = 1   // 通过更高优先级通道完成事件链式触发
+} IfxDma_ChannelRequestSource;
+
+typedef enum
+{
+    IfxDma_ChannelShadow_none                                 = 0,   // 不使用影子地址寄存器
+    IfxDma_ChannelShadow_src                                  = 1,   // SHADR 用于源地址缓冲
+    IfxDma_ChannelShadow_dst                                  = 2,   // SHADR 用于目标地址缓冲
+    IfxDma_ChannelShadow_srcDirectWrite                       = 5,   // 源地址直写变体
+    IfxDma_ChannelShadow_dstDirectWrite                       = 6,   // 目标地址直写变体
+    IfxDma_ChannelShadow_doubleSourceBufferingSwSwitch        = 8,   // 源双缓冲，仅软件切换
+    IfxDma_ChannelShadow_doubleSourceBufferingHwSwSwitch      = 9,   // 源双缓冲，硬件/软件切换
+    IfxDma_ChannelShadow_doubleDestinationBufferingSwSwitch   = 10,  // 目标双缓冲，仅软件切换
+    IfxDma_ChannelShadow_doubleDestinationBufferingHwSwSwitch = 11,  // 目标双缓冲，硬件/软件切换
+    IfxDma_ChannelShadow_linkedList                           = 12,  // 链表模式，加载完整事务控制集
+    IfxDma_ChannelShadow_accumulatedLinkedList                = 13,  // 累计CRC的链表模式
+    IfxDma_ChannelShadow_safeLinkedList                       = 14,  // 带SDCRC校验的安全链表模式
+    IfxDma_ChannelShadow_conditionalLinkedList                = 15   // 条件链表模式，按模式检测结果选择下一跳地址
+} IfxDma_ChannelShadow;
+
+typedef enum
+{
+    IfxDma_HardwareResourcePartition_0 = 0,  // 与硬件资源分区0关联的DMA通道集
+    IfxDma_HardwareResourcePartition_1,      // 与硬件资源分区1关联的DMA通道集
+    IfxDma_HardwareResourcePartition_2,      // 与硬件资源分区2关联的DMA通道集
+    IfxDma_HardwareResourcePartition_3       // 与硬件资源分区3关联的DMA通道集
+} IfxDma_HardwareResourcePartition;
+
+typedef enum
+{
+    IfxDma_MoveEngine_0 = 0,  // 第一个移动引擎
+    IfxDma_MoveEngine_1 = 1   // 第二个移动引擎
+} IfxDma_MoveEngine;
+
+typedef enum
+{
+    IfxDma_SleepMode_enable  = 0,  // 启用睡眠模式
+    IfxDma_SleepMode_disable = 1   // 禁用睡眠模式
+} IfxDma_SleepMode;
+
+
+struct
+typedef struct
+{
+    Ifx_DMA *dma;  // 指定指向DMA寄存器的指针
+} IfxDma_Dma;
+
+typedef struct
+{
+    Ifx_DMA         *dma;       // 指定指向DMA寄存器的指针
+    IfxDma_ChannelId channelId; // 指定DMA通道
+    Ifx_DMA_CH      *channel;   // 指定指向DMA通道寄存器的指针
+} IfxDma_Dma_Channel;
+
+typedef struct
+{
+    IfxDma_Dma                      *module;                                 // DMA模块句柄
+    IfxDma_ChannelId                 channelId;                              // 正在使用的通道
+    uint32                           sourceAddress;                          // 源地址
+    uint32                           destinationAddress;                     // 目标地址
+    uint32                           shadowAddress;                          // SHADR 初始值
+    uint32                           readDataCrc;                            // 通道读取数据CRC
+    uint32                           sourceDestinationAddressCrc;            // 源和目标地址CRC
+    uint16                           transferCount;                          // 事务中的传输次数
+    IfxDma_ChannelMove               blockMode;                              // 每次传输的move次数
+    IfxDma_ChannelRequestMode        requestMode;                            // 请求模式
+    IfxDma_ChannelOperationMode      operationMode;                          // 通道运行模式
+    IfxDma_ChannelMoveSize           moveSize;                               // 数据宽度
+    IfxDma_ChannelPattern            pattern;                                // 模式检测配置
+    IfxDma_ChannelRequestSource      requestSource;                          // 请求源
+    IfxDma_ChannelBusPriority        busPriority;                            // 总线优先级
+    boolean                          hardwareRequestEnabled;                 // 是否启用硬件请求
+    IfxDma_ChannelIncrementStep      sourceAddressIncrementStep;             // 源地址递增步长
+    IfxDma_ChannelIncrementDirection sourceAddressIncrementDirection;        // 源地址递增方向
+    IfxDma_ChannelIncrementCircular  sourceAddressCircularRange;             // 源地址循环范围
+    IfxDma_ChannelIncrementStep      destinationAddressIncrementStep;        // 目标地址递增步长
+    IfxDma_ChannelIncrementDirection destinationAddressIncrementDirection;   // 目标地址递增方向
+    IfxDma_ChannelIncrementCircular  destinationAddressCircularRange;        // 目标地址循环范围
+    IfxDma_ChannelShadow             shadowControl;                          // 影子/双缓冲/链表模式
+    boolean                          sourceCircularBufferEnabled;            // 是否启用源循环缓冲
+    boolean                          destinationCircularBufferEnabled;       // 是否启用目标循环缓冲
+    boolean                          timestampEnabled;                       // 是否附加时间戳
+    boolean                          wrapSourceInterruptEnabled;             // 源地址回卷中断
+    boolean                          wrapDestinationInterruptEnabled;        // 目标地址回卷中断
+    boolean                          channelInterruptEnabled;                // 通道传输中断使能
+    IfxDma_ChannelInterruptControl   channelInterruptControl;                // 通道中断触发方式
+    uint8                            interruptRaiseThreshold;                // 中断阈值
+    boolean                          transactionRequestLostInterruptEnabled; // 事务请求丢失中断使能
+    Ifx_Priority                     channelInterruptPriority;               // 通道中断优先级
+    IfxSrc_Tos                       channelInterruptTypeOfService;          // 中断服务提供者
+} IfxDma_Dma_ChannelConfig;
+
+typedef struct
+{
+    Ifx_DMA *dma;  // 指定指向DMA寄存器的指针
+} IfxDma_Dma_Config;
+
+
+important functions
+DMA模块初始化函数
+void IfxDma_Dma_createModuleHandle(IfxDma_Dma *dmaHandle, Ifx_DMA *dma);  // 基于当前配置初始化DMA模块句柄
+void IfxDma_Dma_initModule(IfxDma_Dma *dma, const IfxDma_Dma_Config *config);  // 使用提供的配置初始化DMA模块
+void IfxDma_Dma_initModuleConfig(IfxDma_Dma_Config *config, Ifx_DMA *dma);  // 使用提供的DMA寄存器初始化DMA模块配置结构
+
+DMA通道初始化函数
+void IfxDma_Dma_initChannel(IfxDma_Dma_Channel *channel, const IfxDma_Dma_ChannelConfig *config);  // 使用指定配置初始化DMA通道
+void IfxDma_Dma_initChannelConfig(IfxDma_Dma_ChannelConfig *config, IfxDma_Dma *dma);  // 使用默认值初始化DMA通道配置
+
+DMA事务控制函数
+void IfxDma_Dma_startChannelTransaction(IfxDma_Dma_Channel *channel);  // 启动指定通道的DMA移动事务
+boolean IfxDma_Dma_isChannelTransactionPending(IfxDma_Dma_Channel *channel);  // 检查指定DMA通道的事务请求是否挂起
+void IfxDma_Dma_setChannelSourceAddress(IfxDma_Dma_Channel *channel, uint32 address);  // 重新设置DMA通道源地址
+void IfxDma_Dma_setChannelDestinationAddress(IfxDma_Dma_Channel *channel, uint32 address);  // 重新设置DMA通道目标地址
+void IfxDma_Dma_setChannelTransferCount(IfxDma_Dma_Channel *channel, uint32 transferCount);  // 重新设置DMA通道传输计数
+
+DMA链表函数
+void IfxDma_Dma_initLinkedListEntry(void *ptrToAddress, const IfxDma_Dma_ChannelConfig *config);  // 初始化DMA链表条目
+
+标准DMA基础函数
+void IfxDma_startChannelTransaction(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 通过模块寄存器直接启动DMA事务
+boolean IfxDma_isChannelTransactionPending(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 查询DMA事务是否挂起
+void IfxDma_setChannelSourceAddress(Ifx_DMA *dma, IfxDma_ChannelId channelId, const void *address);  // 设置源地址
+void IfxDma_setChannelDestinationAddress(Ifx_DMA *dma, IfxDma_ChannelId channelId, void *address);  // 设置目标地址
+void IfxDma_setChannelTransferCount(Ifx_DMA *dma, IfxDma_ChannelId channelId, uint32 transferCount);  // 设置传输计数
+void IfxDma_setChannelMoveSize(Ifx_DMA *dma, IfxDma_ChannelId channelId, IfxDma_ChannelMoveSize moveSize);  // 设置move大小
+void IfxDma_setChannelBlockMode(Ifx_DMA *dma, IfxDma_ChannelId channelId, IfxDma_ChannelMove blockMode);  // 设置block模式
+void IfxDma_setChannelShadow(Ifx_DMA *dma, IfxDma_ChannelId channelId, IfxDma_ChannelShadow shadow);  // 设置影子/链表模式
+void IfxDma_setChannelContinuousMode(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 设置连续事务模式
+void IfxDma_setChannelSingleMode(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 设置单事务模式
+void IfxDma_setChannelSingleTransaction(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 一个请求启动完整事务
+void IfxDma_setChannelSingleTransfer(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 一个请求只启动一次传输
+
+
+others functions
+DMA通道中断函数（非重要函数）
+IFX_INLINE void IfxDma_Dma_clearChannelInterrupt(IfxDma_Dma_Channel *channel);  // 清除指定DMA通道传输中断标志
+IFX_INLINE boolean IfxDma_Dma_getAndClearChannelInterrupt(IfxDma_Dma_Channel *channel);  // 检查并清除通道传输中断标志
+IFX_INLINE boolean IfxDma_Dma_getChannelInterrupt(IfxDma_Dma_Channel *channel);  // 返回通道传输中断标志状态
+
+DMA通道管理函数（非重要函数）
+void IfxDma_Dma_deInitChannel(IfxDma_Dma *dma, IfxDma_ChannelId channel);  // 取消初始化指定DMA通道
+IFX_INLINE volatile Ifx_SRC_SRCR *IfxDma_Dma_getSrcPointer(IfxDma_Dma_Channel *channel);  // 返回指定DMA通道的SRC指针
+
+标准DMA辅助函数（非重要函数）
+IFX_INLINE boolean IfxDma_isChannelReset(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 查询通道是否处于reset状态
+IFX_INLINE void IfxDma_resetChannel(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 复位DMA通道
+IFX_INLINE void IfxDma_clearChannelTransactionRequestLost(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 清除事务请求丢失标志
+IFX_INLINE void IfxDma_enableChannelTransaction(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 使能硬件事务请求
+IFX_INLINE void IfxDma_disableChannelTransaction(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 禁用硬件事务请求
+IFX_INLINE boolean IfxDma_isChannelTransactionEnabled(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 查询硬件事务请求是否使能
+IFX_INLINE boolean IfxDma_getChannelTransactionRequestLost(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 查询事务请求丢失标志
+IFX_INLINE IfxDma_ChannelIncrementCircular IfxDma_getCircularRangeCode(uint16 range);  // 将buffer长度换算为循环范围编码
+IFX_INLINE void IfxDma_setSleepMode(Ifx_DMA *dma, IfxDma_SleepMode mode);  // 设置DMA睡眠模式
+IFX_INLINE uint32 IfxDma_getChannelDestinationAddress(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取目标地址
+IFX_INLINE uint32 IfxDma_getChannelSourceAddress(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取源地址
+IFX_INLINE boolean IfxDma_getChannelSuspendModeStatus(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取通道挂起/冻结状态
+IFX_INLINE uint32 IfxDma_getChannelTransferCount(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取剩余传输计数
+IFX_INLINE uint32 IfxDma_getTimestamp(Ifx_DMA *dma);  // 读取DMA时间戳
+IFX_INLINE void IfxDma_setChannelDestinationIncrementStep(Ifx_DMA *dma, IfxDma_ChannelId channelId, IfxDma_ChannelIncrementStep incStep, IfxDma_ChannelIncrementDirection direction, IfxDma_ChannelIncrementCircular size);  // 配置目标地址递增策略
+IFX_INLINE void IfxDma_setChannelSourceIncrementStep(Ifx_DMA *dma, IfxDma_ChannelId channelId, IfxDma_ChannelIncrementStep incStep, IfxDma_ChannelIncrementDirection direction, IfxDma_ChannelIncrementCircular size);  // 配置源地址递增策略
+IFX_INLINE void IfxDma_setChannelSuspendEnable(Ifx_DMA *dma, IfxDma_ChannelId channelId, boolean enable);  // 使能/禁用通道挂起
+IFX_INLINE void IfxDma_writeChannelShadowEnable(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 允许写影子寄存器
+IFX_INLINE void IfxDma_writeChannelShadowDisable(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 禁止写影子寄存器
+IFX_INLINE void IfxDma_setChannelHalt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 置位通道halt
+IFX_INLINE void IfxDma_clearChannelHalt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 清除通道halt
+IFX_INLINE boolean IfxDma_getChannelHalt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取通道halt状态
+IFX_INLINE boolean IfxDma_getDoubleBufferRead(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取双缓冲读状态
+IFX_INLINE boolean IfxDma_getDoubleBufferSelection(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取当前双缓冲选择
+IFX_INLINE void IfxDma_keepDoubleBufferActive(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 保持双缓冲活跃
+IFX_INLINE void IfxDma_switchDoubleBuffer(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 切换双缓冲
+IFX_INLINE void IfxDma_clearChannelInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 清除通道中断
+IFX_INLINE void IfxDma_enableChannelInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 使能通道中断
+IFX_INLINE void IfxDma_disableChannelInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 禁用通道中断
+IFX_INLINE boolean IfxDma_getAndClearChannelInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取并清除通道中断
+IFX_INLINE boolean IfxDma_getAndClearChannelPatternDetectionInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取并清除模式检测中断
+IFX_INLINE boolean IfxDma_getAndClearChannelWrapDestinationBufferInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取并清除目标回卷中断
+IFX_INLINE boolean IfxDma_getAndClearChannelWrapSourceBufferInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取并清除源回卷中断
+IFX_INLINE boolean IfxDma_getChannelInterrupt(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取通道中断状态
+IFX_INLINE boolean IfxDma_getChannelPatternDetectionOldValue(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取旧模式检测值
+IFX_INLINE volatile Ifx_SRC_SRCR *IfxDma_getSrcPointer(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 获取DMA通道SRC指针
+IFX_INLINE volatile Ifx_SRC_SRCR *IfxDma_getErrPointer(Ifx_DMA *dma);  // 获取DMA错误SRC指针
+IFX_INLINE void IfxDma_setChannelInterruptServiceRequest(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 触发通道中断服务请求
+IFX_INLINE void IfxDma_setChannelHardwareResourcePartition(Ifx_DMA *dma, IfxDma_ChannelId channelId, IfxDma_HardwareResourcePartition resourcePartition);  // 设置硬件资源分区
+IFX_INLINE void IfxDma_setInterruptControlValue(Ifx_DMA *dma, IfxDma_ChannelId channelId, uint8 value);  // 设置中断控制值
+IFX_INLINE void IfxDma_setCircularBufferDestinationLength(Ifx_DMA *dma, IfxDma_ChannelId channelId, uint16 length);  // 设置目标循环缓冲长度
+IFX_INLINE void IfxDma_setCircularBufferSourceLength(Ifx_DMA *dma, IfxDma_ChannelId channelId, uint16 length);  // 设置源循环缓冲长度
+IFX_INLINE void IfxDma_enableSourceCircularBuffer(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 使能源循环缓冲
+IFX_INLINE void IfxDma_enableDestinationCircularBuffer(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 使能目标循环缓冲
+IFX_INLINE uint32 IfxDma_getDataCRC(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取数据CRC
+IFX_INLINE uint32 IfxDma_getSourceAndDestinationCRC(Ifx_DMA *dma, IfxDma_ChannelId channelId);  // 读取源/目标地址CRC
+IFX_INLINE void IfxDma_clearErrorFlags(Ifx_DMA *dma, IfxDma_MoveEngine moveEngine, uint32 mask);  // 清除移动引擎错误标志
+IFX_INLINE uint32 IfxDma_getErrorFlags(Ifx_DMA *dma, IfxDma_MoveEngine moveEngine);  // 读取移动引擎错误标志
+IFX_INLINE void IfxDma_enableMoveEngineSourceError(Ifx_DMA *dma, IfxDma_MoveEngine moveEngine);  // 使能移动引擎源错误中断
+IFX_INLINE void IfxDma_disableMoveEngineSourceError(Ifx_DMA *dma, IfxDma_MoveEngine moveEngine);  // 禁用移动引擎源错误中断
+IFX_INLINE void IfxDma_enableMoveEngineDestinationError(Ifx_DMA *dma, IfxDma_MoveEngine moveEngine);  // 使能移动引擎目标错误中断
+IFX_INLINE void IfxDma_disableMoveEngineDestinationError(Ifx_DMA *dma, IfxDma_MoveEngine moveEngine);  // 禁用移动引擎目标错误中断
+
+
+GTM class
+
+GTM Module 总览
+GTM (Generic Timer Module) 是通用定时器模块，提供定时、PWM、输入捕获和外设触发功能。TC26B 目标库树中本次按实际可用 API 记录 `GTM 通用`、`CMU`、`ATOM`、`TOM`、`ATOM Timer`、`TOM Timer`、`ATOM PWM`、`TOM PWM`、`TRIG`。
+
+--- GTM 通用 ---
+
+enum
+typedef enum
+{
+    IfxGtm_IrqMode_level       = 0,
+    IfxGtm_IrqMode_pulse       = 1,
+    IfxGtm_IrqMode_pulseNotify = 2,
+    IfxGtm_IrqMode_singlePulse = 3
+} IfxGtm_IrqMode;
+
+typedef enum
+{
+    IfxGtm_SuspendMode_none = 0,
+    IfxGtm_SuspendMode_hard = 1,
+    IfxGtm_SuspendMode_soft = 2
+} IfxGtm_SuspendMode;
+
+typedef enum
+{
+    IfxGtm_Cmu_Clk_0 = 0,
+    IfxGtm_Cmu_Clk_1,
+    IfxGtm_Cmu_Clk_2,
+    IfxGtm_Cmu_Clk_3,
+    IfxGtm_Cmu_Clk_4,
+    IfxGtm_Cmu_Clk_5,
+    IfxGtm_Cmu_Clk_6,
+    IfxGtm_Cmu_Clk_7
+} IfxGtm_Cmu_Clk;
+
+typedef enum
+{
+    IfxGtm_Cmu_Eclk_0 = 0,
+    IfxGtm_Cmu_Eclk_1,
+    IfxGtm_Cmu_Eclk_2
+} IfxGtm_Cmu_Eclk;
+
+typedef enum
+{
+    IfxGtm_Cmu_Fxclk_0 = 0,
+    IfxGtm_Cmu_Fxclk_1,
+    IfxGtm_Cmu_Fxclk_2,
+    IfxGtm_Cmu_Fxclk_3,
+    IfxGtm_Cmu_Fxclk_4
+} IfxGtm_Cmu_Fxclk;
+
+typedef enum
+{
+    IfxGtm_Cmu_Tim_Filter_Clk_0,
+    IfxGtm_Cmu_Tim_Filter_Clk_1,
+    IfxGtm_Cmu_Tim_Filter_Clk_6,
+    IfxGtm_Cmu_Tim_Filter_Clk_7
+} IfxGtm_Cmu_Tim_Filter_Clk;
+
+typedef enum
+{
+    IfxGtm_Atom_0,
+    IfxGtm_Atom_1,
+    IfxGtm_Atom_2,
+    IfxGtm_Atom_3,
+    IfxGtm_Atom_4,
+    IfxGtm_Atom_5,
+    IfxGtm_Atom_6,
+    IfxGtm_Atom_7,
+    IfxGtm_Atom_8,
+    IfxGtm_Atom_9,
+    IfxGtm_Atom_10,
+    IfxGtm_Atom_11
+} IfxGtm_Atom;
+
+typedef enum
+{
+    IfxGtm_Tom_0,
+    IfxGtm_Tom_1,
+    IfxGtm_Tom_2,
+    IfxGtm_Tom_3,
+    IfxGtm_Tom_4
+} IfxGtm_Tom;
+
+typedef enum
+{
+    IfxGtm_Tom_Ch_none = -1,
+    IfxGtm_Tom_Ch_0,
+    IfxGtm_Tom_Ch_1,
+    IfxGtm_Tom_Ch_2,
+    IfxGtm_Tom_Ch_3,
+    IfxGtm_Tom_Ch_4,
+    IfxGtm_Tom_Ch_5,
+    IfxGtm_Tom_Ch_6,
+    IfxGtm_Tom_Ch_7,
+    IfxGtm_Tom_Ch_8,
+    IfxGtm_Tom_Ch_9,
+    IfxGtm_Tom_Ch_10,
+    IfxGtm_Tom_Ch_11,
+    IfxGtm_Tom_Ch_12,
+    IfxGtm_Tom_Ch_13,
+    IfxGtm_Tom_Ch_14,
+    IfxGtm_Tom_Ch_15
+} IfxGtm_Tom_Ch;
+
+typedef enum
+{
+    IfxGtm_Atom_Ch_none = -1,
+    IfxGtm_Atom_Ch_0,
+    IfxGtm_Atom_Ch_1,
+    IfxGtm_Atom_Ch_2,
+    IfxGtm_Atom_Ch_3,
+    IfxGtm_Atom_Ch_4,
+    IfxGtm_Atom_Ch_5,
+    IfxGtm_Atom_Ch_6,
+    IfxGtm_Atom_Ch_7
+} IfxGtm_Atom_Ch;
+
+// 与 TC38x 源文档差异：目标 TC26B `IfxGtm_Tom_Ch_ClkSrc` 只有 `cmuFxclk0..4` 和 `noClock`，没有 `cascade`。
+typedef enum
+{
+    IfxGtm_Tom_Ch_ClkSrc_cmuFxclk0 = 0,
+    IfxGtm_Tom_Ch_ClkSrc_cmuFxclk1 = 1,
+    IfxGtm_Tom_Ch_ClkSrc_cmuFxclk2 = 2,
+    IfxGtm_Tom_Ch_ClkSrc_cmuFxclk3 = 3,
+    IfxGtm_Tom_Ch_ClkSrc_cmuFxclk4 = 4,
+    IfxGtm_Tom_Ch_ClkSrc_noClock   = 5
+} IfxGtm_Tom_Ch_ClkSrc;
+
+typedef enum
+{
+    IfxGtm_Tom_Ch_OutputTrigger_forward  = 0,
+    IfxGtm_Tom_Ch_OutputTrigger_generate = 1
+} IfxGtm_Tom_Ch_OutputTrigger;
+
+typedef enum
+{
+    IfxGtm_Tom_Ch_ResetEvent_onCm0     = 0,
+    IfxGtm_Tom_Ch_ResetEvent_onTrigger = 1
+} IfxGtm_Tom_Ch_ResetEvent;
+
+struct
+typedef struct
+{
+    float32                   frequency;
+    Ifx_Priority              isrPriority;
+    IfxSrc_Tos                isrProvider;
+    float32                   minResolution;
+    IfxStdIf_Timer_TrigConfig trigger;
+    IfxStdIf_Timer_CountDir   countDir;
+    float32                   startOffset;
+} IfxStdIf_Timer_Config;
+
+typedef struct
+{
+    boolean            enabled;
+    Ifx_TimerValue     triggerPoint;
+    Ifx_Priority       isrPriority;
+    IfxSrc_Tos         isrProvider;
+    IfxPort_OutputMode outputMode;
+    IfxPort_PadDriver  outputDriver;
+    boolean            risingEdgeAtPeriod;
+    boolean            outputEnabled;
+} IfxStdIf_Timer_TrigConfig;
+
+important functions
+void IfxGtm_enable(Ifx_GTM *gtm);  // 使能GTM模块
+void IfxGtm_disable(Ifx_GTM *gtm);  // 关闭GTM模块
+float32 IfxGtm_getSysClkFrequency(void);  // 读取GTM系统时钟频率
+void IfxGtm_Cmu_enableClocks(Ifx_GTM *gtm, uint32 clkMask);  // 使能CMU时钟集合
+void IfxGtm_Cmu_setGclkFrequency(Ifx_GTM *gtm, float32 frequency);  // 设置全局时钟频率
+void IfxGtm_Cmu_setClkFrequency(Ifx_GTM *gtm, IfxGtm_Cmu_Clk clkIndex, float32 frequency);  // 设置可配置CMU时钟频率
+float32 IfxGtm_Cmu_getModuleFrequency(Ifx_GTM *gtm);  // 读取CMU模块时钟频率
+float32 IfxGtm_Cmu_getGclkFrequency(Ifx_GTM *gtm);  // 读取全局时钟频率
+float32 IfxGtm_Cmu_getClkFrequency(Ifx_GTM *gtm, IfxGtm_Cmu_Clk clkIndex, boolean assumeEnabled);  // 读取可配置时钟频率
+float32 IfxGtm_Cmu_getFxClkFrequency(Ifx_GTM *gtm, IfxGtm_Cmu_Fxclk clkIndex, boolean assumeEnabled);  // 读取FXCLK频率
+
+others functions
+boolean IfxGtm_isEnabled(Ifx_GTM *gtm);  // 查询GTM是否使能
+boolean IfxGtm_isModuleSuspended(Ifx_GTM *gtm);  // 查询GTM是否挂起
+void IfxGtm_setSuspendMode(Ifx_GTM *gtm, IfxGtm_SuspendMode mode);  // 设置挂起模式
+boolean IfxGtm_Cmu_isClkClockEnabled(Ifx_GTM *gtm, IfxGtm_Cmu_Clk clkIndex);  // 查询CMU_CLK是否使能
+boolean IfxGtm_Cmu_isEclkClockEnabled(Ifx_GTM *gtm, IfxGtm_Cmu_Eclk clkIndex);  // 查询ECLK是否使能
+boolean IfxGtm_Cmu_isFxClockEnabled(Ifx_GTM *gtm);  // 查询FXCLK是否使能
+void IfxGtm_Cmu_selectClkInput(Ifx_GTM *gtm, IfxGtm_Cmu_Clk clkIndex, boolean useGlobal);  // 为CLK6/7选择输入
+void IfxGtm_Cmu_setEclkFrequency(Ifx_GTM *gtm, IfxGtm_Cmu_Eclk clkIndex, float32 frequency);  // 设置ECLK频率
+float32 IfxGtm_Cmu_getEclkFrequency(Ifx_GTM *gtm, IfxGtm_Cmu_Eclk clkIndex, boolean assumeEnabled);  // 读取ECLK频率
+
+
+--- GTM_TBU ---
+
+TBU (Time Base Unit) 是 GTM 内部的全局时间基模块，提供 `TS0/TS1/TS2` 三路时间戳参考。它本身不是 PWM 或 ATOM/TOM Timer，不直接输出波形；更适合拿来做统一参考时间轴、模块间同步、硬件触发基准。
+
+使用建议
+1. 同一个 CMU 时钟只能保证多个 ATOM/TOM 通道“计数频率一致”，不能单独保证它们严格保持固定相位差。
+2. 如果希望两个 PWM/Timer 在硬件上共享同一个时间参考，或希望比较/触发点绑定到同一参考时轴，应优先考虑 TBU/TS 机制。
+3. 在底层 `IfxGtm_Atom_SomcControl_*` / `IfxGtm_Tom_*` 能看到 TS0/TS1/TS2 的比较模式；这类模式适合做“统一参考时刻 + 固定偏移”的硬件同步，而不是只靠软件顺序 start。
+4. `IfxGtm_Atom_Agc_setTimeTrigger(...)`、`IfxGtm_Tom_Tgc_setTimeTrigger(...)` 用于把 AGC/TGC 的时间触发点绑定到某个 TBU 通道和值上；本工程当前高层 driver 没有继续封装这条能力，需要时通常要下沉到 iLLD 标准层直接配。
+
+enum
+typedef enum
+{
+    IfxGtm_Tbu_Ts_0,
+    IfxGtm_Tbu_Ts_1,
+    IfxGtm_Tbu_Ts_2
+} IfxGtm_Tbu_Ts;
+
+important functions
+void IfxGtm_Tbu_enableChannel(Ifx_GTM *gtm, IfxGtm_Tbu_Ts channel);  // 使能TBU时间基通道
+float32 IfxGtm_Tbu_getClockFrequency(Ifx_GTM *gtm, IfxGtm_Tbu_Ts channel);  // 读取TBU通道时钟频率
+
+others functions
+boolean IfxGtm_Tbu_isChannelEnabled(Ifx_GTM *gtm, IfxGtm_Tbu_Ts channel);  // 查询TBU通道是否使能
+void IfxGtm_Atom_Agc_setTimeTrigger(Ifx_GTM_ATOM_AGC *agc, IfxGtm_Tbu_Ts base, uint32 value);  // 为ATOM AGC配置基于TBU的时间触发点
+void IfxGtm_Tom_Tgc_setTimeTrigger(Ifx_GTM_TOM_TGC *tgc, IfxGtm_Tbu_Ts base, uint32 value);  // 为TOM TGC配置基于TBU的时间触发点
+
+
+--- GTM_ATOM ---
+
+enum
+typedef enum
+{
+    IfxGtm_Atom_Ch_OutputTrigger_forward  = 0,
+    IfxGtm_Atom_Ch_OutputTrigger_generate = 1
+} IfxGtm_Atom_Ch_OutputTrigger;
+
+typedef enum
+{
+    IfxGtm_Atom_Ch_ResetEvent_onCm0     = 0,
+    IfxGtm_Atom_Ch_ResetEvent_onTrigger = 1
+} IfxGtm_Atom_Ch_ResetEvent;
+
+typedef enum
+{
+    IfxGtm_Atom_Mode_outputImmediate,
+    IfxGtm_Atom_Mode_outputCompare,
+    IfxGtm_Atom_Mode_outputPwm,
+    IfxGtm_Atom_Mode_outputSerial
+} IfxGtm_Atom_Mode;
+
+typedef enum
+{
+    IfxGtm_Atom_AruInput_disabled = 0,
+    IfxGtm_Atom_AruInput_enabled  = 1
+} IfxGtm_Atom_AruInput;
+
+typedef enum
+{
+    IfxGtm_Atom_SomcControl_compareBoth     = 0,
+    IfxGtm_Atom_SomcControl_compareBoth1    = 1,
+    IfxGtm_Atom_SomcControl_ccu0Ts0         = 2,
+    IfxGtm_Atom_SomcControl_ccu1Ts12        = 3,
+    IfxGtm_Atom_SomcControl_ccu0ccu1Ts0     = 4,
+    IfxGtm_Atom_SomcControl_ccu0ccu1Ts12    = 5,
+    IfxGtm_Atom_SomcControl_ccu0Ts0ccu1Ts12 = 6,
+    IfxGtm_Atom_SomcControl_cancelCompare   = 7
+} IfxGtm_Atom_SomcControl;
+
+typedef enum
+{
+    IfxGtm_Atom_SomcSignalLevelControl_noChange = 0,
+    IfxGtm_Atom_SomcSignalLevelControl_sl0out1  = 1,
+    IfxGtm_Atom_SomcSignalLevelControl_sl0out0  = 2,
+    IfxGtm_Atom_SomcSignalLevelControl_toggle   = 3
+} IfxGtm_Atom_SomcSignalLevelControl;
+
+struct
+typedef struct
+{
+    Ifx_TimerValue          period;
+    boolean                 triggerEnabled;
+    float32                 clockFreq;
+    IfxStdIf_Timer_CountDir countDir;
+} IfxGtm_Atom_Timer_Base;
+
+typedef struct
+{
+    IfxGtm_Atom_Timer_Base base;
+    Ifx_GTM               *gtm;
+    Ifx_GTM_ATOM          *atom;
+    Ifx_GTM_ATOM_AGC      *agc;
+    IfxGtm_Atom            atomIndex;
+    IfxGtm_Atom_Ch         timerChannel;
+    IfxGtm_Atom_Ch         triggerChannel;
+    uint16                 channelsMask;
+    Ifx_TimerValue         offset;
+    uint32                 agcDisableUpdate;
+    uint32                 agcApplyUpdate;
+} IfxGtm_Atom_Timer;
+
+typedef struct
+{
+    IfxStdIf_Timer_Config base;
+    Ifx_GTM              *gtm;
+    IfxGtm_Atom           atom;
+    IfxGtm_Atom_Ch        timerChannel;
+    IfxGtm_Atom_ToutMap  *triggerOut;
+    IfxGtm_Cmu_Clk        clock;
+    IfxGtm_IrqMode        irqModeTimer;
+    IfxGtm_IrqMode        irqModeTrigger;
+    boolean               initPins;
+} IfxGtm_Atom_Timer_Config;
+
+typedef struct
+{
+    boolean        ccu0Enabled;
+    boolean        ccu1Enabled;
+    IfxGtm_IrqMode mode;
+    IfxSrc_Tos     isrProvider;
+    Ifx_Priority   isrPriority;
+} IfxGtm_Atom_Pwm_Interrupt;
+
+typedef struct
+{
+    IfxGtm_Atom_ToutMap *outputPin;
+    IfxPort_OutputMode   outputMode;
+    IfxPort_PadDriver    padDriver;
+} IfxGtm_Atom_Pwm_pin;
+
+typedef struct
+{
+    Ifx_GTM                  *gtm;
+    IfxGtm_Atom               atom;
+    IfxGtm_Atom_Ch            atomChannel;
+    IfxGtm_Atom_Mode          mode;
+    uint32                    period;
+    uint32                    dutyCycle;
+    Ifx_ActiveState           signalLevel;
+    boolean                   oneShotModeEnabled;
+    boolean                   synchronousUpdateEnabled;
+    boolean                   immediateStartEnabled;
+    IfxGtm_Atom_Pwm_Interrupt interrupt;
+    IfxGtm_Atom_Pwm_pin       pin;
+} IfxGtm_Atom_Pwm_Config;
+
+typedef struct
+{
+    Ifx_GTM          *gtm;
+    IfxGtm_Atom       atomIndex;
+    IfxGtm_Atom_Ch    atomChannel;
+    Ifx_GTM_ATOM     *atom;
+    Ifx_GTM_ATOM_AGC *agc;
+    IfxGtm_Atom_Mode  mode;
+} IfxGtm_Atom_Pwm_Driver;
+
+typedef struct
+{
+    Ifx_TimerValue  deadtime;
+    Ifx_TimerValue  minPulse;
+    Ifx_TimerValue  maxPulse;
+    Ifx_Pwm_Mode    mode;
+    sint8           setMode;
+    Ifx_ActiveState ccxActiveState;
+    Ifx_ActiveState coutxActiveState;
+    boolean         inverted;
+    uint8           channelCount;
+} IfxGtm_Atom_PwmHl_Base;
+
+typedef struct
+{
+    IfxStdIf_PwmHl_Config           base;
+    IfxGtm_Atom_Timer              *timer;
+    IfxGtm_Atom                     atom;
+    IFX_CONST IfxGtm_Atom_ToutMapP *ccx;
+    IFX_CONST IfxGtm_Atom_ToutMapP *coutx;
+    boolean                         initPins;
+} IfxGtm_Atom_PwmHl_Config;
+
+typedef struct
+{
+    Ifx_Pwm_Mode                  mode;
+    boolean                       inverted;
+    IfxGtm_Atom_PwmHl_Update      update;
+    IfxGtm_Atom_PwmHl_UpdateShift updateAndShift;
+    IfxGtm_Atom_PwmHl_UpdatePulse updatePulse;
+} IfxGtm_Atom_PwmHl_Mode;
+
+struct IfxGtm_Atom_PwmHl_s
+{
+    IfxGtm_Atom_PwmHl_Base        base;
+    IfxGtm_Atom_Timer            *timer;
+    IfxGtm_Atom_PwmHl_Update      update;
+    IfxGtm_Atom_PwmHl_UpdateShift updateAndShift;
+    IfxGtm_Atom_PwmHl_UpdatePulse updatePulse;
+    Ifx_GTM_ATOM                 *atom;
+    Ifx_GTM_ATOM_AGC             *agc;
+    IfxGtm_Atom_Ch                ccx[IFXGTM_ATOM_PWMHL_MAX_NUM_CHANNELS];
+    IfxGtm_Atom_Ch                coutx[IFXGTM_ATOM_PWMHL_MAX_NUM_CHANNELS];
+    IfxGtm_Atom_Ch               *ccxTemp;
+    IfxGtm_Atom_Ch               *coutxTemp;
+};
+
+important functions
+boolean IfxGtm_Atom_Timer_init(IfxGtm_Atom_Timer *driver, const IfxGtm_Atom_Timer_Config *config);  // 初始化ATOM Timer
+void IfxGtm_Atom_Timer_initConfig(IfxGtm_Atom_Timer_Config *config, Ifx_GTM *gtm);  // 初始化ATOM Timer默认配置
+boolean IfxGtm_Atom_Timer_stdIfTimerInit(IfxStdIf_Timer *stdif, IfxGtm_Atom_Timer *driver);  // 初始化StdIf定时器接口
+void IfxGtm_Atom_Timer_run(IfxGtm_Atom_Timer *driver);  // 启动ATOM Timer
+void IfxGtm_Atom_Timer_stop(IfxGtm_Atom_Timer *driver);  // 停止ATOM Timer
+void IfxGtm_Atom_Timer_applyUpdate(IfxGtm_Atom_Timer *driver);  // 应用影子更新
+void IfxGtm_Atom_Timer_disableUpdate(IfxGtm_Atom_Timer *driver);  // 禁止更新
+boolean IfxGtm_Atom_Timer_setPeriod(IfxGtm_Atom_Timer *driver, Ifx_TimerValue period);  // 设置周期
+boolean IfxGtm_Atom_Timer_setFrequency(IfxGtm_Atom_Timer *driver, float32 frequency);  // 设置频率
+void IfxGtm_Atom_Timer_setTrigger(IfxGtm_Atom_Timer *driver, Ifx_TimerValue triggerPoint);  // 设置触发点
+void IfxGtm_Atom_Timer_setSingleMode(IfxGtm_Atom_Timer *driver, boolean enabled);  // 设置单次模式
+boolean IfxGtm_Atom_Pwm_init(IfxGtm_Atom_Pwm_Driver *driver, const IfxGtm_Atom_Pwm_Config *config);  // 初始化ATOM PWM
+void IfxGtm_Atom_Pwm_initConfig(IfxGtm_Atom_Pwm_Config *config, Ifx_GTM *gtm);  // 初始化ATOM PWM默认配置
+void IfxGtm_Atom_Pwm_start(IfxGtm_Atom_Pwm_Driver *driver, boolean immediate);  // 启动ATOM PWM
+void IfxGtm_Atom_Pwm_stop(IfxGtm_Atom_Pwm_Driver *driver, boolean immediate);  // 停止ATOM PWM
+boolean IfxGtm_Atom_PwmHl_init(IfxGtm_Atom_PwmHl *driver, const IfxGtm_Atom_PwmHl_Config *config);  // 初始化ATOM PWMHL
+void IfxGtm_Atom_PwmHl_initConfig(IfxGtm_Atom_PwmHl_Config *config);  // 初始化ATOM PWMHL默认配置
+boolean IfxGtm_Atom_PwmHl_stdIfPwmHlInit(IfxStdIf_PwmHl *stdif, IfxGtm_Atom_PwmHl *driver);  // 初始化PWMHL标准接口
+boolean IfxGtm_Atom_PwmHl_setMode(IfxGtm_Atom_PwmHl *driver, Ifx_Pwm_Mode mode);  // 设置PWMHL模式
+void IfxGtm_Atom_PwmHl_setOnTime(IfxGtm_Atom_PwmHl *driver, Ifx_TimerValue *tOn);  // 设置各相导通时间
+void IfxGtm_Atom_PwmHl_setOnTimeAndShift(IfxGtm_Atom_PwmHl *driver, Ifx_TimerValue *tOn, Ifx_TimerValue *shift);  // 设置导通时间和相位偏移
+void IfxGtm_Atom_PwmHl_setPulse(IfxGtm_Atom_PwmHl *driver, float32 *tOn, float32 *offset);  // 设置独立脉冲宽度和偏移
+void IfxGtm_Atom_PwmHl_setupChannels(IfxGtm_Atom_PwmHl *driver, boolean *activeCh, boolean *stuckSt);  // 配置高低桥通道开关状态
+void IfxGtm_Atom_Ch_configurePwmMode(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel, IfxGtm_Cmu_Clk clock, Ifx_ActiveState activeState, IfxGtm_Atom_Ch_ResetEvent resetEvent, IfxGtm_Atom_Ch_OutputTrigger trigger);  // 配置通道PWM模式
+
+others functions
+boolean IfxGtm_Atom_Timer_acknowledgeTimerIrq(IfxGtm_Atom_Timer *driver);  // 确认定时器中断
+boolean IfxGtm_Atom_Timer_acknowledgeTriggerIrq(IfxGtm_Atom_Timer *driver);  // 确认触发中断
+void IfxGtm_Atom_Timer_addToChannelMask(IfxGtm_Atom_Timer *driver, IfxGtm_Atom_Ch channel);  // 将通道加入同步掩码
+float32 IfxGtm_Atom_Timer_getFrequency(IfxGtm_Atom_Timer *driver);  // 读取频率
+float32 IfxGtm_Atom_Timer_getInputFrequency(IfxGtm_Atom_Timer *driver);  // 读取输入频率
+Ifx_TimerValue IfxGtm_Atom_Timer_getPeriod(IfxGtm_Atom_Timer *driver);  // 读取周期
+float32 IfxGtm_Atom_Timer_getResolution(IfxGtm_Atom_Timer *driver);  // 读取分辨率
+Ifx_TimerValue IfxGtm_Atom_Timer_getTrigger(IfxGtm_Atom_Timer *driver);  // 读取触发点
+void IfxGtm_Atom_Timer_updateInputFrequency(IfxGtm_Atom_Timer *driver);  // 更新输入频率缓存
+Ifx_TimerValue IfxGtm_Atom_Timer_getOffset(IfxGtm_Atom_Timer *driver);  // 读取偏移
+volatile uint32 *IfxGtm_Atom_Timer_getPointer(IfxGtm_Atom_Timer *driver);  // 获取定时器通道指针
+volatile uint32 *IfxGtm_Atom_Timer_getTriggerPointer(IfxGtm_Atom_Timer *driver);  // 获取触发通道指针
+Ifx_GTM_ATOM_CH *IfxGtm_Atom_Ch_getChannelPointer(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel);  // 获取ATOM通道寄存器指针
+void IfxGtm_Atom_Ch_setCompareShadow(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel, uint32 shadowZero, uint32 shadowOne);  // 设置比较影子值
+float32 IfxGtm_Atom_Ch_getClockFrequency(Ifx_GTM *gtm, Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel);  // 读取通道时钟频率
+IfxGtm_Cmu_Clk IfxGtm_Atom_Ch_getClockSource(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel);  // 读取通道时钟源
+void IfxGtm_Atom_Ch_setClockSource(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel, IfxGtm_Cmu_Clk clock);  // 设置通道时钟源
+void IfxGtm_Atom_Ch_setCompare(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel, uint32 compareZero, uint32 compareOne);  // 设置比较值
+void IfxGtm_Atom_Ch_setMode(Ifx_GTM_ATOM *atom, IfxGtm_Atom_Ch channel, IfxGtm_Atom_Mode mode);  // 设置操作模式
+void IfxGtm_Atom_Agc_enableChannel(Ifx_GTM_ATOM_AGC *agc, IfxGtm_Atom_Ch channel, boolean enabled, boolean immediate);  // 使能/禁用通道
+void IfxGtm_Atom_Agc_enableChannelOutput(Ifx_GTM_ATOM_AGC *agc, IfxGtm_Atom_Ch channel, boolean enabled, boolean immediate);  // 使能/禁用通道输出
+float32 IfxGtm_Atom_PwmHl_getDeadtime(IfxGtm_Atom_PwmHl *driver);  // 读取死区时间
+float32 IfxGtm_Atom_PwmHl_getMinPulse(IfxGtm_Atom_PwmHl *driver);  // 读取最小脉宽
+Ifx_Pwm_Mode IfxGtm_Atom_PwmHl_getMode(IfxGtm_Atom_PwmHl *driver);  // 读取当前PWMHL模式
+boolean IfxGtm_Atom_PwmHl_setDeadtime(IfxGtm_Atom_PwmHl *driver, float32 deadtime);  // 设置死区时间
+boolean IfxGtm_Atom_PwmHl_setMinPulse(IfxGtm_Atom_PwmHl *driver, float32 minPulse);  // 设置最小脉宽
+
+// 与 TC38x 源文档差异：目标 TC26B 库树中没有 TC3xx 通用 `IfxGtm_Pwm_*` ATOM/TOM 抽象在本工程可直接使用的包装层，PWMHL 使用方要直接适配 `IfxGtm_Atom_PwmHl_*` 或 `IfxGtm_Tom_PwmHl_*`。
+// 与 TC38x 源文档差异：`IfxGtm_Atom_PwmHl` 依赖一个已链接的 `IfxGtm_Atom_Timer`，且 timer 必须在 `IfxGtm_Atom_PwmHl_init(...)` 之前先启动，否则输出可能异常。
+// 与 TC38x 源文档差异：目标 TC26B `IfxGtm_Atom_PwmHl_Config` 通过 `ccx[]/coutx[]` 指向高低桥输出通道数组，且这些通道必须是相邻通道。
+
+
+--- GTM_TOM ---
+
+struct
+typedef struct
+{
+    Ifx_TimerValue          period;
+    boolean                 triggerEnabled;
+    float32                 clockFreq;
+    IfxStdIf_Timer_CountDir countDir;
+} IfxGtm_Tom_Timer_Base;
+
+typedef struct
+{
+    IfxGtm_Tom_Timer_Base base;
+    Ifx_GTM              *gtm;
+    Ifx_GTM_TOM          *tom;
+    Ifx_GTM_TOM_TGC      *tgc[2];
+    IfxGtm_Tom            tomIndex;
+    IfxGtm_Tom_Ch         timerChannel;
+    IfxGtm_Tom_Ch         triggerChannel;
+    uint16                channelsMask[2];
+    Ifx_TimerValue        offset;
+    uint32                tgcGlobalControlDisableUpdate[2];
+    uint32                tgcGlobalControlApplyUpdate[2];
+} IfxGtm_Tom_Timer;
+
+typedef struct
+{
+    IfxStdIf_Timer_Config base;
+    Ifx_GTM              *gtm;
+    IfxGtm_Tom            tom;
+    IfxGtm_Tom_Ch         timerChannel;
+    IfxGtm_Tom_ToutMap   *triggerOut;
+    IfxGtm_Tom_Ch_ClkSrc  clock;
+    IfxGtm_IrqMode        irqModeTimer;
+    IfxGtm_IrqMode        irqModeTrigger;
+    boolean               initPins;
+} IfxGtm_Tom_Timer_Config;
+
+typedef struct
+{
+    boolean        ccu0Enabled;
+    boolean        ccu1Enabled;
+    IfxGtm_IrqMode mode;
+    IfxSrc_Tos     isrProvider;
+    Ifx_Priority   isrPriority;
+} IfxGtm_Tom_Pwm_Interrupt;
+
+typedef struct
+{
+    IfxGtm_Tom_ToutMap *outputPin;
+    IfxPort_OutputMode  outputMode;
+    IfxPort_PadDriver   padDriver;
+} IfxGtm_Tom_Pwm_pin;
+
+typedef struct
+{
+    Ifx_GTM                 *gtm;
+    IfxGtm_Tom               tom;
+    IfxGtm_Tom_Ch            tomChannel;
+    IfxGtm_Tom_Ch_ClkSrc     clock;
+    uint16                   period;
+    uint16                   dutyCycle;
+    Ifx_ActiveState          signalLevel;
+    boolean                  oneShotModeEnabled;
+    boolean                  synchronousUpdateEnabled;
+    IfxGtm_Tom_Pwm_Interrupt interrupt;
+    IfxGtm_Tom_Pwm_pin       pin;
+    boolean                  immediateStartEnabled;
+} IfxGtm_Tom_Pwm_Config;
+
+typedef struct
+{
+    Ifx_GTM         *gtm;
+    IfxGtm_Tom       tomIndex;
+    IfxGtm_Tom_Ch    tomChannel;
+    Ifx_GTM_TOM     *tom;
+    Ifx_GTM_TOM_TGC *tgc[2];
+} IfxGtm_Tom_Pwm_Driver;
+
+typedef struct
+{
+    Ifx_TimerValue  deadtime;
+    Ifx_TimerValue  minPulse;
+    Ifx_TimerValue  maxPulse;
+    Ifx_Pwm_Mode    mode;
+    sint8           setMode;
+    Ifx_ActiveState ccxActiveState;
+    Ifx_ActiveState coutxActiveState;
+    boolean         inverted;
+    uint8           channelCount;
+} IfxGtm_Tom_PwmHl_Base;
+
+typedef struct
+{
+    IfxStdIf_PwmHl_Config          base;
+    IfxGtm_Tom_Timer              *timer;
+    IfxGtm_Tom                     tom;
+    IFX_CONST IfxGtm_Tom_ToutMapP *ccx;
+    IFX_CONST IfxGtm_Tom_ToutMapP *coutx;
+    boolean                        initPins;
+} IfxGtm_Tom_PwmHl_Config;
+
+typedef struct
+{
+    Ifx_Pwm_Mode                 mode;
+    boolean                      inverted;
+    IfxGtm_Tom_PwmHl_Update      update;
+    IfxGtm_Tom_PwmHl_UpdateShift updateAndShift;
+    IfxGtm_Tom_PwmHl_UpdatePulse updatePulse;
+} IfxGtm_Tom_PwmHl_Mode;
+
+struct IfxGtm_Tom_PwmHl_s
+{
+    IfxGtm_Tom_PwmHl_Base        base;
+    IfxGtm_Tom_Timer            *timer;
+    IfxGtm_Tom_PwmHl_Update      update;
+    IfxGtm_Tom_PwmHl_UpdateShift updateAndShift;
+    IfxGtm_Tom_PwmHl_UpdatePulse updatePulse;
+    Ifx_GTM_TOM                 *tom;
+    Ifx_GTM_TOM_TGC             *tgc;
+    IfxGtm_Tom_Ch                ccx[IFXGTM_TOM_PWMHL_MAX_NUM_CHANNELS];
+    IfxGtm_Tom_Ch                coutx[IFXGTM_TOM_PWMHL_MAX_NUM_CHANNELS];
+    IfxGtm_Tom_Ch               *ccxTemp;
+    IfxGtm_Tom_Ch               *coutxTemp;
+};
+
+important functions
+boolean IfxGtm_Tom_Timer_init(IfxGtm_Tom_Timer *driver, const IfxGtm_Tom_Timer_Config *config);  // 初始化TOM Timer
+void IfxGtm_Tom_Timer_initConfig(IfxGtm_Tom_Timer_Config *config, Ifx_GTM *gtm);  // 初始化TOM Timer默认配置
+boolean IfxGtm_Tom_Timer_stdIfTimerInit(IfxStdIf_Timer *stdif, IfxGtm_Tom_Timer *driver);  // 初始化StdIf定时器接口
+void IfxGtm_Tom_Timer_run(IfxGtm_Tom_Timer *driver);  // 启动TOM Timer
+void IfxGtm_Tom_Timer_stop(IfxGtm_Tom_Timer *driver);  // 停止TOM Timer
+void IfxGtm_Tom_Timer_applyUpdate(IfxGtm_Tom_Timer *driver);  // 应用影子更新
+void IfxGtm_Tom_Timer_disableUpdate(IfxGtm_Tom_Timer *driver);  // 禁止更新
+boolean IfxGtm_Tom_Timer_setPeriod(IfxGtm_Tom_Timer *driver, Ifx_TimerValue period);  // 设置周期
+boolean IfxGtm_Tom_Timer_setFrequency(IfxGtm_Tom_Timer *driver, float32 frequency);  // 设置频率
+void IfxGtm_Tom_Timer_setTrigger(IfxGtm_Tom_Timer *driver, Ifx_TimerValue triggerPoint);  // 设置触发点
+void IfxGtm_Tom_Timer_setSingleMode(IfxGtm_Tom_Timer *driver, boolean enabled);  // 设置单次模式
+boolean IfxGtm_Tom_Pwm_init(IfxGtm_Tom_Pwm_Driver *driver, const IfxGtm_Tom_Pwm_Config *config);  // 初始化TOM PWM
+void IfxGtm_Tom_Pwm_initConfig(IfxGtm_Tom_Pwm_Config *config, Ifx_GTM *gtm);  // 初始化TOM PWM默认配置
+void IfxGtm_Tom_Pwm_start(IfxGtm_Tom_Pwm_Driver *driver, boolean immediate);  // 启动TOM PWM
+void IfxGtm_Tom_Pwm_stop(IfxGtm_Tom_Pwm_Driver *driver, boolean immediate);  // 停止TOM PWM
+boolean IfxGtm_Tom_PwmHl_init(IfxGtm_Tom_PwmHl *driver, const IfxGtm_Tom_PwmHl_Config *config);  // 初始化TOM PWMHL
+void IfxGtm_Tom_PwmHl_initConfig(IfxGtm_Tom_PwmHl_Config *config);  // 初始化TOM PWMHL默认配置
+boolean IfxGtm_Tom_PwmHl_stdIfPwmHlInit(IfxStdIf_PwmHl *stdif, IfxGtm_Tom_PwmHl *driver);  // 初始化PWMHL标准接口
+boolean IfxGtm_Tom_PwmHl_setMode(IfxGtm_Tom_PwmHl *driver, Ifx_Pwm_Mode mode);  // 设置PWMHL模式
+void IfxGtm_Tom_PwmHl_setOnTime(IfxGtm_Tom_PwmHl *driver, Ifx_TimerValue *tOn);  // 设置各相导通时间
+void IfxGtm_Tom_PwmHl_setOnTimeAndShift(IfxGtm_Tom_PwmHl *driver, Ifx_TimerValue *tOn, Ifx_TimerValue *shift);  // 设置导通时间和相位偏移
+void IfxGtm_Tom_PwmHl_setPulse(IfxGtm_Tom_PwmHl *driver, float32 *tOn, float32 *offset);  // 设置独立脉冲宽度和偏移
+void IfxGtm_Tom_PwmHl_setupChannels(IfxGtm_Tom_PwmHl *driver, boolean *activeCh, boolean *stuckSt);  // 配置高低桥通道开关状态
+
+others functions
+boolean IfxGtm_Tom_Timer_acknowledgeTimerIrq(IfxGtm_Tom_Timer *driver);  // 确认定时器中断
+boolean IfxGtm_Tom_Timer_acknowledgeTriggerIrq(IfxGtm_Tom_Timer *driver);  // 确认触发中断
+void IfxGtm_Tom_Timer_addToChannelMask(IfxGtm_Tom_Timer *driver, IfxGtm_Tom_Ch channel);  // 将通道加入同步掩码
+float32 IfxGtm_Tom_Timer_getFrequency(IfxGtm_Tom_Timer *driver);  // 读取频率
+float32 IfxGtm_Tom_Timer_getInputFrequency(IfxGtm_Tom_Timer *driver);  // 读取输入频率
+Ifx_TimerValue IfxGtm_Tom_Timer_getPeriod(IfxGtm_Tom_Timer *driver);  // 读取周期
+float32 IfxGtm_Tom_Timer_getResolution(IfxGtm_Tom_Timer *driver);  // 读取分辨率
+Ifx_TimerValue IfxGtm_Tom_Timer_getTrigger(IfxGtm_Tom_Timer *driver);  // 读取触发点
+Ifx_TimerValue IfxGtm_Tom_Timer_getOffset(IfxGtm_Tom_Timer *driver);  // 读取偏移
+volatile uint32 *IfxGtm_Tom_Timer_getPointer(IfxGtm_Tom_Timer *driver);  // 获取定时器通道指针
+volatile uint32 *IfxGtm_Tom_Timer_getTriggerPointer(IfxGtm_Tom_Timer *driver);  // 获取触发通道指针
+Ifx_GTM_TOM_CH *IfxGtm_Tom_Ch_getChannelPointer(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel);  // 获取TOM通道寄存器指针
+float32 IfxGtm_Tom_Ch_getClockFrequency(Ifx_GTM *gtm, Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel);  // 读取TOM通道时钟频率
+IfxGtm_Tom_Ch_ClkSrc IfxGtm_Tom_Ch_getClockSource(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel);  // 读取时钟源
+void IfxGtm_Tom_Ch_setClockSource(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, IfxGtm_Tom_Ch_ClkSrc clock);  // 设置时钟源
+void IfxGtm_Tom_Ch_setCompare(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, uint16 compareZero, uint16 compareOne);  // 设置比较值
+void IfxGtm_Tom_Ch_setCompareShadow(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, uint16 shadowZero, uint16 shadowOne);  // 设置比较影子值
+void IfxGtm_Tom_Ch_setNotification(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, IfxGtm_IrqMode mode, boolean interruptOnCompareZero, boolean interruptOnCompareOne);  // 设置中断通知
+void IfxGtm_Tom_Ch_setOneShotMode(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, boolean enabled);  // 设置单次模式
+void IfxGtm_Tom_Ch_setResetSource(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, IfxGtm_Tom_Ch_ResetEvent event);  // 设置复位源
+void IfxGtm_Tom_Ch_setSignalLevel(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, Ifx_ActiveState activeState);  // 设置输出有效电平
+void IfxGtm_Tom_Ch_setTriggerOutput(Ifx_GTM_TOM *tom, IfxGtm_Tom_Ch channel, IfxGtm_Tom_Ch_OutputTrigger trigger);  // 设置触发输出
+Ifx_GTM_TOM_TGC *IfxGtm_Tom_Ch_getTgcPointer(Ifx_GTM_TOM *tom, uint32 tgcIndex);  // 获取TGC指针
+void IfxGtm_Tom_Tgc_enableChannel(Ifx_GTM_TOM_TGC *tgc, IfxGtm_Tom_Ch channel, boolean enabled, boolean immediate);  // 使能/禁用通道
+void IfxGtm_Tom_Tgc_enableChannelOutput(Ifx_GTM_TOM_TGC *tgc, IfxGtm_Tom_Ch channel, boolean enabled, boolean immediate);  // 使能/禁用通道输出
+void IfxGtm_Tom_Tgc_enableChannelUpdate(Ifx_GTM_TOM_TGC *tgc, IfxGtm_Tom_Ch channel, boolean enabled);  // 使能/禁用通道更新
+float32 IfxGtm_Tom_PwmHl_getDeadtime(IfxGtm_Tom_PwmHl *driver);  // 读取死区时间
+float32 IfxGtm_Tom_PwmHl_getMinPulse(IfxGtm_Tom_PwmHl *driver);  // 读取最小脉宽
+Ifx_Pwm_Mode IfxGtm_Tom_PwmHl_getMode(IfxGtm_Tom_PwmHl *driver);  // 读取当前PWMHL模式
+boolean IfxGtm_Tom_PwmHl_setDeadtime(IfxGtm_Tom_PwmHl *driver, float32 deadtime);  // 设置死区时间
+boolean IfxGtm_Tom_PwmHl_setMinPulse(IfxGtm_Tom_PwmHl *driver, float32 minPulse);  // 设置最小脉宽
+
+// 与 TC38x 源文档差异：`IfxGtm_Tom_PwmHl` 同样依赖一个已链接的 `IfxGtm_Tom_Timer`，且 timer 必须先启动。
+// 与 TC38x 源文档差异：目标 TC26B `IfxGtm_Tom_PwmHl` 要求 PWM 通道使用同一个 TGC，当前实现还要求 timer 和 PWM 通道也在同一个 TGC。
+// 与 TC38x 源文档差异：目标 TC26B `IfxGtm_Tom_PwmHl` 最大只支持 3 组高低桥通道，受同一 TGC 约束限制。
+
+
+--- GTM_TRIG ---
+
+enum
+typedef enum
+{
+    IfxGtm_Trig_AdcGroup_0,
+    IfxGtm_Trig_AdcGroup_1,
+    IfxGtm_Trig_AdcGroup_2,
+    IfxGtm_Trig_AdcGroup_3,
+    IfxGtm_Trig_AdcGroup_4
+} IfxGtm_Trig_AdcGroup;
+
+typedef enum
+{
+    IfxGtm_Trig_AdcTrig_0,
+    IfxGtm_Trig_AdcTrig_1,
+    IfxGtm_Trig_AdcTrig_count
+} IfxGtm_Trig_AdcTrig;
+
+typedef enum
+{
+    IfxGtm_Trig_AdcTrigChannel_4,
+    IfxGtm_Trig_AdcTrigChannel_5,
+    IfxGtm_Trig_AdcTrigChannel_6,
+    IfxGtm_Trig_AdcTrigChannel_7,
+    IfxGtm_Trig_AdcTrigChannel_13,
+    IfxGtm_Trig_AdcTrigChannel_14,
+    IfxGtm_Trig_AdcTrigChannel_15,
+    IfxGtm_Trig_AdcTrigChannel_count
+} IfxGtm_Trig_AdcTrigChannel;
+
+typedef enum
+{
+    IfxGtm_Trig_AdcTrigSource_atom0,
+    IfxGtm_Trig_AdcTrigSource_atom1,
+    IfxGtm_Trig_AdcTrigSource_atom2,
+    IfxGtm_Trig_AdcTrigSource_atom3,
+    IfxGtm_Trig_AdcTrigSource_tom0,
+    IfxGtm_Trig_AdcTrigSource_tom1,
+    IfxGtm_Trig_AdcTrigSource_count
+} IfxGtm_Trig_AdcTrigSource;
+
+important functions
+boolean IfxGtm_Trig_toVadc(Ifx_GTM *gtm, IfxGtm_Trig_AdcGroup adcGroup, IfxGtm_Trig_AdcTrig adcTrig, IfxGtm_Trig_AdcTrigSource source, IfxGtm_Trig_AdcTrigChannel channel);  // 配置GTM到VADC触发
+
+others functions
+boolean IfxGtm_Trig_fromDsadc(Ifx_GTM *gtm, uint32 dsadcChannel, IfxGtm_Tim tim, IfxGtm_Tim_Ch timChannel);  // 配置DSADC到GTM触发
+void IfxGtm_Trig_toDsadc(Ifx_GTM *gtm, uint32 dsadcChannel, IfxGtm_Trig_DsadcTrig dsadcTrig, IfxGtm_Trig_DsadcTrigSource sel);  // 配置GTM到DSADC触发
+boolean IfxGtm_Trig_toSent(Ifx_GTM *gtm, IfxGtm_Trig_SentGroup sentGroup, IfxGtm_Trig_SentTrig sentTrig, IfxGtm_Trig_SentTrigSource source, IfxGtm_Trig_SentTrigChannel channel);  // 配置GTM到SENT触发
+
+// 与 TC38x 源文档差异：源使用 `IfxGtm_Trig_toEVadc(...)`，目标 TC26B 使用 `IfxGtm_Trig_toVadc(...)`。
+// 与 TC38x 源文档差异：目标 TC26B `IfxGtm_Tom_Ch_ClkSrc` 没有 `IfxGtm_Tom_Ch_ClkSrc_cascade`。
+
+
+STM class
+
+enum
+typedef enum
+{
+    IfxStm_Comparator_0 = 0,      // 比较器ID 0
+    IfxStm_Comparator_1           // 比较器ID 1
+} IfxStm_Comparator;
+
+typedef enum
+{
+    IfxStm_ComparatorInterrupt_ir0 = 0,  // 选择STMIR0
+    IfxStm_ComparatorInterrupt_ir1 = 1   // 选择STMIR1
+} IfxStm_ComparatorInterrupt;
+
+typedef enum
+{
+    IfxStm_ComparatorOffset_0 = 0,      // 64位定时器的比较器起始位位置0
+    IfxStm_ComparatorOffset_1,
+    IfxStm_ComparatorOffset_2,
+    IfxStm_ComparatorOffset_3,
+    IfxStm_ComparatorOffset_4,
+    IfxStm_ComparatorOffset_5,
+    IfxStm_ComparatorOffset_6,
+    IfxStm_ComparatorOffset_7,
+    IfxStm_ComparatorOffset_8,
+    IfxStm_ComparatorOffset_9,
+    IfxStm_ComparatorOffset_10,
+    IfxStm_ComparatorOffset_11,
+    IfxStm_ComparatorOffset_12,
+    IfxStm_ComparatorOffset_13,
+    IfxStm_ComparatorOffset_14,
+    IfxStm_ComparatorOffset_15,
+    IfxStm_ComparatorOffset_16,
+    IfxStm_ComparatorOffset_17,
+    IfxStm_ComparatorOffset_18,
+    IfxStm_ComparatorOffset_19,
+    IfxStm_ComparatorOffset_20,
+    IfxStm_ComparatorOffset_21,
+    IfxStm_ComparatorOffset_22,
+    IfxStm_ComparatorOffset_23,
+    IfxStm_ComparatorOffset_24,
+    IfxStm_ComparatorOffset_25,
+    IfxStm_ComparatorOffset_26,
+    IfxStm_ComparatorOffset_27,
+    IfxStm_ComparatorOffset_28,
+    IfxStm_ComparatorOffset_29,
+    IfxStm_ComparatorOffset_30,
+    IfxStm_ComparatorOffset_31
+} IfxStm_ComparatorOffset;
+
+typedef enum
+{
+    IfxStm_ComparatorSize_1Bit   = 0,   // 比较值大小：1位
+    IfxStm_ComparatorSize_2Bits  = 1,   // 比较值大小：2位
+    IfxStm_ComparatorSize_3Bits  = 2,   // 比较值大小：3位
+    IfxStm_ComparatorSize_4Bits  = 3,   // 比较值大小：4位
+    IfxStm_ComparatorSize_5Bits  = 4,
+    IfxStm_ComparatorSize_6Bits  = 5,
+    IfxStm_ComparatorSize_7Bits  = 6,
+    IfxStm_ComparatorSize_8Bits  = 7,
+    IfxStm_ComparatorSize_9Bits  = 8,
+    IfxStm_ComparatorSize_10Bits = 9,
+    IfxStm_ComparatorSize_11Bits = 10,
+    IfxStm_ComparatorSize_12Bits = 11,
+    IfxStm_ComparatorSize_13Bits = 12,
+    IfxStm_ComparatorSize_14Bits = 13,
+    IfxStm_ComparatorSize_15Bits = 14,
+    IfxStm_ComparatorSize_16Bits = 15,
+    IfxStm_ComparatorSize_17Bits = 16,
+    IfxStm_ComparatorSize_18Bits = 17,
+    IfxStm_ComparatorSize_19Bits = 18,
+    IfxStm_ComparatorSize_20Bits = 19,
+    IfxStm_ComparatorSize_21Bits = 20,
+    IfxStm_ComparatorSize_22Bits = 21,
+    IfxStm_ComparatorSize_23Bits = 22,
+    IfxStm_ComparatorSize_24Bits = 23,
+    IfxStm_ComparatorSize_25Bits = 24,
+    IfxStm_ComparatorSize_26Bits = 25,
+    IfxStm_ComparatorSize_27Bits = 26,
+    IfxStm_ComparatorSize_28Bits = 27,
+    IfxStm_ComparatorSize_29Bits = 28,
+    IfxStm_ComparatorSize_30Bits = 29,
+    IfxStm_ComparatorSize_31Bits = 30,
+    IfxStm_ComparatorSize_32Bits = 31   // 比较值大小：32位
+} IfxStm_ComparatorSize;
+
+typedef enum
+{
+    IfxStm_SleepMode_enable  = 0, // 使能睡眠模式
+    IfxStm_SleepMode_disable = 1  // 禁用睡眠模式
+} IfxStm_SleepMode;
+
+typedef enum
+{
+    IfxStm_SuspendMode_none = 0,  // 无挂起
+    IfxStm_SuspendMode_hard = 1,  // 硬挂起
+    IfxStm_SuspendMode_soft = 2   // 软挂起
+} IfxStm_SuspendMode;
+
+
+struct
+typedef struct
+{
+    IfxStm_Comparator          comparator;          // 比较器ID
+    IfxStm_ComparatorInterrupt comparatorInterrupt; // 比较器中断请求源
+    IfxStm_ComparatorOffset    compareOffset;       // 比较器起始位位置
+    IfxStm_ComparatorSize      compareSize;         // 比较值大小
+    uint32                     ticks;               // 从当前计数开始的下一次比较值增量
+    Ifx_Priority               triggerPriority;     // 中断优先级
+    IfxSrc_Tos                 typeOfService;       // 服务类型
+} IfxStm_CompareConfig;
+
+typedef struct
+{
+    Ifx_TimerValue          period;         // 定时器周期（ticks）
+    boolean                 triggerEnabled; // 触发功能是否初始化
+    float32                 clockFreq;      // 输入时钟频率缓存
+    IfxStdIf_Timer_CountDir countDir;       // 定时器计数模式
+    boolean                 singleShot;     // 是否单次模式
+} IfxStm_Timer_Base;
+
+typedef struct
+{
+    IfxStm_Timer_Base base;            // 定时器接口
+    Ifx_STM          *stm;             // STM模块指针
+    IfxStm_Comparator comparator;      // 比较器选择
+    uint32            comparatorValue; // 下一个事件的比较器值
+    uint8             comparatorShift; // 比较器移位
+} IfxStm_Timer;
+
+typedef struct
+{
+    IfxStdIf_Timer_Config base;       // 标准定时器配置
+    Ifx_STM              *stm;        // STM模块指针
+    IfxStm_Comparator     comparator; // 比较器选择
+} IfxStm_Timer_Config;
+
+
+important functions
+STM 比较器配置函数
+void IfxStm_initCompareConfig(IfxStm_CompareConfig *config);  // 初始化比较器配置结构为默认值
+boolean IfxStm_initCompare(Ifx_STM *stm, const IfxStm_CompareConfig *config);  // 使用给定配置初始化STM比较器
+void IfxStm_clearCompareFlag(Ifx_STM *stm, IfxStm_Comparator comparator);  // 清除比较标志
+void IfxStm_increaseCompare(Ifx_STM *stm, IfxStm_Comparator comparator, uint32 ticks);  // 增加比较值
+
+STM 定时器配置函数
+void IfxStm_Timer_initConfig(IfxStm_Timer_Config *config, Ifx_STM *stm);  // 初始化STM定时器配置结构
+boolean IfxStm_Timer_init(IfxStm_Timer *driver, const IfxStm_Timer_Config *config);  // 初始化STM定时器
+void IfxStm_Timer_run(IfxStm_Timer *driver);  // 运行定时器
+void IfxStm_Timer_stop(IfxStm_Timer *driver);  // 停止定时器
+boolean IfxStm_Timer_acknowledgeTimerIrq(IfxStm_Timer *driver);  // 确认并处理定时器中断
+
+STM 时间计算函数
+sint32 IfxStm_getTicksFromMicroseconds(Ifx_STM *stm, uint32 microSeconds);  // 根据STM频率获取微秒对应ticks
+sint32 IfxStm_getTicksFromMilliseconds(Ifx_STM *stm, uint32 milliSeconds);  // 根据STM频率获取毫秒对应ticks
+void IfxStm_waitTicks(Ifx_STM *stm, uint32 ticks);  // 使用STM等待指定数量ticks
+
+STM 模块控制函数
+uint64 IfxStm_get(Ifx_STM *stm);  // 返回当前系统定时器值
+float32 IfxStm_getFrequency(Ifx_STM *stm);  // 获取STM频率（Hz）
+void IfxStm_resetModule(Ifx_STM *stm);  // 复位STM模块
+
+
+others functions
+STM 比较器控制函数（非重要函数）
+void IfxStm_disableComparatorInterrupt(Ifx_STM *stm, IfxStm_Comparator comparator);  // 禁用比较器中断
+void IfxStm_enableComparatorInterrupt(Ifx_STM *stm, IfxStm_Comparator comparator);  // 启用比较器中断
+boolean IfxStm_isCompareFlagSet(Ifx_STM *stm, IfxStm_Comparator comparator);  // 检查比较标志
+void IfxStm_setCompareControl(Ifx_STM *stm, IfxStm_Comparator comparator, IfxStm_ComparatorOffset offset, IfxStm_ComparatorSize size, IfxStm_ComparatorInterrupt interrupt);  // 配置比较控制
+uint32 IfxStm_getCompare(Ifx_STM *stm, IfxStm_Comparator comparator);  // 读取比较寄存器值
+void IfxStm_updateCompare(Ifx_STM *stm, IfxStm_Comparator comparator, uint32 ticks);  // 直接更新比较值
+
+STM 定时器控制函数（非重要函数）
+float32 IfxStm_Timer_getFrequency(IfxStm_Timer *driver);  // 获取STM定时器频率
+float32 IfxStm_Timer_getInputFrequency(IfxStm_Timer *driver);  // 获取STM定时器输入频率
+Ifx_TimerValue IfxStm_Timer_getPeriod(IfxStm_Timer *driver);  // 获取STM定时器当前周期值
+float32 IfxStm_Timer_getResolution(IfxStm_Timer *driver);  // 获取STM定时器分辨率（秒）
+boolean IfxStm_Timer_setFrequency(IfxStm_Timer *driver, float32 frequency);  // 设置STM定时器频率
+boolean IfxStm_Timer_setPeriod(IfxStm_Timer *driver, Ifx_TimerValue period);  // 设置STM定时器周期
+void IfxStm_Timer_setSingleMode(IfxStm_Timer *driver, boolean enabled);  // 启用/禁用单次模式
+boolean IfxStm_Timer_stdIfTimerInit(IfxStdIf_Timer *stdif, IfxStm_Timer *driver);  // 初始化标准接口定时器
+void IfxStm_Timer_updateInputFrequency(IfxStm_Timer *driver);  // 更新输入频率缓存
+
+STM 模块状态函数（非重要函数）
+boolean IfxStm_isModuleSuspended(Ifx_STM *stm);  // 返回模块挂起状态
+void IfxStm_setSuspendMode(Ifx_STM *stm, IfxStm_SuspendMode mode);  // 设置硬/软挂起模式
+void IfxStm_setSleepMode(Ifx_STM *stm, IfxStm_SleepMode mode);  // 设置STM睡眠模式
+
+STM 偏移定时器函数（非重要函数）
+uint32 IfxStm_getLower(Ifx_STM *stm);  // 获取较低位系统定时器值
+uint32 IfxStm_getOffset4Timer(Ifx_STM *stm);  // 获取TIM1计数器值
+uint32 IfxStm_getOffset8Timer(Ifx_STM *stm);  // 获取TIM2计数器值
+uint32 IfxStm_getOffset12Timer(Ifx_STM *stm);  // 获取TIM3计数器值
+uint32 IfxStm_getOffset16Timer(Ifx_STM *stm);  // 获取TIM4计数器值
+uint32 IfxStm_getOffset20Timer(Ifx_STM *stm);  // 获取TIM5计数器值
+uint32 IfxStm_getOffset32Timer(Ifx_STM *stm);  // 获取TIM6计数器值
+uint32 IfxStm_getOffsetTimer(Ifx_STM *stm, uint8 offset);  // 按位移获取偏移定时器值
+
+STM 时间戳函数（非重要函数）
+sint64 IfxStm_now(void);  // 获取默认STM计数器值
+sint64 IfxStm_getDeadLine(sint64 timeout);  // 计算截止时间
+boolean IfxStm_isDeadLine(sint64 deadLine);  // 检查截止时间是否已到
+void IfxStm_wait(sint64 timeout);  // 等待指定超时时间
+
+STM 模块管理函数（非重要函数）
+void IfxStm_disableModule(Ifx_STM *stm);  // 禁用STM模块
+void IfxStm_enableOcdsSuspend(Ifx_STM *stm);  // 启用调试挂起
+Ifx_STM *IfxStm_getAddress(IfxStm_Index stm);  // 根据索引获取STM模块地址
+IfxStm_Index IfxStm_getIndex(Ifx_STM *stm);  // 获取STM模块索引
+volatile Ifx_SRC_SRCR *IfxStm_getSrcPointer(Ifx_STM *stm, IfxStm_Comparator comparator);  // 获取比较器SRC指针
+
+// ===== STM 关键注意事项 =====
+// Timer API (IfxStm_Timer) 和 Compare API (IfxStm_initCompare) 是两套独立的 API，操作同一个硬件比较器，不可混用。
+//
+// Timer API 使用流程：
+//   1. IfxStm_Timer_init  → 计算 comparatorShift/period，不配置 SRC（如果 isrPriority=0）
+//   2. IfxStm_Timer_run    → 写入 CMP = STM + period，使能比较中断
+//   3. ISR 中调用 IfxStm_Timer_acknowledgeTimerIrq → 清标志 + comparatorValue += period + 写 CMP
+//   Timer API 内部维护 comparatorValue 和 period 作为软件状态，通过 acknowledge 递增。
+//
+// Compare API 使用流程：
+//   1. IfxStm_initCompare  → 一步完成：配置窗口/偏移/SRC/中断使能，写入 CMP = current + ticks
+//   2. ISR 中手动维护：
+//        IfxStm_clearCompareFlag(stm, comparator);
+//        IfxStm_updateCompare(stm, comparator, IfxStm_get(stm) + ticks);
+//   Compare API 无内部软件状态，CMP 值完全由调用者控制。
+//
+// 混用后果：
+//   - 调用 IfxStm_initCompare 设 CMP=current+1000 后，再调 IfxStm_Timer_run 会用 period(~10M)覆盖 CMP
+//   - 在 Compare API 配置的 ISR 中调用 IfxStm_Timer_acknowledgeTimerIrq，每次加的却是 Timer 的 period，
+//     与 Compare API 的 ticks 参数无关，导致中断间隔不等于预期的 ticks
+//   - 总结：Timer_run 会覆盖 initCompare 写入的 CMP；acknowledgeTimerIrq 的递增量也来自 Timer 的 period，
+//     不是 Compare API 的 ticks
+
+
+Flash class
+================================================================================
+
+enum
+typedef enum
+{
+    IfxFlash_FlashType_Fa = 0,  // Flash Array
+    IfxFlash_FlashType_D0 = 1,  // 数据闪存D0
+    IfxFlash_FlashType_D1 = 2,  // 数据闪存D1
+    IfxFlash_FlashType_P0 = 3,  // 程序闪存P0
+    IfxFlash_FlashType_P1 = 4,  // 程序闪存P1
+    IfxFlash_FlashType_P2 = 5,  // 程序闪存P2
+    IfxFlash_FlashType_P3 = 6   // 程序闪存P3
+} IfxFlash_FlashType;
+
+typedef enum
+{
+    IfxFlash_UcbType_ucb0    = 0,  // UCB0
+    IfxFlash_UcbType_ucb1    = 1,  // UCB1
+    IfxFlash_UcbType_ucbHsmc = 5   // HSM UCB
+} IfxFlash_UcbType;
+
+typedef enum
+{
+    IfxFlash_ErrorTracking_none                            = 0,  // 不跟踪错误
+    IfxFlash_ErrorTracking_correctedSingleBitError         = 1,  // 已校正单比特错误
+    IfxFlash_ErrorTracking_correctedDoubleBitError         = 2,  // 已校正双比特错误
+    IfxFlash_ErrorTracking_correctedSingleOrDoubleBitError = 3,  // 已校正单/双比特错误
+    IfxFlash_ErrorTracking_uncorrectableMultiBitError      = 4   // 不可校正多比特错误
+} IfxFlash_ErrorTracking;
+
+typedef enum
+{
+    IfxFlash_PortId_PortId_0 = 0,  // Port Id 0
+    IfxFlash_PortId_PortId_1 = 1   // Port Id 1
+} IfxFlash_PortId;
+
+
+struct
+typedef struct
+{
+    uint32 start;       // 扇区起始地址
+    uint32 end;         // 扇区结束地址
+} IfxFlash_flashSector;
+
+typedef struct
+{
+    uint32                 address;    // Flash错误地址
+    IfxFlash_ErrorTracking errorType;  // 错误类型
+} IfxFlash_ErrorTracking_Address;
+
+
+important functions
+Flash 擦除编程函数
+void IfxFlash_erasePhysicalSector(uint32 sectorAddr);  // 执行单个物理扇区擦除序列
+void IfxFlash_eraseMultiplePhysicalSectors(uint32 sectorAddr, uint32 numSector);  // 执行多个物理扇区擦除序列
+void IfxFlash_eraseSector(uint32 sectorAddr);  // 执行单个逻辑扇区擦除序列
+void IfxFlash_eraseMultipleSectors(uint32 sectorAddr, uint32 numSector);  // 执行多个逻辑扇区擦除序列
+void IfxFlash_loadPage(uint32 pageAddr, uint32 wordL, uint32 wordU);  // 执行单次64位访问的加载页面序列
+void IfxFlash_loadPage2X32(uint32 pageAddr, uint32 wordL, uint32 wordU);  // 执行两次32位访问的加载页面序列
+uint8 IfxFlash_enterPageMode(uint32 pageAddr);  // 进入编程页面模式
+void IfxFlash_writePage(uint32 pageAddr);  // 执行写页面序列
+void IfxFlash_writeBurst(uint32 pageAddr);  // 执行突发写入序列
+void IfxFlash_writePageOnce(uint32 pageAddr);  // 执行写页面一次序列（带编程校验）
+void IfxFlash_resetToRead(uint32 flash);  // 复位到读取模式
+uint8 IfxFlash_waitUnbusy(uint32 flash, IfxFlash_FlashType flashType);  // 轮询选定Flash直到非忙碌
+boolean IfxFlash_waitUnbusyAll(void);  // 等待所有Flash Bank处于非忙碌状态
+void IfxFlash_clearStatus(uint32 flash);  // 清除操作与错误状态标志
+void IfxFlash_disableWriteProtection(uint32 flash, IfxFlash_UcbType ucb, uint32 *password);  // 临时禁用指定UCB写保护
+
+Flash 错误跟踪函数
+void IfxFlash_selectCorrectableErrorTracking(IfxFlash_PortId portId, IfxFlash_ErrorTracking errorTracking);  // 选择可校正错误跟踪模式
+void IfxFlash_selectUncorrectableErrorTracking(IfxFlash_PortId portId, IfxFlash_ErrorTracking errorTracking);  // 选择不可校正错误跟踪模式
+uint32 IfxFlash_getTrackedCorrectableErrors(IfxFlash_PortId portId, IfxFlash_ErrorTracking_Address *trackedFlashAdresses);  // 获取可校正错误记录
+uint32 IfxFlash_getTrackedUncorrectableErrors(IfxFlash_PortId portId, IfxFlash_ErrorTracking_Address *trackedFlashAdresses);  // 获取不可校正错误记录
+
+
+others functions
+Flash 验证与恢复函数（非重要函数）
+void IfxFlash_eraseVerifySector(uint32 sectorAddr);  // 执行单个扇区擦除验证序列
+void IfxFlash_eraseVerifyMultipleSectors(uint32 sectorAddr, uint32 numSector);  // 执行多个扇区擦除验证序列
+void IfxFlash_suspendResumeSector(uint32 sectorAddr);  // 执行单个扇区挂起恢复序列
+void IfxFlash_suspendResumeMultipleSectors(uint32 sectorAddr, uint32 numSector);  // 执行多个扇区挂起恢复序列
+void IfxFlash_resumeProtection(uint32 flash);  // 执行恢复保护序列
+
+Flash 错误跟踪控制函数（非重要函数）
+void IfxFlash_clearCorrectableErrorTracking(IfxFlash_PortId portId);  // 清除可校正错误跟踪记录
+void IfxFlash_clearUncorrectableErrorTracking(IfxFlash_PortId portId);  // 清除不可校正错误跟踪记录
+void IfxFlash_disableCorrectableErrorTracking(IfxFlash_PortId portId, boolean disable);  // 使能/禁用可校正错误跟踪
+void IfxFlash_disableUncorrectableErrorTracking(IfxFlash_PortId portId, boolean disable);  // 使能/禁用不可校正错误跟踪
+
+// 与 TC38x 源文档差异：目标 TC26B `IfxFlash_FlashType` 取值为 `Fa=0, D0=1, D1=2, P0=3, P1=4, P2=5, P3=6`，与源文档记录不同。
+// 与 TC38x 源文档差异：目标 TC26B `IfxFlash_UcbType` 使用 `ucb0/ucb1/ucbHsmc`，而不是源文档中的 `ucbPflash/ucbDflash/ucbDebug/ucbRetest`。
+// 与 TC38x 源文档差异：源文档中的 `IfxFlash_writeBurstOnce`、Flash cranking/demand/dynamic-idle 模式函数、`IfxFlash_verifyErasedPage`、`IfxFlash_verifyErasedWordLine`、`IfxFlash_replaceLogicalSector`、`IfxFlash_user*Count` 未在当前仓库 TC26B `IfxFlash.h` 中暴露，因此目标文档不保留这些 API。
+
+
+Cpu class
+
+enum
+typedef enum
+{
+    IfxCpu_CoreMode_halt,
+    IfxCpu_CoreMode_run,
+    IfxCpu_CoreMode_idle,
+    IfxCpu_CoreMode_sleep,
+    IfxCpu_CoreMode_stby,
+    IfxCpu_CoreMode_unknown
+} IfxCpu_CoreMode;  // CPU核心模式枚举
+
+typedef enum
+{
+    IfxCpu_CounterMode_normal = 0,
+    IfxCpu_CounterMode_task   = 1
+} IfxCpu_CounterMode;  // 性能计数器模式枚举
+
+typedef enum
+{
+    IfxCpu_Id_0 = 0,  // CPU0
+    IfxCpu_Id_1 = 1,  // CPU1
+    IfxCpu_Id_none    // 无CPU
+} IfxCpu_Id;
+
+typedef enum
+{
+    IfxCpu_Index_0 = 0,  // CPU0
+    IfxCpu_Index_1 = 1,  // CPU1
+    IfxCpu_Index_none    // 无CPU
+} IfxCpu_Index;
+
+typedef enum
+{
+    IfxCpu_ResourceCpu_0    = IfxCpu_Index_0,   // CPU0
+    IfxCpu_ResourceCpu_1    = IfxCpu_Index_1,   // CPU1
+    IfxCpu_ResourceCpu_none = IfxCpu_Index_none // 无CPU
+} IfxCpu_ResourceCpu;
+
+
+struct
+typedef struct
+{
+    uint32  counter;        // 计数器值
+    boolean overlfow;       // 溢出标志
+} IfxCpu_Counter;
+
+typedef struct
+{
+    IfxCpu_Counter instruction;       // 指令计数器
+    IfxCpu_Counter clock;             // CPU时钟计数器
+    IfxCpu_Counter counter1;          // 多功能计数器1
+    IfxCpu_Counter counter2;          // 多功能计数器2
+    IfxCpu_Counter counter3;          // 多功能计数器3
+} IfxCpu_Perf;
+
+
+important functions
+CPU核心模式函数
+IfxCpu_CoreMode IfxCpu_getCoreMode(Ifx_CPU *cpu);  // 获取CPU当前模式
+boolean IfxCpu_setCoreMode(Ifx_CPU *cpu, IfxCpu_CoreMode mode);  // 设置CPU模式
+
+CPU索引与地址函数
+IfxCpu_ResourceCpu IfxCpu_getIndex(Ifx_CPU *cpu);  // 获取CPU资源索引
+Ifx_CPU *IfxCpu_getAddress(IfxCpu_ResourceCpu cpu);  // 获取CPU硬件模块寄存器地址
+IfxCpu_ResourceCpu IfxCpu_getCoreIndex(void);  // 获取调用者CPU的核心索引
+IfxCpu_Id IfxCpu_getCoreId(void);  // 获取调用者CPU的核心ID
+
+CPU启动函数
+boolean IfxCpu_setProgramCounter(Ifx_CPU *cpu, uint32 programCounter);  // 设置CPU程序计数器
+boolean IfxCpu_startCore(Ifx_CPU *cpu, uint32 programCounter);  // 设置程序计数器并启动CPU
+
+CPU中断管理函数
+boolean IfxCpu_disableInterrupts(void);  // 禁用全局中断并返回先前状态
+void IfxCpu_enableInterrupts(void);  // 启用全局中断
+void IfxCpu_restoreInterrupts(boolean enabled);  // 恢复全局中断状态
+boolean IfxCpu_areInterruptsEnabled(void);  // 获取全局中断使能状态
+
+CPU互斥锁与自旋锁函数
+boolean IfxCpu_acquireMutex(IfxCpu_mutexLock *lock);  // 获取互斥锁
+void IfxCpu_releaseMutex(IfxCpu_mutexLock *lock);  // 释放互斥锁
+boolean IfxCpu_setSpinLock(IfxCpu_spinLock *lock, uint32 timeoutCount);  // 以自旋模式锁定资源
+void IfxCpu_resetSpinLock(IfxCpu_spinLock *lock);  // 重置自旋锁
+
+CPU同步事件函数
+boolean IfxCpu_waitEvent(IfxCpu_syncEvent *event, uint32 timeoutMilliSec);  // 等待同步事件
+void IfxCpu_emitEvent(IfxCpu_syncEvent *event);  // 设置当前核心对应的事件位
+
+随机数函数
+uint32 IfxCpu_getRandomValue(uint32 *seed);  // 获取随机值
+uint32 IfxCpu_getRandomValueWithinRange(uint32 *seed, uint32 min, uint32 max);  // 在指定范围内生成随机值
+
+
+others functions
+CPU上下文保存区域函数（非重要函数）
+void IfxCpu_initCSA(uint32 *csaBegin, uint32 *csaEnd);  // 初始化调用CPU的上下文保存区域
+
+CPU缓存管理函数（非重要函数）
+void IfxCpu_setDataCache(boolean enable);  // 启用或绕过数据缓存
+void IfxCpu_setProgramCache(boolean enable);  // 启用或绕过程序缓存
+void IfxCpu_enableSegmentSpecificDataAccessCacheability(uint16 segmentNumberMask, boolean enable);  // 启用/禁用选定段的数据缓存能力
+void IfxCpu_enableSegmentSpecificInstructionAccessCacheability(uint16 segmentNumberMask, boolean enable);  // 启用/禁用选定段的指令缓存能力
+void IfxCpu_invalidateProgramCache(void);  // 使程序缓存无效
+boolean IfxCpu_isAddressCachable(void *address);  // 判断地址是否在可缓存的Flash/LMU段中
+
+CPU性能计数器函数（非重要函数）
+uint32 IfxCpu_getClockCounter(void);  // 读取CPU时钟计数器
+uint32 IfxCpu_getInstructionCounter(void);  // 读取CPU指令计数器
+uint32 IfxCpu_getPerformanceCounter(uint16 address);  // 读取性能计数器
+boolean IfxCpu_getClockCounterStickyOverflow(void);  // 获取时钟计数器粘性溢出位
+boolean IfxCpu_getInstructionCounterStickyOverflow(void);  // 获取指令计数器粘性溢出位
+boolean IfxCpu_getPerformanceCounterStickyOverflow(uint16 address);  // 获取性能计数器粘性溢出位
+void IfxCpu_resetAndStartCounters(IfxCpu_CounterMode mode);  // 重置并启动性能计数器
+void IfxCpu_setPerformanceCountersEnableBit(uint32 enable);  // 启用或禁用性能计数器
+void IfxCpu_updateClockCounter(uint32 count);  // 更新时钟计数器
+void IfxCpu_updateInstructionCounter(uint32 count);  // 更新指令计数器
+void IfxCpu_updatePerformanceCounter(uint32 address, uint32 count);  // 更新性能计数器
+IfxCpu_Perf IfxCpu_stopCounters(void);  // 停止计数器并返回其值
+
+CPU安全与复位函数（非重要函数）
+void IfxCpu_setSafetyTaskIdentifier(boolean safetyId);  // 设置或清除安全任务标识符
+void IfxCpu_triggerSwReset(void);  // 触发软件复位
+void IfxCpu_forceDisableInterrupts(void);  // 强制禁用全局中断
+
+// 与 TC38x 源文档差异：当前仓库 TC26B `IfxCpu.h` 未暴露 `IfxCpu_OverlayAddressMask`、`IfxCpu_OverlayMemorySelect`、`IfxCpu_enableOverlayBlock(...)`、`IfxCpu_disableOverlayBlock(...)`，因此目标文档不保留 overlay API。
+// 与 TC38x 源文档差异：当前仓库 TC26B `IfxCpu.h` 未暴露 `IfxCpu_ResetStatus`、`IfxCpu_triggerCpuReset(...)`、`IfxCpu_getCpuResetStatus(...)`、`IfxCpu_disableInterruptsAllExceptMaster(...)`、`IfxCpu_setAllIdleExceptMasterCpu(...)`，因此目标文档不保留这些 API。
+// 与 TC38x 源文档差异：目标 TC26B `IfxCpu_cfg.h` 只暴露两个CPU资源 `IfxCpu_ResourceCpu_0/1`，不保留源文档中面向更多核心的 `core2..core5` 相关内容。
+
+
+SRC class
+
+enum
+typedef enum
+{
+    IfxSrc_Tos_cpu0 = 0,  // CPU0中断服务提供者
+    IfxSrc_Tos_cpu1 = 1,  // CPU1中断服务提供者
+    IfxSrc_Tos_dma  = 3   // DMA中断服务提供者
+} IfxSrc_Tos;
+
+
+struct
+typedef struct Ifx_SRC_SRCR
+{
+    union
+    {
+        struct
+        {
+            uint32 SRPN:8;     // 服务请求优先级编号
+            uint32 TOS:3;      // 服务类型选择
+            uint32 :21;        // 保留位
+        } B;
+        uint32 U;              // 32位无符号整数
+    };
+} Ifx_SRC_SRCR;
+
+
+important functions
+SRC模块函数
+void IfxSrc_init(volatile Ifx_SRC_SRCR *src, IfxSrc_Tos typOfService, Ifx_Priority priority);  // 初始化服务请求控制寄存器
+void IfxSrc_enable(volatile Ifx_SRC_SRCR *src);  // 启用服务请求
+void IfxSrc_disable(volatile Ifx_SRC_SRCR *src);  // 禁用服务请求
+void IfxSrc_deinit(volatile Ifx_SRC_SRCR *src);  // 反初始化服务请求控制寄存器
+
+
+others functions
+SRC状态与请求函数（非重要函数）
+void IfxSrc_clearOverrun(volatile Ifx_SRC_SRCR *src);  // 清除服务请求溢出标志
+void IfxSrc_clearRequest(volatile Ifx_SRC_SRCR *src);  // 通过软件清除特定中断服务
+boolean IfxSrc_isOverrun(volatile Ifx_SRC_SRCR *src);  // 获取当前溢出状态
+boolean IfxSrc_isRequested(volatile Ifx_SRC_SRCR *src);  // 获取当前请求状态
+void IfxSrc_setRequest(volatile Ifx_SRC_SRCR *src);  // 通过软件请求特定中断服务
+
+// 与 TC38x 源文档差异：目标 TC26B `IfxSrc_Tos` 只暴露 `cpu0=0`、`cpu1=1`、`dma=3`，不保留源文档中的 `cpu2`、`cpu3`，且 `dma` 取值也不同。
