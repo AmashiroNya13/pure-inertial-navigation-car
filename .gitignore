@@ -22,6 +22,14 @@ Release/
 *.elf
 *.hex
 *.map
+*.obj
+*.lst
+*.crf
+*.__i
+*.lnp
+*.uvopt
+*.uvguix.*
+software/firmware/esc-ai8051u/project/mdk/out_file/
 
 # Local capture data
 software/tools/PathCapture/data/

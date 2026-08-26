@@ -15,7 +15,9 @@
 │   └── tools/
 │       ├── PathCapture/     # 串口上位机、路径上传与复现数据可视化
 │       └── path-tools/      # 节点坐标规划器、路径日志查看器
-├── hardware/              # 原理图、PCB、BOM 与接线资料
+├── hardware/
+│   ├── schematics/        # 主控原理图
+│   └── README.md          # PCB、BOM 与接线资料的发布约定
 ├── mechanical/            # CAD、装配图与机械 BOM
 ├── docs/                  # 使用、接口与调参说明
 └── archive/               # 本地导入归档，不应推送到公开仓库
@@ -52,5 +54,7 @@ software/tools/path-tools/tools/node_coordinate_viewer.html
 ## 授权状态
 
 当前尚未指定仓库整体许可证。公开前请逐项核对芯片 SDK、IDE 模板、逐飞库及其他第三方内容的原始许可证与再分发条件，再为你拥有版权的内容添加 `LICENSE`。
+
+已识别到的第三方组件和发布边界见 [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。
 
 `archive/` 存放本次整理前的原始导入压缩包，仅供本地追溯，已由 `.gitignore` 排除。

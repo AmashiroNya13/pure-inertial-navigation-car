@@ -11,6 +11,8 @@
 
 工程链接脚本为 `Lcf_Tasking_Tricore_Tc.lsl`。构建产物应生成在本机目录，已由仓库根目录 `.gitignore` 排除。
 
+主控原理图位于仓库根目录的 `hardware/schematics/`，不再混放在固件目录。
+
 ## 主要模块
 
 | 路径 | 职责 |
