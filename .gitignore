@@ -24,10 +24,10 @@ Release/
 *.map
 
 # Local capture data
-software/PathCapture/data/
+software/tools/PathCapture/data/
 
 # Vendor reference PDFs remain in the local source project.
-firmware/main-controller/docs/datasheets/
+software/firmware/main-controller/docs/datasheets/
 
 # OS files
 .DS_Store
