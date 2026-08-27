@@ -8,6 +8,7 @@
 > - [纯惯导软件设计说明](docs/INERTIAL_NAVIGATION_SOFTWARE.md)：IMU、编码器、双自由度角度环、速度前馈、路径与修正思路。
 > - [纯惯导机械设计说明](docs/INERTIAL_NAVIGATION_MECHANICAL.md)：电机、负压、结构、减振、底盘和装配经验。
 > - [纯惯导硬件设计说明](docs/INERTIAL_NAVIGATION_HARDWARE.md)：电调、双 IMU、屏蔽、编码器连接和后续硬件方向。
+> - [机械采购与加工清单（Excel）](docs/MECHANICAL_PROCUREMENT_LIST.xlsx)：采购链接、CNC/3D 打印需求、在售核验与下单规格。
 
 ## 目录
 
