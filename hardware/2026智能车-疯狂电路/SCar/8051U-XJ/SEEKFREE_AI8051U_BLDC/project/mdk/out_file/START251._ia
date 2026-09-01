@@ -1,0 +1,1 @@
+"..\..\libraries\zf_common\START251.A51" MODSRC INTR2 INCDIR(..\..\libraries\zf_common) SET (XSMALL) DEBUG PRINT(.\out_file\START251.lst) OBJECT(.\out_file\START251.obj) EP
